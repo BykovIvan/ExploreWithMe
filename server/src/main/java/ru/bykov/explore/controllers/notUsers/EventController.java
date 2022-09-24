@@ -22,13 +22,13 @@ public class EventController {
     @GetMapping
     public List<EventShortDto> allEvents() {
         log.info("Получен запрос к эндпоинту /events получение всех. Метод GET");
-        return eventService.getAll();
+        return eventService.getAllForAll();
     }
 
     @GetMapping("/{eventId}")
     public CategoryDto categoryById(@PathVariable("eventId") Long eventId) {
         log.info("Получен запрос к эндпоинту /events получение по id. Метод GET");
-        return eventService.getById(eventId);
+        return eventService.getByIdForAll(eventId);
     }
 
 }
