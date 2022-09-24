@@ -10,7 +10,9 @@ import javax.persistence.*;
 @Getter
 @Setter
 @Entity
-@Table(name = "categories", schema = "public", uniqueConstraints = @UniqueConstraint(columnNames = "name"))
+@Table(name = "categories",
+        schema = "public",
+        uniqueConstraints = @UniqueConstraint(columnNames = "name"))
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

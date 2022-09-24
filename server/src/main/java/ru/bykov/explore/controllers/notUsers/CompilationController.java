@@ -1,4 +1,4 @@
-package ru.bykov.explore.controllers;
+package ru.bykov.explore.controllers.notUsers;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,8 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping(path = "admin/categories")
-public class CategoryController {
-
+@RequestMapping(path = "/users")
+public class CompilationController {
 
 }

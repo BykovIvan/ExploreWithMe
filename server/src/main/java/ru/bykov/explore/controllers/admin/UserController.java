@@ -1,10 +1,10 @@
-package ru.bykov.explore.controllers;
+package ru.bykov.explore.controllers.admin;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.bykov.explore.model.User;
-import ru.bykov.explore.services.UserService;
+import ru.bykov.explore.model.dto.user.UserDto;
+import ru.bykov.explore.services.user.UserService;
 
 import javax.transaction.Transactional;
 
@@ -18,13 +18,13 @@ public class UserController {
 
     @PostMapping
     @Transactional
-    public User create(@RequestBody User user) {
+    public UserDto create(@RequestBody UserDto userDto) {
         log.info("Получен запрос к эндпоинту /admin/users. Метод POST");
-        return userService.create(user);
+        return userService.create(userDto);
     }
 
     @GetMapping("/{userId}")
-    public User userById(@PathVariable("userId") Long userId) {
+    public UserDto userById(@PathVariable("userId") Long userId) {
         log.info("Получен запрос к эндпоинту /users получение по id. Метод GET");
         return userService.getById(userId);
     }
