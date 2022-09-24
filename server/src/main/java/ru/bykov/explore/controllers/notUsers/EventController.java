@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.bykov.explore.model.dto.CategoryDto;
 import ru.bykov.explore.model.dto.event.EventShortDto;
 import ru.bykov.explore.services.event.EventService;
 
@@ -22,13 +21,13 @@ public class EventController {
     @GetMapping
     public List<EventShortDto> allEvents() {
         log.info("Получен запрос к эндпоинту /events получение всех. Метод GET");
-        return eventService.getAllForAll();
+        return eventService.getAllForAllUsers();
     }
 
     @GetMapping("/{eventId}")
-    public CategoryDto categoryById(@PathVariable("eventId") Long eventId) {
+    public EventShortDto categoryById(@PathVariable("eventId") Long eventId) {
         log.info("Получен запрос к эндпоинту /events получение по id. Метод GET");
-        return eventService.getByIdForAll(eventId);
+        return eventService.getByIdForAllUsers(eventId);
     }
 
 }

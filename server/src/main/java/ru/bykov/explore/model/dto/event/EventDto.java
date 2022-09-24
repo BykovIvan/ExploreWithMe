@@ -22,13 +22,15 @@ public class EventDto {
     private Long confirmedRequests;
     private LocalDateTime createdOn;
     private String description;
+    private LocalDateTime eventDate;
     private UserShortDto initiator;
     private Location location;
     private Boolean paid;
     private Long participantLimit;
     private LocalDateTime publishedOn;
     private Boolean requestModeration;
-    private StateOfEvent state;
+//    private StateOfEvent state;
+    private String state;
     private String title;
     private Long views;
 }

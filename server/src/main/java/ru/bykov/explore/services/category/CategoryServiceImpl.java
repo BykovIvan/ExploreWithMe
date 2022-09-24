@@ -17,14 +17,14 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
 
     @Override
-    public List<CategoryDto> getAll() {
+    public List<CategoryDto> getAllForAllUsers() {
         return categoryRepository.findAll().stream()
                 .map(CategoryMapping::toCategoryDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public CategoryDto getById(Long id) {
+    public CategoryDto getByIdForAllUsers(Long id) {
         return CategoryMapping.toCategoryDto(categoryRepository.findById(id).orElseThrow(() -> new NotFoundException("Нет такой категории!")));
     }
 

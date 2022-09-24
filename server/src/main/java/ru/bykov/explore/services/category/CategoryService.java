@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface CategoryService {
 
-    List<CategoryDto> getAll();
+    List<CategoryDto> getAllForAllUsers();
 
-    CategoryDto getById(Long id);
+    CategoryDto getByIdForAllUsers(Long id);
 }
