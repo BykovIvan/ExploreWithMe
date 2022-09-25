@@ -1,14 +1,16 @@
-package ru.bykov.explore.services.event;
+package ru.bykov.explore.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.bykov.explore.exceptions.NotFoundException;
+import ru.bykov.explore.model.Event;
 import ru.bykov.explore.model.User;
 import ru.bykov.explore.model.dto.event.EventDto;
 import ru.bykov.explore.model.dto.event.EventRequestDto;
 import ru.bykov.explore.model.dto.event.EventShortDto;
 import ru.bykov.explore.repositories.EventRepository;
 import ru.bykov.explore.repositories.UserRepository;
+import ru.bykov.explore.services.EventService;
 import ru.bykov.explore.utils.mappingForDto.EventMapping;
 
 import java.util.List;
@@ -54,27 +56,33 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventDto findByUserIdAndEventId(Long userId, Long eventId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!"));
+
         return null;
     }
 
     @Override
-    public EventDto canselByUserIdAndEventId(Long userId, EventDto eventDto, EventDto eventDto1) {
+    public EventDto canselByUserIdAndEventId(Long userId, Long eventId, EventDto eventDto1) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!"));
         return null;
     }
 
     @Override
     public List<EventRequestDto> findRequestsByUserIdAndEventId(Long userId, Long eventId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
         return null;
     }
 
     @Override
     public EventRequestDto confirmRequestByUserIdAndEventId(Long userId, Long eventId, Long reqId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
         return null;
     }
 
     @Override
     public EventRequestDto rejectRequestByUserIdAndEventId(Long userId, Long eventId, Long reqId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
         return null;
     }
 }

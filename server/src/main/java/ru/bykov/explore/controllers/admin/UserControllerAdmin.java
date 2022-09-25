@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.bykov.explore.model.dto.user.UserDto;
-import ru.bykov.explore.services.user.UserService;
+import ru.bykov.explore.services.UserService;
 
 import javax.transaction.Transactional;
 
@@ -12,7 +12,7 @@ import javax.transaction.Transactional;
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping(path = "admin/users")
-public class UserController {
+public class UserControllerAdmin {
 
     private final UserService userService;
 

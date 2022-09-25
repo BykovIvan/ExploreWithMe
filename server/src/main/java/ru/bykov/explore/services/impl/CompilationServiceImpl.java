@@ -1,11 +1,11 @@
-package ru.bykov.explore.services.compilation;
+package ru.bykov.explore.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.bykov.explore.exceptions.NotFoundException;
-import ru.bykov.explore.model.dto.CategoryDto;
 import ru.bykov.explore.model.dto.CompilationDto;
 import ru.bykov.explore.repositories.CompilationRepository;
+import ru.bykov.explore.services.CompilationService;
 import ru.bykov.explore.utils.mappingForDto.CompilationMapping;
 
 import java.util.List;

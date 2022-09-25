@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.bykov.explore.model.dto.CategoryDto;
-import ru.bykov.explore.services.category.CategoryService;
+import ru.bykov.explore.services.CategoryService;
 
 import java.util.List;
 

@@ -1,18 +1,14 @@
-package ru.bykov.explore.controllers.admin;
+package ru.bykov.explore.controllers.users;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.bykov.explore.services.event.EventService;
 
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping(path = "admin/events")
-public class EventController {
-
-    private final EventService eventService;
-
+@RequestMapping(path = "/users")
+public class RequestControllerUser {
 
 }

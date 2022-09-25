@@ -8,6 +8,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping(path = "admin/categories")
-public class CategoryController {
+@RequestMapping(path = "admin/compilations")
+public class CompilationControllerAdmin {
 }

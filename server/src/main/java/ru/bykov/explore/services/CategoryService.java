@@ -1,4 +1,4 @@
-package ru.bykov.explore.services.category;
+package ru.bykov.explore.services;
 
 import ru.bykov.explore.model.dto.CategoryDto;
 

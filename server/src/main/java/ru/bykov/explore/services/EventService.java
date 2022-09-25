@@ -1,4 +1,4 @@
-package ru.bykov.explore.services.event;
+package ru.bykov.explore.services;
 
 import ru.bykov.explore.model.dto.event.EventDto;
 import ru.bykov.explore.model.dto.event.EventRequestDto;
@@ -21,7 +21,7 @@ public interface EventService {
 
     EventDto findByUserIdAndEventId(Long userId, Long eventId);
 
-    EventDto canselByUserIdAndEventId(Long userId, EventDto eventDto, EventDto eventDto1);
+    EventDto canselByUserIdAndEventId(Long userId, Long eventId, EventDto eventDto1);
 
     List<EventRequestDto> findRequestsByUserIdAndEventId(Long userId, Long eventId);
 

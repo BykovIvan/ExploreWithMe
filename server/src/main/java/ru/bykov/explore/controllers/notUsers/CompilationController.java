@@ -6,9 +6,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.bykov.explore.model.dto.CategoryDto;
 import ru.bykov.explore.model.dto.CompilationDto;
-import ru.bykov.explore.services.compilation.CompilationService;
+import ru.bykov.explore.services.CompilationService;
 
 import java.util.List;
 
@@ -27,7 +26,7 @@ public class CompilationController {
     }
 
     @GetMapping("/{compilationId}")
-    public CategoryDto compilationById(@PathVariable("compilationId") Long compilationId) {
+    public CompilationDto compilationById(@PathVariable("compilationId") Long compilationId) {
         log.info("Получен запрос к эндпоинту /compilations получение по id. Метод GET");
         return compilationService.getByIdForAll(compilationId);
     }

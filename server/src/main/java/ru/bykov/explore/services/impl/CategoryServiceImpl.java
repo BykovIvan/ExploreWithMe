@@ -1,10 +1,11 @@
-package ru.bykov.explore.services.category;
+package ru.bykov.explore.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.bykov.explore.exceptions.NotFoundException;
 import ru.bykov.explore.model.dto.CategoryDto;
 import ru.bykov.explore.repositories.CategoryRepository;
+import ru.bykov.explore.services.CategoryService;
 import ru.bykov.explore.utils.mappingForDto.CategoryMapping;
 
 import java.util.List;

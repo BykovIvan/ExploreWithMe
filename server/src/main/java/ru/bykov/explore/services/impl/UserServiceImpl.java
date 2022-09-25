@@ -1,4 +1,4 @@
-package ru.bykov.explore.services.user;
+package ru.bykov.explore.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -6,6 +6,7 @@ import ru.bykov.explore.exceptions.NotFoundException;
 import ru.bykov.explore.model.User;
 import ru.bykov.explore.model.dto.user.UserDto;
 import ru.bykov.explore.repositories.UserRepository;
+import ru.bykov.explore.services.UserService;
 import ru.bykov.explore.utils.mappingForDto.UserMapping;
 
 import javax.validation.Valid;

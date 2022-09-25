@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.bykov.explore.model.dto.event.EventShortDto;
-import ru.bykov.explore.services.event.EventService;
+import ru.bykov.explore.services.EventService;
 
 import java.util.List;
 
@@ -16,6 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping(path = "/events")
 public class EventController {
+
     private final EventService eventService;
 
     @GetMapping
