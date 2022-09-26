@@ -3,6 +3,7 @@ package ru.bykov.explore.controllers.users;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import ru.bykov.explore.clientstat.StatClient;
 import ru.bykov.explore.model.dto.event.EventDto;
 import ru.bykov.explore.model.dto.event.EventRequestDto;
 import ru.bykov.explore.services.EventService;
@@ -20,6 +21,8 @@ public class EventControllerUser {
     @GetMapping("/{userId}/events")
     public List<EventDto> userById(@PathVariable("userId") Long userId) {
         log.info("Получен запрос к эндпоинту /users/{userID}/events получение событий пользователя. Метод GET");
+        //нужна запись в статистику
+//        statClient.createStat();
         return eventService.findByUserId(userId);
     }
 
@@ -41,6 +44,8 @@ public class EventControllerUser {
     public EventDto eventById(@PathVariable("userId") Long userId,
                               @PathVariable("eventId") Long eventId) {
         log.info("Получен запрос к эндпоинту /users/{userID}/events{eventId} получение события по id пользователя и id события. Метод GET");
+        //нужна запись в статистику
+
         return eventService.findByUserIdAndEventId(userId, eventId);
     }
 

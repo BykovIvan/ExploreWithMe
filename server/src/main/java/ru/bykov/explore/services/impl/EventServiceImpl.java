@@ -1,7 +1,10 @@
 package ru.bykov.explore.services.impl;
 
+import io.micrometer.core.instrument.Statistic;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.bykov.explore.clientstat.StatClient;
+import ru.bykov.explore.clientstat.StatisticDto;
 import ru.bykov.explore.exceptions.NotFoundException;
 import ru.bykov.explore.model.Event;
 import ru.bykov.explore.model.User;
@@ -23,6 +26,9 @@ public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
 
+    private final StatClient statClient;
+
+
     @Override
     public List<EventShortDto> getAllForAllUsers() {
         return eventRepository.findAll().stream()
@@ -38,6 +44,10 @@ public class EventServiceImpl implements EventService {
     @Override
     public List<EventDto> findByUserId(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
+        //Принимать в методе все параметры, делать из него СтатикДто
+        StatisticDto statisticDto = StatisticDto.builder()
+                .build();
+        statClient.createStat(statisticDto);
         return null;
     }
 
