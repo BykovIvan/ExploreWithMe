@@ -1,15 +1,20 @@
 package ru.bykov.explore.services.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.bykov.explore.exceptions.NotFoundException;
 import ru.bykov.explore.model.User;
 import ru.bykov.explore.model.dto.user.UserDto;
 import ru.bykov.explore.repositories.UserRepository;
 import ru.bykov.explore.services.UserService;
-import ru.bykov.explore.utils.mappingForDto.UserMapping;
+import ru.bykov.explore.utils.FromSizeSortPageable;
+import ru.bykov.explore.utils.mapperForDto.EventMapper;
+import ru.bykov.explore.utils.mapperForDto.UserMapper;
 
 import javax.validation.Valid;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -19,13 +24,20 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto create(UserDto userDto) {
-        @Valid User user = UserMapping.toUser(userDto);
-        return UserMapping.toUserDto(userRepository.save(user));
+        @Valid User user = UserMapper.toUser(userDto);
+        return UserMapper.toUserDto(userRepository.save(user));
     }
 
     @Override
-    public UserDto getById(Long id) {
-        return UserMapping.toUserDto(userRepository.findById(id).orElseThrow(() -> new NotFoundException("Нет такого пользователя!")));
+    public List<UserDto> getByParam(Long[] ids, Integer from, Integer size) {
+        for (Long id : ids) {
+            userRepository.findById(id).orElseThrow(() -> new NotFoundException("Такого пользователя не существует!"));
+        }
+
+        return userRepository.findByIdIn(ids, FromSizeSortPageable.of(from, size, Sort.by(Sort.Direction.ASC, "id")))
+                .stream()
+                .map(UserMapper::toUserDto)
+                .collect(Collectors.toList());
     }
 
     @Override

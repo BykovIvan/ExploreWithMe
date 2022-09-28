@@ -6,7 +6,7 @@ import ru.bykov.explore.exceptions.NotFoundException;
 import ru.bykov.explore.model.dto.CompilationDto;
 import ru.bykov.explore.repositories.CompilationRepository;
 import ru.bykov.explore.services.CompilationService;
-import ru.bykov.explore.utils.mappingForDto.CompilationMapping;
+import ru.bykov.explore.utils.mapperForDto.CompilationMapper;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,12 +19,12 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     public List<CompilationDto> getAllForAll() {
         return compilationRepository.findAll().stream()
-                .map(CompilationMapping::toCompilationDto)
+                .map(CompilationMapper::toCompilationDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public CompilationDto getByIdForAll(Long compilationId) {
-        return CompilationMapping.toCompilationDto(compilationRepository.findById(compilationId).orElseThrow(() -> new NotFoundException("Нет такого события!")));
+        return CompilationMapper.toCompilationDto(compilationRepository.findById(compilationId).orElseThrow(() -> new NotFoundException("Нет такого события!")));
     }
 }

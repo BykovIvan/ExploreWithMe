@@ -6,7 +6,7 @@ import ru.bykov.explore.exceptions.NotFoundException;
 import ru.bykov.explore.model.dto.CategoryDto;
 import ru.bykov.explore.repositories.CategoryRepository;
 import ru.bykov.explore.services.CategoryService;
-import ru.bykov.explore.utils.mappingForDto.CategoryMapping;
+import ru.bykov.explore.utils.mapperForDto.CategoryMapper;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,13 +20,13 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public List<CategoryDto> getAllForAllUsers() {
         return categoryRepository.findAll().stream()
-                .map(CategoryMapping::toCategoryDto)
+                .map(CategoryMapper::toCategoryDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public CategoryDto getByIdForAllUsers(Long id) {
-        return CategoryMapping.toCategoryDto(categoryRepository.findById(id).orElseThrow(() -> new NotFoundException("Нет такой категории!")));
+        return CategoryMapper.toCategoryDto(categoryRepository.findById(id).orElseThrow(() -> new NotFoundException("Нет такой категории!")));
     }
 
 

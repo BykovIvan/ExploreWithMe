@@ -1,9 +1,9 @@
-package ru.bykov.explore.utils.mappingForDto;
+package ru.bykov.explore.utils.mapperForDto;
 
 import ru.bykov.explore.model.Compilation;
 import ru.bykov.explore.model.dto.CompilationDto;
 
-public class CompilationMapping {
+public class CompilationMapper {
     public static CompilationDto toCompilationDto(Compilation compilation) {
         return CompilationDto.builder()
                 .id(compilation.getId())

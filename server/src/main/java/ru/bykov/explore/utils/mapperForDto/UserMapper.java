@@ -1,10 +1,10 @@
-package ru.bykov.explore.utils.mappingForDto;
+package ru.bykov.explore.utils.mapperForDto;
 
-import ru.bykov.explore.model.dto.user.UserDto;
 import ru.bykov.explore.model.User;
+import ru.bykov.explore.model.dto.user.UserDto;
 import ru.bykov.explore.model.dto.user.UserShortDto;
 
-public class UserMapping {
+public class UserMapper {
     public static UserDto toUserDto(User user) {
         return UserDto.builder()
                 .id(user.getId())

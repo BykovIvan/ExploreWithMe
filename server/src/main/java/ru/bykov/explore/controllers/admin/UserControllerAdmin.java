@@ -7,6 +7,7 @@ import ru.bykov.explore.model.dto.user.UserDto;
 import ru.bykov.explore.services.UserService;
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -23,15 +24,17 @@ public class UserControllerAdmin {
         return userService.create(userDto);
     }
 
-    @GetMapping("/{userId}")
-    public UserDto userById(@PathVariable("userId") Long userId) {
-        log.info("Получен запрос к эндпоинту /users получение по id. Метод GET");
-        return userService.getById(userId);
+    @GetMapping()
+    public List<UserDto> userById(@RequestParam(value = "ids") Long[] ids,
+                                  @RequestParam(value = "from", required = false, defaultValue = "0") Integer from,
+                                  @RequestParam(value = "size", required = false, defaultValue = "10") Integer size) {
+        log.info("Получен запрос к эндпоинту /admin/users получение пользователей по param. Метод GET");
+        return userService.getByParam(ids, from, size);
     }
 
     @DeleteMapping("/{userId}")
     public void deleteById(@PathVariable("userId") Long userId) {
-        log.info("Получен запрос к эндпоинту /users удаление по id. Метод DELETE");
+        log.info("Получен запрос к эндпоинту /users удаление по id {}. Метод DELETE", userId);
         userService.deleteById(userId);
     }
 }

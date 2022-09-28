@@ -8,9 +8,9 @@ import java.util.List;
 
 public interface EventService {
 
-    List<EventShortDto> getAllForAllUsers();
+    List<EventShortDto> getAllForAllUsers(String text, String[] categories, Boolean paid, String rangeStart, String rangeEnd, Boolean onlyAvailable, String sort, Integer from, Integer size);
 
-    EventShortDto getByIdForAllUsers(Long eventId);
+    EventDto getByIdForAllUsers(Long eventId);
 
     //Получение событий, добавленых текущим пользователем
     List<EventDto> findByUserId(Long userId);
@@ -28,5 +28,6 @@ public interface EventService {
     EventRequestDto confirmRequestByUserIdAndEventId(Long userId, Long eventId, Long reqId);
 
     EventRequestDto rejectRequestByUserIdAndEventId(Long userId, Long eventId, Long reqId);
+
 
 }

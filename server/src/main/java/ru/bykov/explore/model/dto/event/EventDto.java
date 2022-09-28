@@ -5,9 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.bykov.explore.model.Category;
-import ru.bykov.explore.model.Location;
+import ru.bykov.explore.model.dto.LocationDto;
 import ru.bykov.explore.model.dto.user.UserShortDto;
-import ru.bykov.explore.utils.StateOfEvent;
 
 import java.time.LocalDateTime;
 
@@ -24,12 +23,12 @@ public class EventDto {
     private String description;
     private LocalDateTime eventDate;
     private UserShortDto initiator;
-    private Location location;
+    private LocationDto location;
     private Boolean paid;
     private Long participantLimit;
     private LocalDateTime publishedOn;
     private Boolean requestModeration;
-//    private StateOfEvent state;
+    //    private StateOfEvent state;
     private String state;
     private String title;
     private Long views;

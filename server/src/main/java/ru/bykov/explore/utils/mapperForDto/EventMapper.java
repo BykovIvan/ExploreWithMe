@@ -1,10 +1,10 @@
-package ru.bykov.explore.utils.mappingForDto;
+package ru.bykov.explore.utils.mapperForDto;
 
 import ru.bykov.explore.model.Event;
 import ru.bykov.explore.model.dto.event.EventDto;
 import ru.bykov.explore.model.dto.event.EventShortDto;
 
-public class EventMapping {
+public class EventMapper {
     public static EventDto toEventDto(Event event) {
         return EventDto.builder()
                 .id(event.getId())

@@ -1,10 +1,11 @@
 package ru.bykov.explore.services.impl;
 
-import io.micrometer.core.instrument.Statistic;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.bykov.explore.clientstat.StatClient;
 import ru.bykov.explore.clientstat.StatisticDto;
+import ru.bykov.explore.exceptions.NoParamInRequestException;
 import ru.bykov.explore.exceptions.NotFoundException;
 import ru.bykov.explore.model.Event;
 import ru.bykov.explore.model.User;
@@ -14,7 +15,8 @@ import ru.bykov.explore.model.dto.event.EventShortDto;
 import ru.bykov.explore.repositories.EventRepository;
 import ru.bykov.explore.repositories.UserRepository;
 import ru.bykov.explore.services.EventService;
-import ru.bykov.explore.utils.mappingForDto.EventMapping;
+import ru.bykov.explore.utils.FromSizeSortPageable;
+import ru.bykov.explore.utils.mapperForDto.EventMapper;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,20 +27,30 @@ public class EventServiceImpl implements EventService {
 
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
-
     private final StatClient statClient;
 
-
     @Override
-    public List<EventShortDto> getAllForAllUsers() {
-        return eventRepository.findAll().stream()
-                .map(EventMapping::toEventShortDto)
+    public List<EventShortDto> getAllForAllUsers(String text, String[] categories, Boolean paid, String rangeStart, String rangeEnd, Boolean onlyAvailable, String sort, Integer from, Integer size) {
+        if (text == null || categories == null || paid == null || rangeStart == null || rangeEnd == null) {
+            throw new NoParamInRequestException("Плохо составленый запрос!");
+        }
+        if (from < 0 || size <= 0) {
+            throw new NoParamInRequestException("Введены неверные параметры!");
+        }
+        if (!sort.equals("EVENT_DATE") || !sort.equals("VIEWS")){
+            throw new NoParamInRequestException("Введены неверные параметры!");
+        }
+        //сделать запрос в бд
+        return eventRepository.findByParam(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, FromSizeSortPageable.of(from, size, Sort.by(Sort.Direction.DESC, sort)))
+                .stream()
+                .map(EventMapper::toEventShortDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public EventShortDto getByIdForAllUsers(Long eventId) {
-        return EventMapping.toEventShortDto(eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!")));
+    public EventDto getByIdForAllUsers(Long eventId) {
+        //добавить проверки для выставления ошибок
+        return EventMapper.toEventDto(eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!")));
     }
 
     @Override
