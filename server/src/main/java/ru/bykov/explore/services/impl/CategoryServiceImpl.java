@@ -2,12 +2,15 @@ package ru.bykov.explore.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.bykov.explore.exceptions.NoParamInRequestException;
 import ru.bykov.explore.exceptions.NotFoundException;
+import ru.bykov.explore.model.Category;
 import ru.bykov.explore.model.dto.CategoryDto;
 import ru.bykov.explore.repositories.CategoryRepository;
 import ru.bykov.explore.services.CategoryService;
 import ru.bykov.explore.utils.mapperForDto.CategoryMapper;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,5 +32,28 @@ public class CategoryServiceImpl implements CategoryService {
         return CategoryMapper.toCategoryDto(categoryRepository.findById(id).orElseThrow(() -> new NotFoundException("Нет такой категории!")));
     }
 
+    @Override
+    public CategoryDto createByAdmin(CategoryDto categoryDto) {
+        @Valid Category category = CategoryMapper.toCategory(categoryDto);
+        return CategoryMapper.toCategoryDto(categoryRepository.save(category));
+    }
 
+    @Override
+    public CategoryDto updateByAdmin(CategoryDto categoryDto) {
+        if (categoryDto.getId() == null || categoryDto.getName() == null){
+            throw new NoParamInRequestException("Введены неверные параметры!");
+        }
+        Category category = categoryRepository.findById(categoryDto.getId()).orElseThrow(() -> new NotFoundException("Нет такой категории!"));
+        category.setName(categoryDto.getName());
+        return CategoryMapper.toCategoryDto(categoryRepository.save(category));
+    }
+
+    @Override
+    public void deleteByAdminByCatId(Long catId) {
+        if (catId == null){
+            throw new NoParamInRequestException("Введены неверные параметры!");
+        }
+        categoryRepository.findById(catId).orElseThrow(() -> new NotFoundException("Нет такой категории!"));
+        categoryRepository.deleteById(catId);
+    }
 }

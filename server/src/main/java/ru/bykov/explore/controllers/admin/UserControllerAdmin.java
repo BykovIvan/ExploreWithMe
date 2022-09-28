@@ -34,7 +34,7 @@ public class UserControllerAdmin {
 
     @DeleteMapping("/{userId}")
     public void deleteById(@PathVariable("userId") Long userId) {
-        log.info("Получен запрос к эндпоинту /users удаление по id {}. Метод DELETE", userId);
+        log.info("Получен запрос к эндпоинту /admin/users удаление по id {}. Метод DELETE", userId);
         userService.deleteById(userId);
     }
 }
