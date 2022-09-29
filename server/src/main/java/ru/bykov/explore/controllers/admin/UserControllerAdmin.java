@@ -21,7 +21,7 @@ public class UserControllerAdmin {
     @Transactional
     public UserDto create(@RequestBody UserDto userDto) {
         log.info("Получен запрос к эндпоинту /admin/users. Метод POST");
-        return userService.create(userDto);
+        return userService.createFromAdmin(userDto);
     }
 
     @GetMapping()
@@ -29,12 +29,12 @@ public class UserControllerAdmin {
                                   @RequestParam(value = "from", required = false, defaultValue = "0") Integer from,
                                   @RequestParam(value = "size", required = false, defaultValue = "10") Integer size) {
         log.info("Получен запрос к эндпоинту /admin/users получение пользователей по param. Метод GET");
-        return userService.getByParam(ids, from, size);
+        return userService.getByParamFromAdmin(ids, from, size);
     }
 
     @DeleteMapping("/{userId}")
     public void deleteById(@PathVariable("userId") Long userId) {
         log.info("Получен запрос к эндпоинту /admin/users удаление по id {}. Метод DELETE", userId);
-        userService.deleteById(userId);
+        userService.deleteByIdFromAdmin(userId);
     }
 }

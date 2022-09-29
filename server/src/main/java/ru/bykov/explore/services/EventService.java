@@ -1,6 +1,7 @@
 package ru.bykov.explore.services;
 
 import ru.bykov.explore.model.dto.event.EventDto;
+import ru.bykov.explore.model.dto.event.NewEventDto;
 import ru.bykov.explore.model.dto.event.EventRequestDto;
 import ru.bykov.explore.model.dto.event.EventShortDto;
 
@@ -29,5 +30,11 @@ public interface EventService {
 
     EventRequestDto rejectRequestByUserIdAndEventId(Long userId, Long eventId, Long reqId);
 
+    List<EventDto> getByParamFromAdmin(Long[] users, String[] states, Long[] categories, String rangeStart, String rangeEnd, Integer from, Integer size);
 
+    EventDto updateByIdFromAdmin(Long eventId, NewEventDto newEventDto);
+
+    EventDto publishEventByIdFromAdmin(Long eventId);
+
+    EventDto rejectEventByIdFromAdmin(Long eventId);
 }

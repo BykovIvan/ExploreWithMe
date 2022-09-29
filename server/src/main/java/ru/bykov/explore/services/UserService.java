@@ -6,9 +6,9 @@ import java.util.List;
 
 public interface UserService {
 
-    UserDto create(UserDto userDto);
+    UserDto createFromAdmin(UserDto userDto);
 
-    void deleteById(Long userId);
+    void deleteByIdFromAdmin(Long userId);
 
-    List<UserDto> getByParam(Long[] ids, Integer from, Integer size);
+    List<UserDto> getByParamFromAdmin(Long[] ids, Integer from, Integer size);
 }

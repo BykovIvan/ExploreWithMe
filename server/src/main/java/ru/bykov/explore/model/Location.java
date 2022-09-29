@@ -13,6 +13,8 @@ import javax.persistence.*;
 @Table(name = "locations",
         schema = "public")
 public class Location {
+
+    //возможно убать id и сделать ключ по 2 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

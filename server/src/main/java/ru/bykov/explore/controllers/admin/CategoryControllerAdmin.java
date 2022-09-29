@@ -17,19 +17,19 @@ public class CategoryControllerAdmin {
     @PostMapping()
     public CategoryDto create (@RequestBody CategoryDto categoryDto){
         log.info("Получен запрос к эндпоинту /admin/categories метод POST");
-        return categoryService.createByAdmin(categoryDto);
+        return categoryService.createFromAdmin(categoryDto);
     }
 
     @PatchMapping
     public CategoryDto update(@RequestBody CategoryDto categoryDto){
         log.info("Получен запрос к эндпоинту /admin/categories метод POST");
-        return categoryService.updateByAdmin(categoryDto);
+        return categoryService.updateFromAdmin(categoryDto);
     }
 
     @DeleteMapping("/{catId}")
     public void deleteById(@PathVariable("catId") Long catId) {
         log.info("Получен запрос к эндпоинту /admin/categories удаление по id {}. Метод DELETE", catId);
-        categoryService.deleteByAdminByCatId(catId);
+        categoryService.deleteByAdminFromCatId(catId);
     }
 
 

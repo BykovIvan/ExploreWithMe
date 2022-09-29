@@ -33,19 +33,19 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     @Override
-    public CompilationDto createByAdmin(CompilationDto compilationDto) {
+    public CompilationDto createFromAdmin(CompilationDto compilationDto) {
         @Valid Compilation compilation = CompilationMapper.toCompilation(compilationDto);
         return CompilationMapper.toCompilationDto(compilationRepository.save(compilation));
     }
 
     @Override
-    public void deleteByIdByAdmin(Long compId) {
+    public void deleteByIdFromAdmin(Long compId) {
         compilationRepository.findById(compId).orElseThrow(() -> new NotFoundException("Нет такой подборки!"));
         compilationRepository.deleteById(compId);
     }
 
     @Override
-    public void deleteEventFromCompByAdmin(Long compId, Long eventId) {
+    public void deleteEventFromCompFromAdmin(Long compId, Long eventId) {
         Compilation compilation = compilationRepository.findById(compId).orElseThrow(() -> new NotFoundException("Нет такой подборки!"));
         compilation.getEvents().removeIf(nextEvent -> nextEvent.getId() == (eventId));
 

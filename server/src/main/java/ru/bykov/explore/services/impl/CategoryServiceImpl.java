@@ -33,13 +33,13 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryDto createByAdmin(CategoryDto categoryDto) {
+    public CategoryDto createFromAdmin(CategoryDto categoryDto) {
         @Valid Category category = CategoryMapper.toCategory(categoryDto);
         return CategoryMapper.toCategoryDto(categoryRepository.save(category));
     }
 
     @Override
-    public CategoryDto updateByAdmin(CategoryDto categoryDto) {
+    public CategoryDto updateFromAdmin(CategoryDto categoryDto) {
         if (categoryDto.getId() == null || categoryDto.getName() == null){
             throw new NoParamInRequestException("Введены неверные параметры!");
         }
@@ -49,7 +49,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public void deleteByAdminByCatId(Long catId) {
+    public void deleteFromAdminByCatId(Long catId) {
         if (catId == null){
             throw new NoParamInRequestException("Введены неверные параметры!");
         }

@@ -23,13 +23,13 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    public UserDto create(UserDto userDto) {
+    public UserDto createFromAdmin(UserDto userDto) {
         @Valid User user = UserMapper.toUser(userDto);
         return UserMapper.toUserDto(userRepository.save(user));
     }
 
     @Override
-    public List<UserDto> getByParam(Long[] ids, Integer from, Integer size) {
+    public List<UserDto> getByParamFromAdmin(Long[] ids, Integer from, Integer size) {
         for (Long id : ids) {
             userRepository.findById(id).orElseThrow(() -> new NotFoundException("Такого пользователя не существует!"));
         }
@@ -41,7 +41,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteById(Long userId) {
+    public void deleteByIdFromAdmin(Long userId) {
         userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Такого пользователя не существует!"));
         userRepository.deleteById(userId);
     }

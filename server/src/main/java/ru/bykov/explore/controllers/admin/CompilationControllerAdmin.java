@@ -19,21 +19,21 @@ public class CompilationControllerAdmin {
     @PostMapping
     public CompilationDto create(@RequestBody CompilationDto compilationDto){
         log.info("Получен запрос к эндпоинту /admin/compilations метод POST");
-        return compilationService.createByAdmin(compilationDto);
+        return compilationService.createFromAdmin(compilationDto);
     }
 
     @DeleteMapping("/{compId}")
     public void deleteById(@PathVariable("compId") Long compId){
         log.info("Получен запрос к эндпоинту /admin/compilations метод Delete по id = {}", compId);
-        compilationService.deleteByIdByAdmin(compId);
+        compilationService.deleteByIdFromAdmin(compId);
     }
 
     //удаление события из подборки
     @DeleteMapping("/{compId}/events/{eventId}")
-    public void deleteEventFromCompByAdmin(@PathVariable("compId") Long compId,
+    public void deleteEventFromCompFromAdmin(@PathVariable("compId") Long compId,
                                            @PathVariable("eventId") Long eventId){
         log.info("Получен запрос к эндпоинту /admin/compilations/{compId}/events/{eventId} метод Delete, удаление события id = {} из подборки id = {}", eventId , compId);
-        compilationService.deleteEventFromCompByAdmin(compId, eventId);
+        compilationService.deleteEventFromCompFromAdmin(compId, eventId);
     }
 
 }

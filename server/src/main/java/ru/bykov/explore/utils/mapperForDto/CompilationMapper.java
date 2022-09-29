@@ -11,6 +11,8 @@ public class CompilationMapper {
                 .build();
     }
 
+
+    //TODO сделать по тз
     public static Compilation toCompilation(CompilationDto compilationDto) {
         return Compilation.builder()
                 .events(compilationDto.getEvents())

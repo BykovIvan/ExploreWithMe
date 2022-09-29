@@ -10,9 +10,9 @@ public interface CompilationService {
 
     CompilationDto getByIdForAll(Long compilationId);
 
-    CompilationDto createByAdmin(CompilationDto compilationDto);
+    CompilationDto createFromAdmin(CompilationDto compilationDto);
 
-    void deleteByIdByAdmin(Long compId);
+    void deleteByIdFromAdmin(Long compId);
 
-    void deleteEventFromCompByAdmin(Long compId, Long eventId);
+    void deleteEventFromCompFromAdmin(Long compId, Long eventId);
 }

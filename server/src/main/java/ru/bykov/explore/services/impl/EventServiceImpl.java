@@ -10,6 +10,7 @@ import ru.bykov.explore.exceptions.NotFoundException;
 import ru.bykov.explore.model.Event;
 import ru.bykov.explore.model.User;
 import ru.bykov.explore.model.dto.event.EventDto;
+import ru.bykov.explore.model.dto.event.NewEventDto;
 import ru.bykov.explore.model.dto.event.EventRequestDto;
 import ru.bykov.explore.model.dto.event.EventShortDto;
 import ru.bykov.explore.repositories.EventRepository;
@@ -99,12 +100,40 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventRequestDto confirmRequestByUserIdAndEventId(Long userId, Long eventId, Long reqId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!"));
         return null;
     }
 
     @Override
     public EventRequestDto rejectRequestByUserIdAndEventId(Long userId, Long eventId, Long reqId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!"));
         return null;
     }
+
+    @Override
+    public List<EventDto> getByParamFromAdmin(Long[] users, String[] states, Long[] categories, String rangeStart, String rangeEnd, Integer from, Integer size) {
+
+        return null;
+    }
+
+    @Override
+    public EventDto updateByIdFromAdmin(Long eventId, NewEventDto newEventDto) {
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!"));
+
+        return null;
+    }
+
+    @Override
+    public EventDto publishEventByIdFromAdmin(Long eventId) {
+        //дата начала события должна быть не ранее чем за час от даты публикации.
+        //событие должно быть в состоянии ожидания публикации
+        return null;
+    }
+
+    @Override
+    public EventDto rejectEventByIdFromAdmin(Long eventId) {
+        return null;
+    }
+
 }
