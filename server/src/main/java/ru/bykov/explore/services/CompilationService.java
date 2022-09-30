@@ -15,4 +15,10 @@ public interface CompilationService {
     void deleteByIdFromAdmin(Long compId);
 
     void deleteEventFromCompFromAdmin(Long compId, Long eventId);
+
+    void addEventToCompFromAdmin(Long compId, Long eventId);
+
+    void deleteCompFromMainPageFromAdmin(Long compId);
+
+    void addCompFromMainPageFromAdmin(Long compId);
 }

@@ -29,7 +29,7 @@ public class CategoryControllerAdmin {
     @DeleteMapping("/{catId}")
     public void deleteById(@PathVariable("catId") Long catId) {
         log.info("Получен запрос к эндпоинту /admin/categories удаление по id {}. Метод DELETE", catId);
-        categoryService.deleteByAdminFromCatId(catId);
+        categoryService.deleteFromAdminByCatId(catId);
     }
 
 
