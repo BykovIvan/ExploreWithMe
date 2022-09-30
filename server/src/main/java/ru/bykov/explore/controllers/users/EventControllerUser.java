@@ -8,6 +8,7 @@ import ru.bykov.explore.model.dto.event.EventDto;
 import ru.bykov.explore.model.dto.event.EventRequestDto;
 import ru.bykov.explore.services.EventService;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -19,11 +20,16 @@ public class EventControllerUser {
     private final EventService eventService;
 
     @GetMapping("/{userId}/events")
-    public List<EventDto> userById(@PathVariable("userId") Long userId) {
+    public List<EventDto> userById(@PathVariable("userId") Long userId, HttpServletRequest request) {
         log.info("Получен запрос к эндпоинту /users/{userID}/events получение событий пользователя. Метод GET");
         //нужна запись в статистику
 //        statClient.createStat();
-        return eventService.findByUserId(userId);
+//        @GetMapping("/some/path/{id}")
+//        public void logIPAndPath(@PathVariable long id, HttpServletRequest request) {
+//            log.info("client ip: {}", request.getRemoteAddr());
+//            log.info("endpoint path: {}", request.getRequestURI());
+//        }
+        return eventService.findByUserId(userId, request.getRemoteAddr(), request.getRequestURI());
     }
 
     @PatchMapping("/{userId}/events")

@@ -22,4 +22,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 //            "and b.start < ?2 " +
 //            "and b.end > ?2 ")
 //    Page<Booking> findByBookerIdByUserId(Long bookerId, Timestamp timestamp, Pageable pageable);
+
+//    @Query("select u from User u " +
+//            "where u.id IN (:ids)")
 }

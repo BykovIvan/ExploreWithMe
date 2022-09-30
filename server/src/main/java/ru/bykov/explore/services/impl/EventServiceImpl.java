@@ -19,6 +19,8 @@ import ru.bykov.explore.services.EventService;
 import ru.bykov.explore.utils.FromSizeSortPageable;
 import ru.bykov.explore.utils.mapperForDto.EventMapper;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,6 +28,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class EventServiceImpl implements EventService {
 
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
     private final StatClient statClient;
@@ -55,6 +58,20 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    public List<EventDto> findByUserId(Long userId, String remoteAddr, String requestURI) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
+        //Принимать в методе все параметры, делать из него СтатикДто
+        StatisticDto statisticDto = StatisticDto.builder()
+                .app("EventService")
+                .uri(requestURI)
+                .ip(remoteAddr)
+                .timestamp(LocalDateTime.now().format(formatter))
+                .build();
+        statClient.createStat(statisticDto);
+        return null;
+    }
+
+//    @Override
     public List<EventDto> findByUserId(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
         //Принимать в методе все параметры, делать из него СтатикДто

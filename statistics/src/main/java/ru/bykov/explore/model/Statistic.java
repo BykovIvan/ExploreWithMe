@@ -3,7 +3,6 @@ package ru.bykov.explore.model;
 import lombok.*;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 
 @Builder
 @AllArgsConstructor
@@ -20,5 +19,5 @@ public class Statistic {
     private String app;
     private String uri;
     private String ip;
-    private LocalDateTime timestamp;
+    private String timestamp;
 }

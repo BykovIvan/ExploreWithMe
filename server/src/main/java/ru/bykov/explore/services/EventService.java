@@ -14,7 +14,8 @@ public interface EventService {
     EventDto getByIdForAllUsers(Long eventId);
 
     //Получение событий, добавленых текущим пользователем
-    List<EventDto> findByUserId(Long userId);
+//    List<EventDto> findByUserId(Long userId);
+    List<EventDto> findByUserId(Long userId, String remoteAddr, String requestURI);
 
     EventDto updateByUserId(Long userId, EventDto eventDto);
 
@@ -37,4 +38,5 @@ public interface EventService {
     EventDto publishEventByIdFromAdmin(Long eventId);
 
     EventDto rejectEventByIdFromAdmin(Long eventId);
+
 }

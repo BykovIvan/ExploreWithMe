@@ -40,7 +40,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDto updateFromAdmin(CategoryDto categoryDto) {
-        if (categoryDto.getId() == null || categoryDto.getName() == null){
+        if (categoryDto.getId() == null || categoryDto.getName() == null) {
             throw new NoParamInRequestException("Введены неверные параметры!");
         }
         Category category = categoryRepository.findById(categoryDto.getId()).orElseThrow(() -> new NotFoundException("Нет такой категории!"));
@@ -50,7 +50,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void deleteFromAdminByCatId(Long catId) {
-        if (catId == null){
+        if (catId == null) {
             throw new NoParamInRequestException("Введены неверные параметры!");
         }
         categoryRepository.findById(catId).orElseThrow(() -> new NotFoundException("Нет такой категории!"));
