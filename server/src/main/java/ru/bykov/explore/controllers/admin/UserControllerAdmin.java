@@ -18,6 +18,7 @@ public class UserControllerAdmin {
     private final UserService userService;
 
     @PostMapping
+    //TODO проверить нужна ли транзакция
     @Transactional
     public UserDto create(@RequestBody UserDto userDto) {
         log.info("Получен запрос к эндпоинту /admin/users. Метод POST");

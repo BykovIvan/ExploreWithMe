@@ -4,12 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.bykov.explore.exceptions.NotFoundException;
+import ru.bykov.explore.services.UserService;
 import ru.bykov.explore.model.User;
 import ru.bykov.explore.model.dto.user.UserDto;
 import ru.bykov.explore.repositories.UserRepository;
-import ru.bykov.explore.services.UserService;
 import ru.bykov.explore.utils.FromSizeSortPageable;
-import ru.bykov.explore.utils.mapperForDto.EventMapper;
 import ru.bykov.explore.utils.mapperForDto.UserMapper;
 
 import javax.validation.Valid;

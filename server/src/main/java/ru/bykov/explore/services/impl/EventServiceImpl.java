@@ -11,7 +11,7 @@ import ru.bykov.explore.model.Event;
 import ru.bykov.explore.model.User;
 import ru.bykov.explore.model.dto.event.EventDto;
 import ru.bykov.explore.model.dto.event.NewEventDto;
-import ru.bykov.explore.model.dto.event.EventRequestDto;
+import ru.bykov.explore.model.dto.RequestDto;
 import ru.bykov.explore.model.dto.event.EventShortDto;
 import ru.bykov.explore.repositories.EventRepository;
 import ru.bykov.explore.repositories.UserRepository;
@@ -109,20 +109,20 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public List<EventRequestDto> findRequestsByUserIdAndEventId(Long userId, Long eventId) {
+    public List<RequestDto> findRequestsByUserIdAndEventId(Long userId, Long eventId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
         return null;
     }
 
     @Override
-    public EventRequestDto confirmRequestByUserIdAndEventId(Long userId, Long eventId, Long reqId) {
+    public RequestDto confirmRequestByUserIdAndEventId(Long userId, Long eventId, Long reqId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!"));
         return null;
     }
 
     @Override
-    public EventRequestDto rejectRequestByUserIdAndEventId(Long userId, Long eventId, Long reqId) {
+    public RequestDto rejectRequestByUserIdAndEventId(Long userId, Long eventId, Long reqId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!"));
         return null;

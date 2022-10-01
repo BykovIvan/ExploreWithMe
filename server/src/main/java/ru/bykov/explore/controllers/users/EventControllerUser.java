@@ -3,9 +3,8 @@ package ru.bykov.explore.controllers.users;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.bykov.explore.clientstat.StatClient;
 import ru.bykov.explore.model.dto.event.EventDto;
-import ru.bykov.explore.model.dto.event.EventRequestDto;
+import ru.bykov.explore.model.dto.RequestDto;
 import ru.bykov.explore.services.EventService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,13 +21,8 @@ public class EventControllerUser {
     @GetMapping("/{userId}/events")
     public List<EventDto> userById(@PathVariable("userId") Long userId, HttpServletRequest request) {
         log.info("Получен запрос к эндпоинту /users/{userID}/events получение событий пользователя. Метод GET");
-        //нужна запись в статистику
-//        statClient.createStat();
-//        @GetMapping("/some/path/{id}")
-//        public void logIPAndPath(@PathVariable long id, HttpServletRequest request) {
-//            log.info("client ip: {}", request.getRemoteAddr());
-//            log.info("endpoint path: {}", request.getRequestURI());
-//        }
+        log.info("client ip: {}", request.getRemoteAddr());
+        log.info("endpoint path: {}", request.getRequestURI());
         return eventService.findByUserId(userId, request.getRemoteAddr(), request.getRequestURI());
     }
 
@@ -66,24 +60,24 @@ public class EventControllerUser {
 
     //Получение информации о запросах на участие в событиях текущего пользователя
     @GetMapping("/{userId}/events/{eventId}/request")
-    public List<EventRequestDto> requestEventById(@PathVariable("userId") Long userId,
-                                                  @PathVariable("eventId") Long eventId) {
+    public List<RequestDto> requestEventById(@PathVariable("userId") Long userId,
+                                             @PathVariable("eventId") Long eventId) {
         log.info("Получен запрос к эндпоинту /users/{userID}/events{eventId}/request получение информации о запросах на участие в событиях. Метод GET");
         return eventService.findRequestsByUserIdAndEventId(userId, eventId);
     }
 
     @PatchMapping("/{userId}/events/{eventId}/request/{reqId}/confirm")
-    public EventRequestDto requestConfirmEventById(@PathVariable("userId") Long userId,
-                                                   @PathVariable("eventId") Long eventId,
-                                                   @PathVariable("reqId") Long reqId) {
+    public RequestDto requestConfirmEventById(@PathVariable("userId") Long userId,
+                                              @PathVariable("eventId") Long eventId,
+                                              @PathVariable("reqId") Long reqId) {
         log.info("Получен запрос к эндпоинту /users/{userID}/events{eventId}/request/{reqId}/confirm подтверждение чужой заявки на участие в событии пользователем. Метод PATCH");
         return eventService.confirmRequestByUserIdAndEventId(userId, eventId, reqId);
     }
 
     @PatchMapping("/{userId}/events/{eventId}/request/{reqId}/reject")
-    public EventRequestDto requestRejectEventById(@PathVariable("userId") Long userId,
-                                                  @PathVariable("eventId") Long eventId,
-                                                  @PathVariable("reqId") Long reqId) {
+    public RequestDto requestRejectEventById(@PathVariable("userId") Long userId,
+                                             @PathVariable("eventId") Long eventId,
+                                             @PathVariable("reqId") Long reqId) {
         log.info("Получен запрос к эндпоинту /users/{userID}/events{eventId}/request/{reqId}/confirm отклонение чужой заявки на участие в событии пользователем. Метод PATCH");
         return eventService.rejectRequestByUserIdAndEventId(userId, eventId, reqId);
     }

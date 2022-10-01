@@ -1,11 +1,9 @@
-package ru.bykov.explore.model.dto.event;
+package ru.bykov.explore.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.bykov.explore.model.User;
-import ru.bykov.explore.utils.StateOfEvent;
 
 import java.time.LocalDateTime;
 
@@ -13,11 +11,11 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class EventRequestDto {
+public class RequestDto {
     private Long id;
     private LocalDateTime created;
     private Long event;
-    private User requester;
-//    private StateOfEvent state;
+    private Long requester;
+    //    private StateOfEvent state;
     private String state;
 }
