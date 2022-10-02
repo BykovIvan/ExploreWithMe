@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.bykov.explore.exceptions.NotFoundException;
+import ru.bykov.explore.model.dto.user.NewUserRequest;
 import ru.bykov.explore.services.UserService;
 import ru.bykov.explore.model.User;
 import ru.bykov.explore.model.dto.user.UserDto;
@@ -22,8 +23,8 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    public UserDto createFromAdmin(UserDto userDto) {
-        @Valid User user = UserMapper.toUser(userDto);
+    public UserDto createFromAdmin(NewUserRequest newUserRequest) {
+        User user = UserMapper.toUser(newUserRequest);
         return UserMapper.toUserDto(userRepository.save(user));
     }
 

@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.bykov.explore.model.dto.CompilationDto;
+import ru.bykov.explore.model.dto.NewCompilationDto;
 import ru.bykov.explore.services.CompilationService;
 
 @RestController
@@ -17,9 +17,9 @@ public class CompilationControllerAdmin {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CompilationDto create(@RequestBody CompilationDto compilationDto){
+    public NewCompilationDto create(@RequestBody NewCompilationDto newCompilationDto){
         log.info("Получен запрос к эндпоинту /admin/compilations метод POST");
-        return compilationService.createFromAdmin(compilationDto);
+        return compilationService.createFromAdmin(newCompilationDto);
     }
 
     @DeleteMapping("/{compId}")

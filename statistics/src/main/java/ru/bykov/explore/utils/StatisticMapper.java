@@ -1,9 +1,9 @@
 package ru.bykov.explore.utils;
 
 import ru.bykov.explore.model.Statistic;
-import ru.bykov.explore.model.StatisticDto;
+import ru.bykov.explore.model.dto.StatisticDto;
 
-public class StatisticMapping {
+public class StatisticMapper {
 
     public static Statistic toStatistic(StatisticDto statisticDto){
         return Statistic.builder().build();

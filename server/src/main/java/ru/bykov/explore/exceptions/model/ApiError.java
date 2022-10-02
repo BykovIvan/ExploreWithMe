@@ -8,16 +8,16 @@ import java.util.List;
  * Class for generating a response in case of errors
  */
 
-public class ErrorResponse {
+public class ApiError {
     private final String error;                 //Название ошибки
 
     private List<String> errors;
     private String message;
     private String reason;
     private String status;
-    private Timestamp timestamp;
+    private String timestamp;
 
-    public ErrorResponse(String error) {
+    public ApiError(String error) {
         this.error = error;
     }
 

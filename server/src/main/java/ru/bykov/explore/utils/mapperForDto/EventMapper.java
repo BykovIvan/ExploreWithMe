@@ -1,15 +1,15 @@
 package ru.bykov.explore.utils.mapperForDto;
 
 import ru.bykov.explore.model.Event;
-import ru.bykov.explore.model.dto.event.EventDto;
+import ru.bykov.explore.model.dto.event.EventFullDto;
 import ru.bykov.explore.model.dto.event.NewEventDto;
 import ru.bykov.explore.model.dto.event.EventShortDto;
 
 
 //TODO весь класс необходимо сделать
 public class EventMapper {
-    public static EventDto toEventDto(Event event) {
-        return EventDto.builder()
+    public static EventFullDto toEventDto(Event event) {
+        return EventFullDto.builder()
                 .id(event.getId())
                 .annotation(event.getAnnotation())
                 .build();
@@ -22,9 +22,9 @@ public class EventMapper {
                 .build();
     }
 
-    public static Event toEvent(EventDto eventDto) {
+    public static Event toEvent(EventFullDto eventFullDto) {
         return Event.builder()
-                .annotation(eventDto.getAnnotation())
+                .annotation(eventFullDto.getAnnotation())
                 .build();
     }
 

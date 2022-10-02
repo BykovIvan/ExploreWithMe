@@ -1,12 +1,13 @@
 package ru.bykov.explore.services;
 
+import ru.bykov.explore.model.dto.user.NewUserRequest;
 import ru.bykov.explore.model.dto.user.UserDto;
 
 import java.util.List;
 
 public interface UserService {
 
-    UserDto createFromAdmin(UserDto userDto);
+    UserDto createFromAdmin(NewUserRequest newUserRequest);
 
     void deleteByIdFromAdmin(Long userId);
 

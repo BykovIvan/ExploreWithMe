@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.bykov.explore.model.Statistic;
-import ru.bykov.explore.model.StatisticDto;
+import ru.bykov.explore.model.dto.StatisticDto;
 import ru.bykov.explore.service.StatisticService;
 
 import java.util.List;
@@ -17,9 +17,9 @@ public class StatisticController {
     private final StatisticService statisticService;
 
     @PostMapping("/hit")
-    public Statistic createStat(@RequestBody Statistic statistic){
+    public Statistic createStat(@RequestBody StatisticDto statisticDto){
         log.info("Получен запрос к эндпоинту /hit, сохранение статистики");
-        return statisticService.createStat(statistic);
+        return statisticService.createStat(statisticDto);
     }
 
     @GetMapping("/stats")

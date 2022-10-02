@@ -6,7 +6,7 @@ import ru.bykov.explore.exceptions.NoParamInRequestException;
 import ru.bykov.explore.exceptions.NotFoundException;
 import ru.bykov.explore.services.CategoryService;
 import ru.bykov.explore.model.Category;
-import ru.bykov.explore.model.dto.CategoryDto;
+import ru.bykov.explore.model.dto.NewCategoryDto;
 import ru.bykov.explore.repositories.CategoryRepository;
 import ru.bykov.explore.utils.mapperForDto.CategoryMapper;
 
@@ -21,30 +21,30 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
 
     @Override
-    public List<CategoryDto> getAllForAllUsers() {
+    public List<NewCategoryDto> getAllForAllUsers() {
         return categoryRepository.findAll().stream()
                 .map(CategoryMapper::toCategoryDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public CategoryDto getByIdForAllUsers(Long id) {
+    public NewCategoryDto getByIdForAllUsers(Long id) {
         return CategoryMapper.toCategoryDto(categoryRepository.findById(id).orElseThrow(() -> new NotFoundException("Нет такой категории!")));
     }
 
     @Override
-    public CategoryDto createFromAdmin(CategoryDto categoryDto) {
-        @Valid Category category = CategoryMapper.toCategory(categoryDto);
+    public NewCategoryDto createFromAdmin(NewCategoryDto newCategoryDto) {
+        @Valid Category category = CategoryMapper.toCategory(newCategoryDto);
         return CategoryMapper.toCategoryDto(categoryRepository.save(category));
     }
 
     @Override
-    public CategoryDto updateFromAdmin(CategoryDto categoryDto) {
-        if (categoryDto.getId() == null || categoryDto.getName() == null) {
+    public NewCategoryDto updateFromAdmin(NewCategoryDto newCategoryDto) {
+        if (newCategoryDto.getId() == null || newCategoryDto.getName() == null) {
             throw new NoParamInRequestException("Введены неверные параметры!");
         }
-        Category category = categoryRepository.findById(categoryDto.getId()).orElseThrow(() -> new NotFoundException("Нет такой категории!"));
-        category.setName(categoryDto.getName());
+        Category category = categoryRepository.findById(newCategoryDto.getId()).orElseThrow(() -> new NotFoundException("Нет такой категории!"));
+        category.setName(newCategoryDto.getName());
         return CategoryMapper.toCategoryDto(categoryRepository.save(category));
     }
 

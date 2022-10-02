@@ -1,12 +1,12 @@
 package ru.bykov.explore.utils.mapperForDto;
 
 import ru.bykov.explore.model.Request;
-import ru.bykov.explore.model.dto.RequestDto;
+import ru.bykov.explore.model.dto.ParticipationRequestDto;
 
 public class RequestMapper {
 
-    public static RequestDto toRequestDto(Request request){
-        return RequestDto.builder()
+    public static ParticipationRequestDto toRequestDto(Request request){
+        return ParticipationRequestDto.builder()
                 .created(request.getCreated())
                 .event(request.getEvent())
                 .id(request.getId())
@@ -15,13 +15,13 @@ public class RequestMapper {
                 .build();
     }
 
-    public static Request toRequest(RequestDto requestDto){
+    public static Request toRequest(ParticipationRequestDto participationRequestDto){
         return Request.builder()
-                .created(requestDto.getCreated())
-                .event(requestDto.getEvent())
-                .id(requestDto.getId())
-                .requester(requestDto.getRequester())
-                .state(requestDto.getState())
+                .created(participationRequestDto.getCreated())
+                .event(participationRequestDto.getEvent())
+                .id(participationRequestDto.getId())
+                .requester(participationRequestDto.getRequester())
+                .state(participationRequestDto.getState())
                 .build();
     }
 

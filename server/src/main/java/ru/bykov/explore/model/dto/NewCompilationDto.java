@@ -4,17 +4,22 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.bykov.explore.model.Event;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.List;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CompilationDto {
-    private Long id;
-    private List<Event> events;
+public class NewCompilationDto {
+    private List<Long> events;
+    //default: false
     private Boolean pinned;
+    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 80)
     private String title;
 }

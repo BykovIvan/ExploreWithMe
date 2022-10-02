@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.bykov.explore.services.RequestService;
-import ru.bykov.explore.model.dto.RequestDto;
+import ru.bykov.explore.model.dto.ParticipationRequestDto;
 
 import java.util.List;
 
@@ -18,13 +18,24 @@ public class RequestControllerUser {
     private final RequestService requestService;
 
     @GetMapping("/{userId}/request")
-    public List<RequestDto> findByUserId(@PathVariable("userId") Long userId) {
+    public List<ParticipationRequestDto> findByUserId(@PathVariable("userId") Long userId) {
         log.info("Получен запрос к эндпоинту /users/{userID}/request получение информации о заявках текущего пользователя с id = {} на участие в чужих событиях", userId);
         return requestService.findByUserId(userId);
     }
 
-    @PostMapping
+    @PostMapping("/{userId}/request")
     @ResponseStatus(HttpStatus.CREATED)
-    public RequestDto addRequest()
+    public ParticipationRequestDto addRequest(@PathVariable("userId") Long userId,
+                                              @RequestParam(value = "eventId") Long eventId){
+        log.info("Получен запрос к эндпоинту /users/{userID}/request добаление запроса от пользователя id = {} на участие в событии id = {}", userId, eventId);
+        return requestService.addRequestToEventByUserId(userId, eventId);
+    }
+
+    @PatchMapping("/{userId}/request/{requestId}/cansel")
+    public ParticipationRequestDto canselRequest(@PathVariable("userId") Long userId,
+                                                 @PathVariable("requestId") Long requestId){
+        log.info("Получен запрос к эндпоинту /users/{userID}/request/{requestId}/cansel отмена запроса от пользователя id = {} на участие с id = {}", userId, requestId);
+        return requestService.canselRequestByUserIdAndRequestId(userId, requestId);
+    }
 
 }

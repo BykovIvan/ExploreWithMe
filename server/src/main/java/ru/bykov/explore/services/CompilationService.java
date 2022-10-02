@@ -1,16 +1,16 @@
 package ru.bykov.explore.services;
 
-import ru.bykov.explore.model.dto.CompilationDto;
+import ru.bykov.explore.model.dto.NewCompilationDto;
 
 import java.util.List;
 
 public interface CompilationService {
 
-    List<CompilationDto> getAllForAll();
+    List<NewCompilationDto> getAllForAll();
 
-    CompilationDto getByIdForAll(Long compilationId);
+    NewCompilationDto getByIdForAll(Long compilationId);
 
-    CompilationDto createFromAdmin(CompilationDto compilationDto);
+    NewCompilationDto createFromAdmin(NewCompilationDto newCompilationDto);
 
     void deleteByIdFromAdmin(Long compId);
 

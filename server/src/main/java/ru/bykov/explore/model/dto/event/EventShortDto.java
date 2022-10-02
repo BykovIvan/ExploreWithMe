@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.bykov.explore.model.Category;
+import ru.bykov.explore.model.dto.NewCategoryDto;
 import ru.bykov.explore.model.dto.user.UserShortDto;
 
 import java.time.LocalDateTime;
@@ -18,11 +18,11 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EventShortDto {
-    private Long id;
     private String annotation;
-    private Category category;
+    private NewCategoryDto category;
     private Long confirmedRequests;
     private LocalDateTime eventDate;
+    private Long id;
     private UserShortDto initiator;
     private Boolean paid;
     private String title;

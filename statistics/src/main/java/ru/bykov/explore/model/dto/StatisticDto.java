@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CategoryDto {
-    private Long id;
-    private String name;
+public class StatisticDto {
+    private String app;
+    private String uri;
+    private Long hits;
 }

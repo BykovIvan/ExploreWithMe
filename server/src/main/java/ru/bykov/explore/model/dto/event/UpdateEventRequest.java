@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.bykov.explore.model.dto.LocationDto;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -14,7 +13,7 @@ import javax.validation.constraints.Size;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class NewEventDto {
+public class UpdateEventRequest {
 
     @NotNull
     @NotBlank
@@ -27,13 +26,9 @@ public class NewEventDto {
     private String description;
     //    "yyyy-MM-dd HH:mm:ss"
     private String eventDate;
-    private LocationDto location;
-    //    default: false
+    private Long eventId;
     private Boolean paid;
-    //    default: 0
     private Long participantLimit;
-    //    default: true
-    private Boolean requestModeration;
     @NotNull
     @NotBlank
     @Size(min = 3, max = 120)

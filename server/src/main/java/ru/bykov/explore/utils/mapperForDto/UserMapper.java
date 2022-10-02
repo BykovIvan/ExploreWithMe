@@ -1,6 +1,7 @@
 package ru.bykov.explore.utils.mapperForDto;
 
 import ru.bykov.explore.model.User;
+import ru.bykov.explore.model.dto.user.NewUserRequest;
 import ru.bykov.explore.model.dto.user.UserDto;
 import ru.bykov.explore.model.dto.user.UserShortDto;
 
@@ -24,6 +25,13 @@ public class UserMapper {
         return User.builder()
                 .name(userDto.getName())
                 .email(userDto.getEmail())
+                .build();
+    }
+
+    public static User toUser(NewUserRequest newUserRequest) {
+        return User.builder()
+                .name(newUserRequest.getName())
+                .email(newUserRequest.getEmail())
                 .build();
     }
 }

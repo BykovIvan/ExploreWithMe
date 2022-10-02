@@ -1,11 +1,11 @@
 package ru.bykov.explore.utils.mapperForDto;
 
 import ru.bykov.explore.model.Compilation;
-import ru.bykov.explore.model.dto.CompilationDto;
+import ru.bykov.explore.model.dto.NewCompilationDto;
 
 public class CompilationMapper {
-    public static CompilationDto toCompilationDto(Compilation compilation) {
-        return CompilationDto.builder()
+    public static NewCompilationDto toCompilationDto(Compilation compilation) {
+        return NewCompilationDto.builder()
                 .id(compilation.getId())
                 .events(compilation.getEvents())
                 .build();
@@ -13,9 +13,9 @@ public class CompilationMapper {
 
 
     //TODO сделать по тз
-    public static Compilation toCompilation(CompilationDto compilationDto) {
+    public static Compilation toCompilation(NewCompilationDto newCompilationDto) {
         return Compilation.builder()
-                .events(compilationDto.getEvents())
+                .events(newCompilationDto.getEvents())
                 .build();
     }
 }

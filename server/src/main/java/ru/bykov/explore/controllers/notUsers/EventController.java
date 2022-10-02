@@ -3,7 +3,7 @@ package ru.bykov.explore.controllers.notUsers;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.bykov.explore.model.dto.event.EventDto;
+import ru.bykov.explore.model.dto.event.EventFullDto;
 import ru.bykov.explore.model.dto.event.EventShortDto;
 import ru.bykov.explore.services.EventService;
 
@@ -32,7 +32,7 @@ public class EventController {
     }
 
     @GetMapping("/{eventId}")
-    public EventDto categoryById(@PathVariable("eventId") Long eventId) {
+    public EventFullDto categoryById(@PathVariable("eventId") Long eventId) {
         log.info("Получен запрос к эндпоинту /events получение по id. Метод GET");
         return eventService.getByIdForAllUsers(eventId);
     }

@@ -2,16 +2,20 @@ package ru.bykov.explore.controllers.admin;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.bykov.explore.model.dto.user.NewUserRequest;
 import ru.bykov.explore.model.dto.user.UserDto;
 import ru.bykov.explore.services.UserService;
 
 import javax.transaction.Transactional;
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
 @Slf4j
 @RequiredArgsConstructor
+@Validated
 @RequestMapping(path = "admin/users")
 public class UserControllerAdmin {
 
@@ -19,10 +23,10 @@ public class UserControllerAdmin {
 
     @PostMapping
     //TODO проверить нужна ли транзакция
-    @Transactional
-    public UserDto create(@RequestBody UserDto userDto) {
+//    @Transactional
+    public UserDto create(@Valid @RequestBody NewUserRequest newUserRequest) {
         log.info("Получен запрос к эндпоинту /admin/users. Метод POST");
-        return userService.createFromAdmin(userDto);
+        return userService.createFromAdmin(newUserRequest);
     }
 
     @GetMapping()

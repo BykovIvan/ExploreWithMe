@@ -14,19 +14,19 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class EventDto {
-    private Long id;
+public class EventFullDto {
     private String annotation;
     private Category category;
     private Long confirmedRequests;
     private LocalDateTime createdOn;
     private String description;
     private LocalDateTime eventDate;
+    private Long id;
     private UserShortDto initiator;
     private LocationDto location;
     private Boolean paid;
     private Long participantLimit;
-    private LocalDateTime publishedOn;
+    private String publishedOn;
     private Boolean requestModeration;
     //    private StateOfEvent state;
     private String state;

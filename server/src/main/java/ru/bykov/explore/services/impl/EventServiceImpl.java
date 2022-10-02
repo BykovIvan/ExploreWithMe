@@ -9,9 +9,9 @@ import ru.bykov.explore.exceptions.NoParamInRequestException;
 import ru.bykov.explore.exceptions.NotFoundException;
 import ru.bykov.explore.model.Event;
 import ru.bykov.explore.model.User;
-import ru.bykov.explore.model.dto.event.EventDto;
+import ru.bykov.explore.model.dto.event.EventFullDto;
 import ru.bykov.explore.model.dto.event.NewEventDto;
-import ru.bykov.explore.model.dto.RequestDto;
+import ru.bykov.explore.model.dto.ParticipationRequestDto;
 import ru.bykov.explore.model.dto.event.EventShortDto;
 import ru.bykov.explore.repositories.EventRepository;
 import ru.bykov.explore.repositories.UserRepository;
@@ -52,13 +52,13 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventDto getByIdForAllUsers(Long eventId) {
+    public EventFullDto getByIdForAllUsers(Long eventId) {
         //добавить проверки для выставления ошибок
         return EventMapper.toEventDto(eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!")));
     }
 
     @Override
-    public List<EventDto> findByUserId(Long userId, String remoteAddr, String requestURI) {
+    public List<EventFullDto> findByUserId(Long userId, String remoteAddr, String requestURI) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
         //Принимать в методе все параметры, делать из него СтатикДто
         StatisticDto statisticDto = StatisticDto.builder()
@@ -72,7 +72,7 @@ public class EventServiceImpl implements EventService {
     }
 
 //    @Override
-    public List<EventDto> findByUserId(Long userId) {
+    public List<EventFullDto> findByUserId(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
         //Принимать в методе все параметры, делать из него СтатикДто
         StatisticDto statisticDto = StatisticDto.builder()
@@ -82,74 +82,74 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventDto updateByUserId(Long userId, EventDto eventDto) {
+    public EventFullDto updateByUserId(Long userId, EventFullDto eventFullDto) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
         return null;
     }
 
     @Override
-    public EventDto createByUserId(Long userId, EventDto eventDto) {
+    public EventFullDto createByUserId(Long userId, EventFullDto eventFullDto) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
         return null;
     }
 
     @Override
-    public EventDto findByUserIdAndEventId(Long userId, Long eventId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
-        Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!"));
-
-        return null;
-    }
-
-    @Override
-    public EventDto canselByUserIdAndEventId(Long userId, Long eventId, EventDto eventDto1) {
+    public EventFullDto findByUserIdAndEventId(Long userId, Long eventId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!"));
+
         return null;
     }
 
     @Override
-    public List<RequestDto> findRequestsByUserIdAndEventId(Long userId, Long eventId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
-        return null;
-    }
-
-    @Override
-    public RequestDto confirmRequestByUserIdAndEventId(Long userId, Long eventId, Long reqId) {
+    public EventFullDto canselByUserIdAndEventId(Long userId, Long eventId, EventFullDto eventFullDto1) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!"));
         return null;
     }
 
     @Override
-    public RequestDto rejectRequestByUserIdAndEventId(Long userId, Long eventId, Long reqId) {
+    public List<ParticipationRequestDto> findRequestsByUserIdAndEventId(Long userId, Long eventId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
+        return null;
+    }
+
+    @Override
+    public ParticipationRequestDto confirmRequestByUserIdAndEventId(Long userId, Long eventId, Long reqId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!"));
         return null;
     }
 
     @Override
-    public List<EventDto> getByParamFromAdmin(Long[] users, String[] states, Long[] categories, String rangeStart, String rangeEnd, Integer from, Integer size) {
+    public ParticipationRequestDto rejectRequestByUserIdAndEventId(Long userId, Long eventId, Long reqId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!"));
+        return null;
+    }
+
+    @Override
+    public List<EventFullDto> getByParamFromAdmin(Long[] users, String[] states, Long[] categories, String rangeStart, String rangeEnd, Integer from, Integer size) {
 
         return null;
     }
 
     @Override
-    public EventDto updateByIdFromAdmin(Long eventId, NewEventDto newEventDto) {
+    public EventFullDto updateByIdFromAdmin(Long eventId, NewEventDto newEventDto) {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!"));
 
         return null;
     }
 
     @Override
-    public EventDto publishEventByIdFromAdmin(Long eventId) {
+    public EventFullDto publishEventByIdFromAdmin(Long eventId) {
         //дата начала события должна быть не ранее чем за час от даты публикации.
         //событие должно быть в состоянии ожидания публикации
         return null;
     }
 
     @Override
-    public EventDto rejectEventByIdFromAdmin(Long eventId) {
+    public EventFullDto rejectEventByIdFromAdmin(Long eventId) {
         return null;
     }
 
