@@ -1,18 +1,19 @@
 package ru.bykov.explore.services;
 
-import ru.bykov.explore.model.dto.NewCategoryDto;
+import ru.bykov.explore.model.dto.category.CategoryDto;
+import ru.bykov.explore.model.dto.category.NewCategoryDto;
 
 import java.util.List;
 
 public interface CategoryService {
 
-    List<NewCategoryDto> getAllForAllUsers();
+    List<CategoryDto> getAllForAllUsers();
 
-    NewCategoryDto getByIdForAllUsers(Long id);
+    CategoryDto getByIdForAllUsers(Long id);
 
-    NewCategoryDto createFromAdmin(NewCategoryDto newCategoryDto);
+    CategoryDto createFromAdmin(NewCategoryDto newCategoryDto);
 
-    NewCategoryDto updateFromAdmin(NewCategoryDto newCategoryDto);
+    CategoryDto updateFromAdmin(CategoryDto CategoryDto);
 
     void deleteFromAdminByCatId(Long catId);
 

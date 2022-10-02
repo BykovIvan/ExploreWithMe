@@ -1,11 +1,12 @@
 package ru.bykov.explore.utils.mapperForDto;
 
 import ru.bykov.explore.model.Category;
-import ru.bykov.explore.model.dto.NewCategoryDto;
+import ru.bykov.explore.model.dto.category.CategoryDto;
+import ru.bykov.explore.model.dto.category.NewCategoryDto;
 
 public class CategoryMapper {
-    public static NewCategoryDto toCategoryDto(Category category) {
-        return NewCategoryDto.builder()
+    public static CategoryDto toCategoryDto(Category category) {
+        return CategoryDto.builder()
                 .id(category.getId())
                 .name(category.getName())
                 .build();

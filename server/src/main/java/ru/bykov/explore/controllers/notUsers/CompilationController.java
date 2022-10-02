@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.bykov.explore.model.dto.NewCompilationDto;
+import ru.bykov.explore.model.dto.copmilation.NewCompilationDto;
 import ru.bykov.explore.services.CompilationService;
 
 import java.util.List;

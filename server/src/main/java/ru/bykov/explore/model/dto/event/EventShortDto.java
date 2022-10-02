@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.bykov.explore.model.dto.NewCategoryDto;
+import ru.bykov.explore.model.dto.category.NewCategoryDto;
 import ru.bykov.explore.model.dto.user.UserShortDto;
 
 import java.time.LocalDateTime;

@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.bykov.explore.exceptions.NotFoundException;
 import ru.bykov.explore.model.Compilation;
 import ru.bykov.explore.model.Event;
-import ru.bykov.explore.model.dto.NewCompilationDto;
+import ru.bykov.explore.model.dto.copmilation.NewCompilationDto;
 import ru.bykov.explore.repositories.CompilationRepository;
 import ru.bykov.explore.repositories.EventRepository;
 import ru.bykov.explore.services.CompilationService;

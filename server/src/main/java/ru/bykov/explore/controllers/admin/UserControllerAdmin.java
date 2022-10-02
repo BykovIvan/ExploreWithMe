@@ -21,20 +21,18 @@ public class UserControllerAdmin {
 
     private final UserService userService;
 
-    @PostMapping
-    //TODO проверить нужна ли транзакция
-//    @Transactional
-    public UserDto create(@Valid @RequestBody NewUserRequest newUserRequest) {
-        log.info("Получен запрос к эндпоинту /admin/users. Метод POST");
-        return userService.createFromAdmin(newUserRequest);
-    }
-
     @GetMapping()
     public List<UserDto> userById(@RequestParam(value = "ids") Long[] ids,
                                   @RequestParam(value = "from", required = false, defaultValue = "0") Integer from,
                                   @RequestParam(value = "size", required = false, defaultValue = "10") Integer size) {
         log.info("Получен запрос к эндпоинту /admin/users получение пользователей по param. Метод GET");
         return userService.getByParamFromAdmin(ids, from, size);
+    }
+
+    @PostMapping
+    public UserDto create(@Valid @RequestBody NewUserRequest newUserRequest) {
+        log.info("Получен запрос к эндпоинту /admin/users. Метод POST");
+        return userService.createFromAdmin(newUserRequest);
     }
 
     @DeleteMapping("/{userId}")

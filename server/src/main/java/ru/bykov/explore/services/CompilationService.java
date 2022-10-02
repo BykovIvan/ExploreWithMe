@@ -1,6 +1,6 @@
 package ru.bykov.explore.services;
 
-import ru.bykov.explore.model.dto.NewCompilationDto;
+import ru.bykov.explore.model.dto.copmilation.NewCompilationDto;
 
 import java.util.List;
 

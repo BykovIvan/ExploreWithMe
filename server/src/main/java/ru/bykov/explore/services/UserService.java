@@ -7,9 +7,11 @@ import java.util.List;
 
 public interface UserService {
 
+    List<UserDto> getByParamFromAdmin(Long[] ids, Integer from, Integer size);
+
     UserDto createFromAdmin(NewUserRequest newUserRequest);
 
     void deleteByIdFromAdmin(Long userId);
 
-    List<UserDto> getByParamFromAdmin(Long[] ids, Integer from, Integer size);
+
 }
