@@ -34,18 +34,15 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryDto createFromAdmin(NewCategoryDto newCategoryDto) {
-        Category category = CategoryMapper.toCategory(newCategoryDto);
+    public CategoryDto updateFromAdmin(CategoryDto categoryDto) {
+        Category category = categoryRepository.findById(categoryDto.getId()).orElseThrow(() -> new NotFoundException("Нет такой категории!"));
+        category.setName(categoryDto.getName());
         return CategoryMapper.toCategoryDto(categoryRepository.save(category));
     }
 
     @Override
-    public CategoryDto updateFromAdmin(CategoryDto categoryDto) {
-        if (categoryDto.getId() == null || categoryDto.getName() == null) {
-            throw new NoParamInRequestException("Введены неверные параметры!");
-        }
-        Category category = categoryRepository.findById(categoryDto.getId()).orElseThrow(() -> new NotFoundException("Нет такой категории!"));
-        category.setName(categoryDto.getName());
+    public CategoryDto createFromAdmin(NewCategoryDto newCategoryDto) {
+        Category category = CategoryMapper.toCategory(newCategoryDto);
         return CategoryMapper.toCategoryDto(categoryRepository.save(category));
     }
 

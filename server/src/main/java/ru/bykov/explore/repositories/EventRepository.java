@@ -16,6 +16,8 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "")
     Page<Event> findByParam(String text, String[] categories, Boolean paid, String rangeStart, String rangeEnd, Boolean onlyAvailable, Pageable pageable);
 
+    Page<Event> findAllByInitiatorId(Long userId, Pageable pageable);
+
 //    @Query(" select b from Booking b " +
 //            "JOIN Item i on b.item.id = i.id " +
 //            "where b.booker.id = ?1 " +

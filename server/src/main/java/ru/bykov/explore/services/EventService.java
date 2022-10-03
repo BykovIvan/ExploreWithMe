@@ -4,6 +4,7 @@ import ru.bykov.explore.model.dto.event.EventFullDto;
 import ru.bykov.explore.model.dto.event.NewEventDto;
 import ru.bykov.explore.model.dto.ParticipationRequestDto;
 import ru.bykov.explore.model.dto.event.EventShortDto;
+import ru.bykov.explore.model.dto.event.UpdateEventRequest;
 
 import java.util.List;
 
@@ -15,9 +16,9 @@ public interface EventService {
 
     //Получение событий, добавленых текущим пользователем
 //    List<EventDto> findByUserId(Long userId);
-    List<EventFullDto> findByUserId(Long userId, String remoteAddr, String requestURI);
+    List<EventShortDto> findByUserIdFromUser(Long userId, String remoteAddr, String requestURI, Integer from, Integer size);
 
-    EventFullDto updateByUserId(Long userId, EventFullDto eventFullDto);
+    EventFullDto updateByUserIdFromUser(Long userId, UpdateEventRequest updateEventRequest);
 
     EventFullDto createByUserId(Long userId, EventFullDto eventFullDto);
 

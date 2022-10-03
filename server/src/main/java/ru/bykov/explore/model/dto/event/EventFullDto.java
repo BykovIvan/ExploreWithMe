@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import ru.bykov.explore.model.Category;
 import ru.bykov.explore.model.dto.LocationDto;
 import ru.bykov.explore.model.dto.user.UserShortDto;
+import ru.bykov.explore.utils.StateOfEvent;
 
 import java.time.LocalDateTime;
 
@@ -28,8 +29,8 @@ public class EventFullDto {
     private Long participantLimit;
     private String publishedOn;
     private Boolean requestModeration;
-    //    private StateOfEvent state;
-    private String state;
+    private StateOfEvent state;
+//    private String state;
     private String title;
     private Long views;
 }

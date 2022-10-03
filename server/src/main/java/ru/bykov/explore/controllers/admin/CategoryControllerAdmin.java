@@ -19,16 +19,16 @@ public class CategoryControllerAdmin {
 
     private final CategoryService categoryService;
 
-    @PostMapping()
-    public CategoryDto create (@Valid @RequestBody NewCategoryDto newCategoryDto){
-        log.info("Получен запрос к эндпоинту /admin/categories метод POST");
-        return categoryService.createFromAdmin(newCategoryDto);
-    }
-
     @PatchMapping
-    public CategoryDto update(@RequestBody CategoryDto categoryDto){
+    public CategoryDto update(@Valid @RequestBody CategoryDto categoryDto) {
         log.info("Получен запрос к эндпоинту /admin/categories метод PATCH");
         return categoryService.updateFromAdmin(categoryDto);
+    }
+
+    @PostMapping()
+    public CategoryDto create(@Valid @RequestBody NewCategoryDto newCategoryDto) {
+        log.info("Получен запрос к эндпоинту /admin/categories метод POST");
+        return categoryService.createFromAdmin(newCategoryDto);
     }
 
     @DeleteMapping("/{catId}")
@@ -36,8 +36,6 @@ public class CategoryControllerAdmin {
         log.info("Получен запрос к эндпоинту /admin/categories удаление по id {}. Метод DELETE", catId);
         categoryService.deleteFromAdminByCatId(catId);
     }
-
-
 
 
 }

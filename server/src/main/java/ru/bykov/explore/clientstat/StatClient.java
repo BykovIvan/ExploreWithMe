@@ -30,4 +30,8 @@ public class StatClient extends BaseClient {
         post("", statisticDto);
     }
 
+//    public void getStat() {
+//        get("");
+//    }
+
 }

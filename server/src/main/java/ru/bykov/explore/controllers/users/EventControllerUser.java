@@ -2,16 +2,21 @@ package ru.bykov.explore.controllers.users;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.bykov.explore.model.dto.event.EventFullDto;
 import ru.bykov.explore.model.dto.ParticipationRequestDto;
+import ru.bykov.explore.model.dto.event.EventShortDto;
+import ru.bykov.explore.model.dto.event.UpdateEventRequest;
 import ru.bykov.explore.services.EventService;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
 @Slf4j
+@Validated
 @RequiredArgsConstructor
 @RequestMapping(path = "/users")
 public class EventControllerUser {
@@ -19,18 +24,21 @@ public class EventControllerUser {
     private final EventService eventService;
 
     @GetMapping("/{userId}/events")
-    public List<EventFullDto> userById(@PathVariable("userId") Long userId, HttpServletRequest request) {
+    public List<EventShortDto> userById(@PathVariable("userId") Long userId,
+                                        HttpServletRequest request,
+                                        @RequestParam(value = "from", required = false, defaultValue = "0") Integer from,
+                                        @RequestParam(value = "size", required = false, defaultValue = "10") Integer size) {
         log.info("Получен запрос к эндпоинту /users/{userID}/events получение событий пользователя. Метод GET");
         log.info("client ip: {}", request.getRemoteAddr());
         log.info("endpoint path: {}", request.getRequestURI());
-        return eventService.findByUserId(userId, request.getRemoteAddr(), request.getRequestURI());
+        return eventService.findByUserIdFromUser(userId, request.getRemoteAddr(), request.getRequestURI(), from, size);
     }
 
     @PatchMapping("/{userId}/events")
     public EventFullDto updateByUser(@PathVariable("userId") Long userId,
-                                     @RequestBody EventFullDto eventFullDto) {
+                                     @Valid @RequestBody UpdateEventRequest updateEventRequest) {
         log.info("Получен запрос к эндпоинту /users/{userID}/events обновление события пользователем. Метод PATCH");
-        return eventService.updateByUserId(userId, eventFullDto);
+        return eventService.updateByUserIdFromUser(userId, updateEventRequest);
     }
 
     @PostMapping("/{userId}/events")

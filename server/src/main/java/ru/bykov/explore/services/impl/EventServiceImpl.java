@@ -9,16 +9,20 @@ import ru.bykov.explore.exceptions.NoParamInRequestException;
 import ru.bykov.explore.exceptions.NotFoundException;
 import ru.bykov.explore.model.Event;
 import ru.bykov.explore.model.User;
-import ru.bykov.explore.model.dto.event.EventFullDto;
-import ru.bykov.explore.model.dto.event.NewEventDto;
 import ru.bykov.explore.model.dto.ParticipationRequestDto;
+import ru.bykov.explore.model.dto.event.EventFullDto;
 import ru.bykov.explore.model.dto.event.EventShortDto;
+import ru.bykov.explore.model.dto.event.NewEventDto;
+import ru.bykov.explore.model.dto.event.UpdateEventRequest;
+import ru.bykov.explore.repositories.CategoryRepository;
 import ru.bykov.explore.repositories.EventRepository;
 import ru.bykov.explore.repositories.UserRepository;
 import ru.bykov.explore.services.EventService;
 import ru.bykov.explore.utils.FromSizeSortPageable;
+import ru.bykov.explore.utils.StateOfEvent;
 import ru.bykov.explore.utils.mapperForDto.EventMapper;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -31,6 +35,7 @@ public class EventServiceImpl implements EventService {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
+    private final CategoryRepository categoryRepository;
     private final StatClient statClient;
 
     @Override
@@ -41,13 +46,15 @@ public class EventServiceImpl implements EventService {
         if (from < 0 || size <= 0) {
             throw new NoParamInRequestException("Введены неверные параметры!");
         }
-        if (!sort.equals("EVENT_DATE") || !sort.equals("VIEWS")){
+        if (!sort.equals("EVENT_DATE") || !sort.equals("VIEWS")) {
             throw new NoParamInRequestException("Введены неверные параметры!");
         }
+        //TODO
+        Long views = null;
         //сделать запрос в бд
         return eventRepository.findByParam(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, FromSizeSortPageable.of(from, size, Sort.by(Sort.Direction.DESC, sort)))
                 .stream()
-                .map(EventMapper::toEventShortDto)
+                .map((Event event) -> EventMapper.toEventShortDto(event, views))
                 .collect(Collectors.toList());
     }
 
@@ -57,10 +64,15 @@ public class EventServiceImpl implements EventService {
         return EventMapper.toEventDto(eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!")));
     }
 
+
+    //путь Для users/
     @Override
-    public List<EventFullDto> findByUserId(Long userId, String remoteAddr, String requestURI) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
-        //Принимать в методе все параметры, делать из него СтатикДто
+    public List<EventShortDto> findByUserIdFromUser(Long userId, String remoteAddr, String requestURI, Integer from, Integer size) {
+        userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
+        //запись в сервис статистики
+        //Сохранять статистику нужно будет по двум эндпоинтам:
+        // GET /events, который отвечает за получение событий с возможностью фильтрации, и
+        // GET /events/{id}, который позволяет получить подробную информацию об опубликованном событии по его идентификатору
         StatisticDto statisticDto = StatisticDto.builder()
                 .app("EventService")
                 .uri(requestURI)
@@ -68,23 +80,46 @@ public class EventServiceImpl implements EventService {
                 .timestamp(LocalDateTime.now().format(formatter))
                 .build();
         statClient.createStat(statisticDto);
-        return null;
-    }
-
-//    @Override
-    public List<EventFullDto> findByUserId(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
-        //Принимать в методе все параметры, делать из него СтатикДто
-        StatisticDto statisticDto = StatisticDto.builder()
-                .build();
-        statClient.createStat(statisticDto);
-        return null;
+        //виюшка должна быть у конкретного события????
+        Long views = null;
+        //добавить views
+        return eventRepository.findAllByInitiatorId(userId, FromSizeSortPageable.of(from, size, Sort.by(Sort.Direction.ASC, "id")))
+                .stream()
+                .map((Event event) -> EventMapper.toEventShortDto(event, views))
+                //то что правильно :
+//                .map((Event event) -> EventMapper.toEventShortDto(event, statClient.getViewByIdEvent(event.getId())))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public EventFullDto updateByUserId(Long userId, EventFullDto eventFullDto) {
+    public EventFullDto updateByUserIdFromUser(Long userId, UpdateEventRequest updateEventRequest) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
+
+        //TODO сделать проверка на то что человек ранее именно он опубликовал данную запись
+        Event event = eventRepository.findById(updateEventRequest.getEventId()).orElseThrow(() -> new NotFoundException("Такого события не существует!"));
+        if (event.getState().equals(StateOfEvent.PUBLISHED)){
+            throw new NoParamInRequestException("Событие уже опубликовано и его нельзя изменить!");
+        }
+
+        event.setAnnotation(updateEventRequest.getAnnotation());
+        if (updateEventRequest.getCategory() != null) {
+            event.setCategory(categoryRepository.findById(updateEventRequest.getCategory()).orElseThrow(() -> new NotFoundException("Такого категории не существует!")));
+        }
+        event.setDescription(updateEventRequest.getDescription());
+        if (updateEventRequest.getEventDate() != null){
+            LocalDateTime dateAndTimeOfEvent = LocalDateTime.parse(updateEventRequest.getEventDate(), formatter);
+            Duration duration = Duration.between(LocalDateTime.now(), dateAndTimeOfEvent);
+            if (duration.toMinutes() < 120){
+                throw new NoParamInRequestException("Время до события менее 2 часов и поэтому его нельзя изменить!");
+            }
+            event.setEventDate(dateAndTimeOfEvent);
+        }
+
+        if (event.getState().equals(StateOfEvent.CANCELED)){
+            event.setState(StateOfEvent.PENDING);
+        }
         return null;
+//        return EventMapper.toEventFullDto(eventRepository.save(event));
     }
 
     @Override

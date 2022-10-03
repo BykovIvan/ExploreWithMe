@@ -1,6 +1,7 @@
 package ru.bykov.explore.model;
 
 import lombok.*;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -19,13 +20,8 @@ public class Compilation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotNull
     @OneToMany()
-    //может лучше Set хранить, тогда не будет повторений
     private List<Event> events;
-    @NotNull
     private Boolean pinned;
-    @NotNull
-    @NotBlank
     private String title;
 }

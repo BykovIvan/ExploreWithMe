@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.bykov.explore.exceptions.NotFoundException;
 import ru.bykov.explore.model.Compilation;
 import ru.bykov.explore.model.Event;
+import ru.bykov.explore.model.dto.copmilation.CompilationDto;
 import ru.bykov.explore.model.dto.copmilation.NewCompilationDto;
 import ru.bykov.explore.repositories.CompilationRepository;
 import ru.bykov.explore.repositories.EventRepository;
@@ -23,20 +24,21 @@ public class CompilationServiceImpl implements CompilationService {
     private final EventRepository eventRepository;
 
     @Override
-    public List<NewCompilationDto> getAllForAll() {
+    public List<CompilationDto> getAllForAll() {
         return compilationRepository.findAll().stream()
                 .map(CompilationMapper::toCompilationDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public NewCompilationDto getByIdForAll(Long compilationId) {
+    public CompilationDto getByIdForAll(Long compilationId) {
         return CompilationMapper.toCompilationDto(compilationRepository.findById(compilationId).orElseThrow(() -> new NotFoundException("Нет такой подборки!")));
     }
 
     @Override
-    public NewCompilationDto createFromAdmin(NewCompilationDto newCompilationDto) {
-        @Valid Compilation compilation = CompilationMapper.toCompilation(newCompilationDto);
+    public CompilationDto createFromAdmin(NewCompilationDto newCompilationDto) {
+        List<Event> listOfEvent = eventRepository.findAllById(newCompilationDto.getEvents());
+        Compilation compilation = CompilationMapper.toCompilation(newCompilationDto, listOfEvent);
         return CompilationMapper.toCompilationDto(compilationRepository.save(compilation));
     }
 

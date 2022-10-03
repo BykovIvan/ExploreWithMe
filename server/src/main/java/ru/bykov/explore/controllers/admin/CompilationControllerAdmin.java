@@ -3,12 +3,17 @@ package ru.bykov.explore.controllers.admin;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.bykov.explore.model.dto.copmilation.CompilationDto;
 import ru.bykov.explore.model.dto.copmilation.NewCompilationDto;
 import ru.bykov.explore.services.CompilationService;
 
+import javax.validation.Valid;
+
 @RestController
 @Slf4j
+@Validated
 @RequiredArgsConstructor
 @RequestMapping(path = "admin/compilations")
 public class CompilationControllerAdmin {
@@ -17,7 +22,7 @@ public class CompilationControllerAdmin {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public NewCompilationDto create(@RequestBody NewCompilationDto newCompilationDto){
+    public CompilationDto create(@Valid @RequestBody NewCompilationDto newCompilationDto){
         log.info("Получен запрос к эндпоинту /admin/compilations метод POST");
         return compilationService.createFromAdmin(newCompilationDto);
     }
@@ -31,7 +36,7 @@ public class CompilationControllerAdmin {
     //удаление события из подборки
     @DeleteMapping("/{compId}/events/{eventId}")
     public void deleteEventFromComp(@PathVariable("compId") Long compId,
-                                           @PathVariable("eventId") Long eventId){
+                                    @PathVariable("eventId") Long eventId){
         log.info("Получен запрос к эндпоинту /admin/compilations/{compId}/events/{eventId} метод Delete, удаление события id = {} из подборки id = {}", eventId , compId);
         compilationService.deleteEventFromCompFromAdmin(compId, eventId);
     }

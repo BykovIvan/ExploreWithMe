@@ -11,9 +11,9 @@ public interface CategoryService {
 
     CategoryDto getByIdForAllUsers(Long id);
 
-    CategoryDto createFromAdmin(NewCategoryDto newCategoryDto);
-
     CategoryDto updateFromAdmin(CategoryDto CategoryDto);
+
+    CategoryDto createFromAdmin(NewCategoryDto newCategoryDto);
 
     void deleteFromAdminByCatId(Long catId);
 

@@ -33,9 +33,9 @@ public class Event {
     private Long participantLimit;
     private LocalDateTime publishedOn;
     private Boolean requestModeration;
+    @Enumerated(EnumType.STRING)
     private StateOfEvent state;
     private String title;
-
     private Long views;
 
 

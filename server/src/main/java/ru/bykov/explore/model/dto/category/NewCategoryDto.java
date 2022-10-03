@@ -16,6 +16,6 @@ import javax.validation.constraints.Size;
 public class NewCategoryDto {
     @NotNull
     @NotBlank
-    @Size(min = 2, max = 20)
+    @Size(min = 1, max = 40)
     private String name;
 }
