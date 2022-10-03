@@ -11,11 +11,11 @@ import javax.persistence.*;
 @Setter
 @Entity
 @Table(name = "categories",
-        schema = "public",
-        uniqueConstraints = @UniqueConstraint(columnNames = "name"))
+        schema = "public")
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(unique = true)
     private String name;
 }

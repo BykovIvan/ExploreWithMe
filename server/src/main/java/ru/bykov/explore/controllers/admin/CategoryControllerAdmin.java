@@ -27,7 +27,7 @@ public class CategoryControllerAdmin {
 
     @PatchMapping
     public CategoryDto update(@RequestBody CategoryDto categoryDto){
-        log.info("Получен запрос к эндпоинту /admin/categories метод POST");
+        log.info("Получен запрос к эндпоинту /admin/categories метод PATCH");
         return categoryService.updateFromAdmin(categoryDto);
     }
 
