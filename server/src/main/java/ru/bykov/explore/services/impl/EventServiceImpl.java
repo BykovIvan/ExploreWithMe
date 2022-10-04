@@ -7,6 +7,7 @@ import ru.bykov.explore.clientstat.StatClient;
 import ru.bykov.explore.clientstat.StatisticDto;
 import ru.bykov.explore.exceptions.NoParamInRequestException;
 import ru.bykov.explore.exceptions.NotFoundException;
+import ru.bykov.explore.model.Category;
 import ru.bykov.explore.model.Event;
 import ru.bykov.explore.model.User;
 import ru.bykov.explore.model.dto.ParticipationRequestDto;
@@ -16,11 +17,13 @@ import ru.bykov.explore.model.dto.event.NewEventDto;
 import ru.bykov.explore.model.dto.event.UpdateEventRequest;
 import ru.bykov.explore.repositories.CategoryRepository;
 import ru.bykov.explore.repositories.EventRepository;
+import ru.bykov.explore.repositories.RequestRepository;
 import ru.bykov.explore.repositories.UserRepository;
 import ru.bykov.explore.services.EventService;
 import ru.bykov.explore.utils.FromSizeSortPageable;
 import ru.bykov.explore.utils.StateOfEvent;
 import ru.bykov.explore.utils.mapperForDto.EventMapper;
+import ru.bykov.explore.utils.mapperForDto.RequestMapper;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -36,6 +39,7 @@ public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+    private final RequestRepository requestRepository;
     private final StatClient statClient;
 
     @Override
@@ -92,8 +96,10 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventFullDto updateByUserIdFromUser(Long userId, UpdateEventRequest updateEventRequest) {
+    public EventFullDto updateFromUser(Long userId, UpdateEventRequest updateEventRequest) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
+
+        //TODO сделать проверка на то что человек ранее именно он опубликовал данную запись
         Event event = eventRepository.findById(updateEventRequest.getEventId()).orElseThrow(() -> new NotFoundException("Такого события не существует!"));
         if (event.getInitiator().getId() != user.getId()){
             throw new NoParamInRequestException("Пользователь не является инициатором данного события!");
@@ -101,6 +107,7 @@ public class EventServiceImpl implements EventService {
         if (event.getState().equals(StateOfEvent.PUBLISHED)){
             throw new NoParamInRequestException("Событие уже опубликовано и его нельзя изменить!");
         }
+
         event.setAnnotation(updateEventRequest.getAnnotation());
         if (updateEventRequest.getCategory() != null) {
             event.setCategory(categoryRepository.findById(updateEventRequest.getCategory()).orElseThrow(() -> new NotFoundException("Такого категории не существует!")));
@@ -129,30 +136,49 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventFullDto createByUserIdFromUser(Long userId, NewEventDto newEventDto) {
+    public EventFullDto createFromUser(Long userId, NewEventDto newEventDto) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
-        return null;
+        Category category = categoryRepository.findById(newEventDto.getCategory()).orElseThrow(() -> new NotFoundException("Нет такой категории!"));
+        Event event = EventMapper.toEvent(newEventDto, category, user);
+        //TODO
+//        Long views = statClient.getViewByIdEvent(event.getId()));
+        Long views = 0L;
+        return EventMapper.toEventFullDto(eventRepository.save(event), views);
     }
 
     @Override
-    public EventFullDto findByUserIdAndEventId(Long userId, Long eventId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
+    public EventFullDto findByUserIdAndEventIdFromUser(Long userId, Long eventId) {
+        userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
+        eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!"));
+        //TODO
+//        Long views = statClient.getViewByIdEvent(event.getId()));
+        Long views = 0L;
+        return EventMapper.toEventFullDto(eventRepository.findByIdAndInitiatorId(eventId, userId), views);
+    }
+
+    @Override
+    public EventFullDto canselByUserIdAndEventIdFromUser(Long userId, Long eventId) {
+        userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!"));
-
-        return null;
+        if (event.getState().equals(StateOfEvent.PUBLISHED)){
+            throw new NoParamInRequestException("Событие уже опубликовано!");
+        }
+        event.setState(StateOfEvent.CANCELED);
+        //TODO
+//        Long views = statClient.getViewByIdEvent(event.getId()));
+        Long views = 0L;
+        return EventMapper.toEventFullDto(eventRepository.save(event), views);
     }
 
     @Override
-    public EventFullDto canselByUserIdAndEventId(Long userId, Long eventId, EventFullDto eventFullDto1) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
-        Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!"));
-        return null;
-    }
+    public List<ParticipationRequestDto> findRequestsByUserIdAndEventIdFromUser(Long userId, Long eventId) {
+        userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
+        eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!"));
 
-    @Override
-    public List<ParticipationRequestDto> findRequestsByUserIdAndEventId(Long userId, Long eventId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
-        return null;
+        return requestRepository.findByEventAndRequester(eventId, userId)
+                .stream()
+                .map(RequestMapper::toParticipationRequestDto)
+                .collect(Collectors.toList());
     }
 
     @Override

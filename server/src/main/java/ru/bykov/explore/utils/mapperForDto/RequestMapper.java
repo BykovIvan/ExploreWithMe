@@ -5,7 +5,7 @@ import ru.bykov.explore.model.dto.ParticipationRequestDto;
 
 public class RequestMapper {
 
-    public static ParticipationRequestDto toRequestDto(Request request){
+    public static ParticipationRequestDto toParticipationRequestDto(Request request){
         return ParticipationRequestDto.builder()
                 .created(request.getCreated())
                 .event(request.getEvent())

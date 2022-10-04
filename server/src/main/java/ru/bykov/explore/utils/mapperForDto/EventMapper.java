@@ -1,10 +1,15 @@
 package ru.bykov.explore.utils.mapperForDto;
 
+import ru.bykov.explore.model.Category;
 import ru.bykov.explore.model.Event;
+import ru.bykov.explore.model.Location;
+import ru.bykov.explore.model.User;
 import ru.bykov.explore.model.dto.event.EventFullDto;
 import ru.bykov.explore.model.dto.event.EventShortDto;
 import ru.bykov.explore.model.dto.event.NewEventDto;
+import ru.bykov.explore.utils.StateOfEvent;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 
@@ -33,9 +38,21 @@ public class EventMapper {
     }
 
     //TODO
-    public static Event toEvent(NewEventDto newEventDto) {
+    public static Event toEvent(NewEventDto newEventDto, Category category, User user) {
         return Event.builder()
                 .annotation(newEventDto.getAnnotation())
+                .category(category)
+                .confirmedRequests(0L)
+                .createdOn(LocalDateTime.now())
+                .description(newEventDto.getDescription())
+                .eventDate(LocalDateTime.parse(newEventDto.getEventDate(), formatter))
+                .initiator(user)
+                .location(LocationMapper.toLocation(newEventDto.getLocation()))
+                .paid(newEventDto.getPaid())
+                .participantLimit(newEventDto.getParticipantLimit())
+                .requestModeration(newEventDto.getRequestModeration())
+                .state(StateOfEvent.PENDING)
+                .title(newEventDto.getTitle())
                 .build();
     }
 

@@ -14,19 +14,18 @@ public interface EventService {
 
     EventFullDto getByIdForAllUsers(Long eventId);
 
-    //Получение событий, добавленых текущим пользователем
-//    List<EventDto> findByUserId(Long userId);
+    //Получение событий, добавленных текущим пользователем
     List<EventShortDto> findByUserIdFromUser(Long userId, String remoteAddr, String requestURI, Integer from, Integer size);
 
-    EventFullDto updateByUserIdFromUser(Long userId, UpdateEventRequest updateEventRequest);
+    EventFullDto updateFromUser(Long userId, UpdateEventRequest updateEventRequest);
 
-    EventFullDto createByUserIdFromUser(Long userId, NewEventDto newEventDto);
+    EventFullDto createFromUser(Long userId, NewEventDto newEventDto);
 
-    EventFullDto findByUserIdAndEventId(Long userId, Long eventId);
+    EventFullDto findByUserIdAndEventIdFromUser(Long userId, Long eventId);
 
-    EventFullDto canselByUserIdAndEventId(Long userId, Long eventId, EventFullDto eventFullDto1);
+    EventFullDto canselByUserIdAndEventIdFromUser(Long userId, Long eventId);
 
-    List<ParticipationRequestDto> findRequestsByUserIdAndEventId(Long userId, Long eventId);
+    List<ParticipationRequestDto> findRequestsByUserIdAndEventIdFromUser(Long userId, Long eventId);
 
     ParticipationRequestDto confirmRequestByUserIdAndEventId(Long userId, Long eventId, Long reqId);
 

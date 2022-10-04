@@ -37,36 +37,35 @@ public class EventControllerUser {
     }
 
     @PatchMapping("/{userId}/events")
-    public EventFullDto updateByUser(@PathVariable("userId") Long userId,
-                                     @Valid @RequestBody UpdateEventRequest updateEventRequest) {
+    public EventFullDto updateFromUser(@PathVariable("userId") Long userId,
+                                       @Valid @RequestBody UpdateEventRequest updateEventRequest) {
         log.info("Получен запрос к эндпоинту /users/{userID}/events обновление события пользователем. Метод PATCH");
-        return eventService.updateByUserIdFromUser(userId, updateEventRequest);
+        return eventService.updateFromUser(userId, updateEventRequest);
     }
 
     @PostMapping("/{userId}/events")
     @ResponseStatus(HttpStatus.CREATED)
-    public EventFullDto create(@PathVariable("userId") Long userId,
-                               @RequestBody NewEventDto newEventDto) {
+    public EventFullDto createFromUser(@PathVariable("userId") Long userId,
+                                       @Valid @RequestBody NewEventDto newEventDto) {
         log.info("Получен запрос к эндпоинту /users/{userID}/events создание события пользователем. Метод POST");
-        return eventService.createByUserIdFromUser(userId, newEventDto);
+        return eventService.createFromUser(userId, newEventDto);
     }
 
+    //Получение полной информации о событии добавленном текущим пользователем
     @GetMapping("/{userId}/events/{eventId}")
-    public EventFullDto eventById(@PathVariable("userId") Long userId,
-                                  @PathVariable("eventId") Long eventId) {
+    public EventFullDto eventByUserIdAndEventIdFromUser(@PathVariable("userId") Long userId,
+                                                        @PathVariable("eventId") Long eventId) {
         log.info("Получен запрос к эндпоинту /users/{userID}/events{eventId} получение события по id пользователя и id события. Метод GET");
-        //нужна запись в статистику
-
-        return eventService.findByUserIdAndEventId(userId, eventId);
+        //TODO нужна запись в статистику
+        return eventService.findByUserIdAndEventIdFromUser(userId, eventId);
     }
 
-    //отмена события добавленного текущаим пользователем
+    //отмена события добавленного текущим пользователем
     @PatchMapping("/{userId}/events/{eventId}")
     public EventFullDto canselByUser(@PathVariable("userId") Long userId,
-                                     @PathVariable("eventId") Long eventId,
-                                     @RequestBody EventFullDto eventFullDto) {
+                                     @PathVariable("eventId") Long eventId) {
         log.info("Получен запрос к эндпоинту /users/{userID}/events/{eventId} отмена события пользователем. Метод PATCH");
-        return eventService.canselByUserIdAndEventId(userId, eventId, eventFullDto);
+        return eventService.canselByUserIdAndEventIdFromUser(userId, eventId);
     }
 
     //Получение информации о запросах на участие в событиях текущего пользователя
@@ -74,7 +73,7 @@ public class EventControllerUser {
     public List<ParticipationRequestDto> requestEventById(@PathVariable("userId") Long userId,
                                                           @PathVariable("eventId") Long eventId) {
         log.info("Получен запрос к эндпоинту /users/{userID}/events{eventId}/request получение информации о запросах на участие в событиях. Метод GET");
-        return eventService.findRequestsByUserIdAndEventId(userId, eventId);
+        return eventService.findRequestsByUserIdAndEventIdFromUser(userId, eventId);
     }
 
     @PatchMapping("/{userId}/events/{eventId}/request/{reqId}/confirm")

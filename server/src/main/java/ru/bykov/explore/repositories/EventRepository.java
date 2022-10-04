@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import ru.bykov.explore.model.Event;
+import ru.bykov.explore.model.dto.event.EventFullDto;
 
 import java.sql.Timestamp;
 import java.util.Arrays;
@@ -17,6 +18,8 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     Page<Event> findByParam(String text, String[] categories, Boolean paid, String rangeStart, String rangeEnd, Boolean onlyAvailable, Pageable pageable);
 
     Page<Event> findAllByInitiatorId(Long userId, Pageable pageable);
+
+    Event findByIdAndInitiatorId(Long eventId, Long userId);
 
 //    @Query(" select b from Booking b " +
 //            "JOIN Item i on b.item.id = i.id " +

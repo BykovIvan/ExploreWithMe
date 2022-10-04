@@ -26,7 +26,10 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public List<ParticipationRequestDto> findByUserId(Long userId) {
         userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Такого пользователя не существует!"));
-        return requestRepository.findByRequester(userId).stream().map(RequestMapper::toRequestDto).collect(Collectors.toList());
+        return requestRepository.findByRequester(userId)
+                .stream()
+                .map(RequestMapper::toParticipationRequestDto)
+                .collect(Collectors.toList());
     }
 
     //Обратите внимание:
