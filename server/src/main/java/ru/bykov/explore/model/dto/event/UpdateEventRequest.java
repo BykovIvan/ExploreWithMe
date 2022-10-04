@@ -22,13 +22,13 @@ public class UpdateEventRequest {
     @NotBlank
     @Size(min = 20, max = 7000)
     private String description;
-    //    "yyyy-MM-dd HH:mm:ss"
     @Future
     private String eventDate;
     @NotNull
     @Positive
     private Long eventId;
     private Boolean paid;
+    @NotNull
     @Positive
     private Long participantLimit;
     @NotNull

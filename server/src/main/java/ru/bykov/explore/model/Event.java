@@ -29,14 +29,15 @@ public class Event {
     private User initiator;
     @ManyToOne(fetch = FetchType.EAGER)
     private Location location;
+    @Column(nullable = false, columnDefinition = "false")
     private Boolean paid;
+    @Column(nullable = false, columnDefinition = "0")
     private Long participantLimit;
     private LocalDateTime publishedOn;
+    @Column(nullable = false, columnDefinition = "true")
     private Boolean requestModeration;
     @Enumerated(EnumType.STRING)
     private StateOfEvent state;
     private String title;
-    private Long views;
-
 
 }

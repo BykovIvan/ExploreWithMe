@@ -94,13 +94,13 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventFullDto updateByUserIdFromUser(Long userId, UpdateEventRequest updateEventRequest) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
-
-        //TODO сделать проверка на то что человек ранее именно он опубликовал данную запись
         Event event = eventRepository.findById(updateEventRequest.getEventId()).orElseThrow(() -> new NotFoundException("Такого события не существует!"));
+        if (event.getInitiator().getId() != user.getId()){
+            throw new NoParamInRequestException("Пользователь не является инициатором данного события!");
+        }
         if (event.getState().equals(StateOfEvent.PUBLISHED)){
             throw new NoParamInRequestException("Событие уже опубликовано и его нельзя изменить!");
         }
-
         event.setAnnotation(updateEventRequest.getAnnotation());
         if (updateEventRequest.getCategory() != null) {
             event.setCategory(categoryRepository.findById(updateEventRequest.getCategory()).orElseThrow(() -> new NotFoundException("Такого категории не существует!")));
@@ -114,16 +114,22 @@ public class EventServiceImpl implements EventService {
             }
             event.setEventDate(dateAndTimeOfEvent);
         }
-
+        if (updateEventRequest.getPaid() != null){
+            event.setPaid(updateEventRequest.getPaid());
+        }
+        event.setParticipantLimit(updateEventRequest.getParticipantLimit());
+        event.setTitle(updateEventRequest.getTitle());
         if (event.getState().equals(StateOfEvent.CANCELED)){
             event.setState(StateOfEvent.PENDING);
         }
-        return null;
-//        return EventMapper.toEventFullDto(eventRepository.save(event));
+        //TODO
+//        Long views = statClient.getViewByIdEvent(event.getId()));
+        Long views = 0L;
+        return EventMapper.toEventFullDto(eventRepository.save(event), views);
     }
 
     @Override
-    public EventFullDto createByUserId(Long userId, EventFullDto eventFullDto) {
+    public EventFullDto createByUserIdFromUser(Long userId, NewEventDto newEventDto) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
         return null;
     }

@@ -20,13 +20,16 @@ public class NewEventDto {
     @NotBlank
     @Size(min = 20, max = 2000)
     private String annotation;
+    @NotNull
     private Long category;
     @NotNull
     @NotBlank
     @Size(min = 20, max = 7000)
     private String description;
-    //    "yyyy-MM-dd HH:mm:ss"
+    @NotNull
+    @NotBlank
     private String eventDate;
+    @NotNull
     private LocationDto location;
     //    default: false
     private Boolean paid;

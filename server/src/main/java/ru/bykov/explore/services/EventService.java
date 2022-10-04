@@ -20,7 +20,7 @@ public interface EventService {
 
     EventFullDto updateByUserIdFromUser(Long userId, UpdateEventRequest updateEventRequest);
 
-    EventFullDto createByUserId(Long userId, EventFullDto eventFullDto);
+    EventFullDto createByUserIdFromUser(Long userId, NewEventDto newEventDto);
 
     EventFullDto findByUserIdAndEventId(Long userId, Long eventId);
 

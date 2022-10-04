@@ -2,11 +2,13 @@ package ru.bykov.explore.controllers.users;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.bykov.explore.model.dto.event.EventFullDto;
 import ru.bykov.explore.model.dto.ParticipationRequestDto;
 import ru.bykov.explore.model.dto.event.EventShortDto;
+import ru.bykov.explore.model.dto.event.NewEventDto;
 import ru.bykov.explore.model.dto.event.UpdateEventRequest;
 import ru.bykov.explore.services.EventService;
 
@@ -42,10 +44,11 @@ public class EventControllerUser {
     }
 
     @PostMapping("/{userId}/events")
+    @ResponseStatus(HttpStatus.CREATED)
     public EventFullDto create(@PathVariable("userId") Long userId,
-                               @RequestBody EventFullDto eventFullDto) {
+                               @RequestBody NewEventDto newEventDto) {
         log.info("Получен запрос к эндпоинту /users/{userID}/events создание события пользователем. Метод POST");
-        return eventService.createByUserId(userId, eventFullDto);
+        return eventService.createByUserIdFromUser(userId, newEventDto);
     }
 
     @GetMapping("/{userId}/events/{eventId}")
