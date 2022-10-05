@@ -2,6 +2,7 @@ package ru.bykov.explore.utils.mapperForDto;
 
 import ru.bykov.explore.model.Request;
 import ru.bykov.explore.model.dto.ParticipationRequestDto;
+import ru.bykov.explore.utils.StateOfEventAndReq;
 
 public class RequestMapper {
 
@@ -11,7 +12,7 @@ public class RequestMapper {
                 .event(request.getEvent())
                 .id(request.getId())
                 .requester(request.getRequester())
-                .state(request.getState())
+                .state(String.valueOf(request.getState()))
                 .build();
     }
 
@@ -21,7 +22,7 @@ public class RequestMapper {
                 .event(participationRequestDto.getEvent())
                 .id(participationRequestDto.getId())
                 .requester(participationRequestDto.getRequester())
-                .state(participationRequestDto.getState())
+                .state(StateOfEventAndReq.valueOf(participationRequestDto.getState()))
                 .build();
     }
 

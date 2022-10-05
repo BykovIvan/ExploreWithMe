@@ -81,7 +81,7 @@ public class EventControllerUser {
                                                            @PathVariable("eventId") Long eventId,
                                                            @PathVariable("reqId") Long reqId) {
         log.info("Получен запрос к эндпоинту /users/{userID}/events{eventId}/request/{reqId}/confirm подтверждение чужой заявки на участие в событии пользователем. Метод PATCH");
-        return eventService.confirmRequestByUserIdAndEventId(userId, eventId, reqId);
+        return eventService.confirmRequestByUserIdAndEventIdFromUser(userId, eventId, reqId);
     }
 
     @PatchMapping("/{userId}/events/{eventId}/request/{reqId}/reject")

@@ -1,7 +1,7 @@
 package ru.bykov.explore.model;
 
 import lombok.*;
-import ru.bykov.explore.utils.StateOfEvent;
+import ru.bykov.explore.utils.StateOfEventAndReq;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -37,7 +37,7 @@ public class Event {
     @Column(nullable = false, columnDefinition = "true")
     private Boolean requestModeration;
     @Enumerated(EnumType.STRING)
-    private StateOfEvent state;
+    private StateOfEventAndReq state;
     private String title;
 
 }

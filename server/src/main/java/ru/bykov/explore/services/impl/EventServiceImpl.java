@@ -9,6 +9,7 @@ import ru.bykov.explore.exceptions.NoParamInRequestException;
 import ru.bykov.explore.exceptions.NotFoundException;
 import ru.bykov.explore.model.Category;
 import ru.bykov.explore.model.Event;
+import ru.bykov.explore.model.Request;
 import ru.bykov.explore.model.User;
 import ru.bykov.explore.model.dto.ParticipationRequestDto;
 import ru.bykov.explore.model.dto.event.EventFullDto;
@@ -21,7 +22,7 @@ import ru.bykov.explore.repositories.RequestRepository;
 import ru.bykov.explore.repositories.UserRepository;
 import ru.bykov.explore.services.EventService;
 import ru.bykov.explore.utils.FromSizeSortPageable;
-import ru.bykov.explore.utils.StateOfEvent;
+import ru.bykov.explore.utils.StateOfEventAndReq;
 import ru.bykov.explore.utils.mapperForDto.EventMapper;
 import ru.bykov.explore.utils.mapperForDto.RequestMapper;
 
@@ -104,7 +105,7 @@ public class EventServiceImpl implements EventService {
         if (event.getInitiator().getId() != user.getId()){
             throw new NoParamInRequestException("Пользователь не является инициатором данного события!");
         }
-        if (event.getState().equals(StateOfEvent.PUBLISHED)){
+        if (event.getState().equals(StateOfEventAndReq.PUBLISHED)){
             throw new NoParamInRequestException("Событие уже опубликовано и его нельзя изменить!");
         }
 
@@ -126,8 +127,8 @@ public class EventServiceImpl implements EventService {
         }
         event.setParticipantLimit(updateEventRequest.getParticipantLimit());
         event.setTitle(updateEventRequest.getTitle());
-        if (event.getState().equals(StateOfEvent.CANCELED)){
-            event.setState(StateOfEvent.PENDING);
+        if (event.getState().equals(StateOfEventAndReq.CANCELED)){
+            event.setState(StateOfEventAndReq.PENDING);
         }
         //TODO
 //        Long views = statClient.getViewByIdEvent(event.getId()));
@@ -160,10 +161,10 @@ public class EventServiceImpl implements EventService {
     public EventFullDto canselByUserIdAndEventIdFromUser(Long userId, Long eventId) {
         userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!"));
-        if (event.getState().equals(StateOfEvent.PUBLISHED)){
+        if (event.getState().equals(StateOfEventAndReq.PUBLISHED)){
             throw new NoParamInRequestException("Событие уже опубликовано!");
         }
-        event.setState(StateOfEvent.CANCELED);
+        event.setState(StateOfEventAndReq.CANCELED);
         //TODO
 //        Long views = statClient.getViewByIdEvent(event.getId()));
         Long views = 0L;
@@ -174,25 +175,56 @@ public class EventServiceImpl implements EventService {
     public List<ParticipationRequestDto> findRequestsByUserIdAndEventIdFromUser(Long userId, Long eventId) {
         userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
         eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!"));
-
         return requestRepository.findByEventAndRequester(eventId, userId)
                 .stream()
                 .map(RequestMapper::toParticipationRequestDto)
                 .collect(Collectors.toList());
     }
 
+    //если для события лимит заявок равен 0 или отключена пре-модерация заявок, то подтверждение заявок не требуется
+    //нельзя подтвердить заявку, если уже достигнут лимит по заявкам на данное событие
+    //если при подтверждении данной заявки, лимит заявок для события исчерпан, то все неподтверждённые заявки необходимо отклонить
+
     @Override
-    public ParticipationRequestDto confirmRequestByUserIdAndEventId(Long userId, Long eventId, Long reqId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
+    public ParticipationRequestDto confirmRequestByUserIdAndEventIdFromUser(Long userId, Long eventId, Long reqId) {
+        userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!"));
-        return null;
+        Request request = requestRepository.findById(reqId).orElseThrow(() -> new NotFoundException("Нет такого запроса!"));
+        if (event.getInitiator().getId() != userId){
+            throw new NoParamInRequestException("Пользователь не является инициатором события!");
+        }
+        if (event.getParticipantLimit() == 0 || !event.getRequestModeration()){
+            throw new NoParamInRequestException("Подтверждение заявки не требуется!");
+        }
+        if (requestRepository.countByEvent(eventId) >= event.getParticipantLimit()){
+            requestRepository.setStatusCanselWhereByStatusAndEventId(StateOfEventAndReq.CANCELED, StateOfEventAndReq.PENDING, eventId);
+            //TODO Проверить запрос в таблице через запрос, будет ли работать!
+//            List<Request> listOfReq = requestRepository.findAllByEventAndStatus(eventId, StateOfEventAndReq.PENDING);
+//            for (Request getRequester : listOfReq) {
+//                getRequester.setStatus(StateOfEventAndReq.CANCELED);
+//                requestRepository.save(getRequester);
+//            }
+//            request.setStatus(StateOfEventAndReq.CANCELED);
+//            return RequestMapper.toParticipationRequestDto(requestRepository.save(request));
+        }
+        request.setStatus(StateOfEventAndReq.PUBLISHED);
+        return RequestMapper.toParticipationRequestDto(requestRepository.save(request));
     }
 
     @Override
     public ParticipationRequestDto rejectRequestByUserIdAndEventId(Long userId, Long eventId, Long reqId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
+        //можно вставить метод проверки на все правила что бы не было дубликата!
+        userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!"));
-        return null;
+        Request request = requestRepository.findById(reqId).orElseThrow(() -> new NotFoundException("Нет такого запроса!"));
+        if (event.getInitiator().getId() != userId){
+            throw new NoParamInRequestException("Пользователь не является инициатором события!");
+        }
+        if (event.getParticipantLimit() == 0 || !event.getRequestModeration()){
+            throw new NoParamInRequestException("Подтверждение заявки не требуется!");
+        }
+        request.setStatus(StateOfEventAndReq.CANCELED);
+        return RequestMapper.toParticipationRequestDto(requestRepository.save(request));
     }
 
     @Override

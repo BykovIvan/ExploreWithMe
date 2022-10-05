@@ -1,6 +1,7 @@
 package ru.bykov.explore.model;
 
 import lombok.*;
+import ru.bykov.explore.utils.StateOfEventAndReq;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -21,5 +22,6 @@ public class Request {
     private Long event;
     @Column(unique = true)
     private Long requester;
-    private String state;
+    @Enumerated(EnumType.STRING)
+    private StateOfEventAndReq status;
 }

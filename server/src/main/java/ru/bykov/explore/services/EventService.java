@@ -27,7 +27,7 @@ public interface EventService {
 
     List<ParticipationRequestDto> findRequestsByUserIdAndEventIdFromUser(Long userId, Long eventId);
 
-    ParticipationRequestDto confirmRequestByUserIdAndEventId(Long userId, Long eventId, Long reqId);
+    ParticipationRequestDto confirmRequestByUserIdAndEventIdFromUser(Long userId, Long eventId, Long reqId);
 
     ParticipationRequestDto rejectRequestByUserIdAndEventId(Long userId, Long eventId, Long reqId);
 

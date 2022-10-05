@@ -16,7 +16,5 @@ public class ParticipationRequestDto {
     private Long event;
     private Long id;
     private Long requester;
-    //    private StateOfEvent state;
-    //проверить есть ли он в енум таблице
-    private String state;
+    private String status;
 }

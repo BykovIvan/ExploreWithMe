@@ -1,6 +1,6 @@
 package ru.bykov.explore.utils;
 
-public enum StateOfEvent {
+public enum StateOfEventAndReq {
     PENDING,
     PUBLISHED,
     CANCELED
