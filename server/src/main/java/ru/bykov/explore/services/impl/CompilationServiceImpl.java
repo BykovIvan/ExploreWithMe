@@ -12,7 +12,6 @@ import ru.bykov.explore.repositories.EventRepository;
 import ru.bykov.explore.services.CompilationService;
 import ru.bykov.explore.utils.mapperForDto.CompilationMapper;
 
-import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 

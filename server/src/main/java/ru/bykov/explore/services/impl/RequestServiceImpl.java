@@ -2,14 +2,20 @@ package ru.bykov.explore.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.bykov.explore.exceptions.NoParamInRequestException;
 import ru.bykov.explore.exceptions.NotFoundException;
+import ru.bykov.explore.model.Event;
+import ru.bykov.explore.model.Request;
+import ru.bykov.explore.model.User;
 import ru.bykov.explore.model.dto.ParticipationRequestDto;
 import ru.bykov.explore.repositories.EventRepository;
 import ru.bykov.explore.repositories.RequestRepository;
 import ru.bykov.explore.repositories.UserRepository;
 import ru.bykov.explore.services.RequestService;
+import ru.bykov.explore.utils.StateOfEventAndReq;
 import ru.bykov.explore.utils.mapperForDto.RequestMapper;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,7 +25,6 @@ public class RequestServiceImpl implements RequestService {
 
     private final RequestRepository requestRepository;
     private final UserRepository userRepository;
-
     private final EventRepository eventRepository;
 
 
@@ -40,10 +45,21 @@ public class RequestServiceImpl implements RequestService {
     //если для события отключена пре-модерация запросов на участие, то запрос должен автоматически перейти в состояние подтвержденного
     @Override
     public ParticipationRequestDto addRequestToEventByUserId(Long userId, Long eventId) {
-        userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Такого пользователя не существует!"));
-        eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!"));
-
-        return null;
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Такого пользователя не существует!"));
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!"));
+        if (event.getInitiator().getId() == userId){
+            throw new NoParamInRequestException("Пользователь не может подать запрос на участие в своем событии!");
+        }
+        if (event.getState().equals(StateOfEventAndReq.PENDING) || event.getState().equals(StateOfEventAndReq.CANCELED)){
+            throw new NoParamInRequestException("Пользователь не может участвовать в неопубликованном событии!");
+        }
+        Request requestNew = Request.builder()
+                .created(LocalDateTime.now())
+                .event(eventId)
+                .requester(userId)
+                .status(StateOfEventAndReq.PENDING)
+                .build();
+        return RequestMapper.toParticipationRequestDto(requestRepository.save(requestNew));
     }
 
     @Override

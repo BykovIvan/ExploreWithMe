@@ -194,11 +194,16 @@ public class EventServiceImpl implements EventService {
             throw new NoParamInRequestException("Пользователь не является инициатором события!");
         }
         if (event.getParticipantLimit() == 0 || !event.getRequestModeration()){
-            throw new NoParamInRequestException("Подтверждение заявки не требуется!");
+            //TODO Проверить
+            //если для события отключена пре-модерация запросов на участие, то запрос должен автоматически перейти в состояние подтвержденного
+//            throw new NoParamInRequestException("Подтверждение заявки не требуется!");
+            request.setStatus(StateOfEventAndReq.PUBLISHED);
+            return RequestMapper.toParticipationRequestDto(requestRepository.save(request));
         }
         if (requestRepository.countByEvent(eventId) >= event.getParticipantLimit()){
-            requestRepository.setStatusCanselWhereByStatusAndEventId(StateOfEventAndReq.CANCELED, StateOfEventAndReq.PENDING, eventId);
             //TODO Проверить запрос в таблице через запрос, будет ли работать!
+            requestRepository.setStatusCanselWhereByStatusAndEventId(StateOfEventAndReq.CANCELED, StateOfEventAndReq.PENDING, eventId);
+
 //            List<Request> listOfReq = requestRepository.findAllByEventAndStatus(eventId, StateOfEventAndReq.PENDING);
 //            for (Request getRequester : listOfReq) {
 //                getRequester.setStatus(StateOfEventAndReq.CANCELED);
