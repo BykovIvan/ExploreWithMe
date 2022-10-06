@@ -6,12 +6,16 @@ import ru.bykov.explore.model.dto.copmilation.CompilationDto;
 import ru.bykov.explore.model.dto.copmilation.NewCompilationDto;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CompilationMapper {
-    public static CompilationDto toCompilationDto(Compilation compilation) {
+    public static CompilationDto toCompilationDto(Compilation compilation, Long views) {
         return CompilationDto.builder()
                 .id(compilation.getId())
-                .events(compilation.getEvents())
+                .events(compilation.getEvents()
+                        .stream()
+                        .map((Event event) -> EventMapper.toEventShortDto(event, views))
+                        .collect(Collectors.toList()))
                 .pinned(compilation.getPinned())
                 .title(compilation.getTitle())
                 .build();

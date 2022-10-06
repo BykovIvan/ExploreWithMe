@@ -38,6 +38,7 @@ public class CompilationServiceImpl implements CompilationService {
     public CompilationDto createFromAdmin(NewCompilationDto newCompilationDto) {
         List<Event> listOfEvent = eventRepository.findAllById(newCompilationDto.getEvents());
         Compilation compilation = CompilationMapper.toCompilation(newCompilationDto, listOfEvent);
+        //TODO сделать как то про views подумать 
         return CompilationMapper.toCompilationDto(compilationRepository.save(compilation));
     }
 
