@@ -4,14 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.bykov.explore.exceptions.NoParamInRequestException;
 import ru.bykov.explore.exceptions.NotFoundException;
-import ru.bykov.explore.model.dto.category.CategoryDto;
-import ru.bykov.explore.services.CategoryService;
 import ru.bykov.explore.model.Category;
+import ru.bykov.explore.model.dto.category.CategoryDto;
 import ru.bykov.explore.model.dto.category.NewCategoryDto;
 import ru.bykov.explore.repositories.CategoryRepository;
+import ru.bykov.explore.services.CategoryService;
 import ru.bykov.explore.utils.mapperForDto.CategoryMapper;
 
-import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 

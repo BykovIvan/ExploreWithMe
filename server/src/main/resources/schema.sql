@@ -89,6 +89,6 @@ ALTER TABLE requests ADD FOREIGN KEY (event) REFERENCES events (id);
 
 ALTER TABLE requests ADD FOREIGN KEY (requester) REFERENCES users (id);
 
-ALTER TABLE eventsOfCompilation ADD FOREIGN KEY (compilation) REFERENCES compilations (id);
+ALTER TABLE event_compilation ADD FOREIGN KEY (compilation) REFERENCES compilations (id);
 
-ALTER TABLE eventsOfCompilation ADD FOREIGN KEY (event) REFERENCES events (id);
+ALTER TABLE event_compilation ADD FOREIGN KEY (event) REFERENCES events (id);

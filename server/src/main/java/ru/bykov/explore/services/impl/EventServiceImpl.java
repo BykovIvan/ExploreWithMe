@@ -65,7 +65,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventFullDto getByIdForAllUsers(Long eventId) {
-        //добавить проверки для выставления ошибок
+        //TODO добавить проверки для выставления ошибок
         return EventMapper.toEventDto(eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!")));
     }
 
@@ -220,7 +220,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public ParticipationRequestDto rejectRequestByUserIdAndEventIdFromUser(Long userId, Long eventId, Long reqId) {
-        //можно вставить метод проверки на все правила что бы не было дубликата!
+        //TODO можно вставить метод проверки на все правила что бы не было дубликата!
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!"));
         userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
         Request request = requestRepository.findById(reqId).orElseThrow(() -> new NotFoundException("Нет такого запроса!"));
@@ -240,7 +240,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<EventFullDto> getByParamFromAdmin(Long[] users, String[] states, Long[] categories, String rangeStart, String rangeEnd, Integer from, Integer size) {
-
+        //TODO сделать запрос с параметрами
         return null;
     }
 
@@ -287,14 +287,19 @@ public class EventServiceImpl implements EventService {
     public EventFullDto publishEventByIdFromAdmin(Long eventId) {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!"));
         LocalDateTime dateAndTimeOfEvent = event.getEventDate();
-        Duration duration = Duration.between(LocalDateTime.now(), dateAndTimeOfEvent);
-        event.setPublishedOn(LocalDateTime.now());
-        if (duration.toMinutes() < 60){
+        LocalDateTime dateAndTimeNow = LocalDateTime.now();
+        Duration duration = Duration.between(dateAndTimeNow, dateAndTimeOfEvent);
+        if (duration.toMinutes() > 60){
             throw new NoParamInRequestException("Дата начала события должна быть не ранее чем за час от даты публикации");
         }
-
-
-        return null;
+        if (event.getState().equals(StateOfEventAndReq.CANCELED)){
+            throw new NoParamInRequestException("Событие уже отменено!");
+        }
+        event.setPublishedOn(dateAndTimeNow);
+        event.setState(StateOfEventAndReq.PUBLISHED);
+        //TODO сделать запрос клиента на количество просмотров
+        Long views = null;
+        return EventMapper.toEventFullDto(eventRepository.save(event), views);
     }
 
     //Событие не должно быть опубликовано
@@ -302,9 +307,13 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventFullDto rejectEventByIdFromAdmin(Long eventId) {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!"));
-
-
-        return null;
+        if (event.getState().equals(StateOfEventAndReq.PUBLISHED)){
+            throw new NoParamInRequestException("Событие уже опубликовано!");
+        }
+        event.setState(StateOfEventAndReq.CANCELED);
+        //TODO сделать запрос клиента на количество просмотров
+        Long views = null;
+        return EventMapper.toEventFullDto(eventRepository.save(event), views);
     }
 
 }

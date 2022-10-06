@@ -12,6 +12,7 @@ import javax.validation.Valid;
 
 @RestController
 @Slf4j
+//TODO проверить для чего
 @Validated
 @RequiredArgsConstructor
 @RequestMapping(path = "admin/categories")

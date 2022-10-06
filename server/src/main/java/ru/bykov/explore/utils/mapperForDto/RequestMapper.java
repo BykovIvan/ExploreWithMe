@@ -12,7 +12,7 @@ public class RequestMapper {
                 .event(request.getEvent())
                 .id(request.getId())
                 .requester(request.getRequester())
-                .state(String.valueOf(request.getState()))
+                .status(String.valueOf(request.getStatus()))
                 .build();
     }
 
@@ -22,7 +22,7 @@ public class RequestMapper {
                 .event(participationRequestDto.getEvent())
                 .id(participationRequestDto.getId())
                 .requester(participationRequestDto.getRequester())
-                .state(StateOfEventAndReq.valueOf(participationRequestDto.getState()))
+                .status(StateOfEventAndReq.valueOf(participationRequestDto.getStatus()))
                 .build();
     }
 
