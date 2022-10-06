@@ -29,7 +29,7 @@ public class RequestServiceImpl implements RequestService {
 
 
     @Override
-    public List<ParticipationRequestDto> findByUserId(Long userId) {
+    public List<ParticipationRequestDto> findByUserIdFromUser(Long userId) {
         userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Такого пользователя не существует!"));
         return requestRepository.findByRequester(userId)
                 .stream()
@@ -44,8 +44,8 @@ public class RequestServiceImpl implements RequestService {
     //если у события достигнут лимит запросов на участие - необходимо вернуть ошибку
     //если для события отключена пре-модерация запросов на участие, то запрос должен автоматически перейти в состояние подтвержденного
     @Override
-    public ParticipationRequestDto addRequestToEventByUserId(Long userId, Long eventId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Такого пользователя не существует!"));
+    public ParticipationRequestDto addRequestToEventByUserIdFromUser(Long userId, Long eventId) {
+        userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Такого пользователя не существует!"));
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!"));
         if (event.getInitiator().getId() == userId){
             throw new NoParamInRequestException("Пользователь не может подать запрос на участие в своем событии!");
@@ -53,17 +53,23 @@ public class RequestServiceImpl implements RequestService {
         if (event.getState().equals(StateOfEventAndReq.PENDING) || event.getState().equals(StateOfEventAndReq.CANCELED)){
             throw new NoParamInRequestException("Пользователь не может участвовать в неопубликованном событии!");
         }
+        if (requestRepository.countByEvent(eventId) >= event.getParticipantLimit()){
+            throw new NoParamInRequestException("Достигнут лимит запросов на участие!");
+        }
         Request requestNew = Request.builder()
                 .created(LocalDateTime.now())
                 .event(eventId)
                 .requester(userId)
                 .status(StateOfEventAndReq.PENDING)
                 .build();
+        if (!event.getRequestModeration()){
+            requestNew.setStatus(StateOfEventAndReq.PUBLISHED);
+        }
         return RequestMapper.toParticipationRequestDto(requestRepository.save(requestNew));
     }
 
     @Override
-    public ParticipationRequestDto canselRequestByUserIdAndRequestId(Long userId, Long requestId) {
+    public ParticipationRequestDto canselRequestByUserIdAndRequestIdFromUser(Long userId, Long requestId) {
         userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Такого пользователя не существует!"));
         requestRepository.findById(requestId).orElseThrow(() -> new NotFoundException("Такой заявки не существует!"));
 
