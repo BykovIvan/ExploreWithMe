@@ -3,6 +3,7 @@ package ru.bykov.explore.controllers.admin;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import ru.bykov.explore.model.dto.event.AdminUpdateEventRequest;
 import ru.bykov.explore.model.dto.event.EventFullDto;
 import ru.bykov.explore.model.dto.event.NewEventDto;
 import ru.bykov.explore.services.EventService;
@@ -31,9 +32,9 @@ public class EventControllerAdmin {
 
     @PutMapping("/{eventId}")
     public EventFullDto updateById(@PathVariable("eventId") Long eventId,
-                                   @RequestBody NewEventDto newEventDto) {
-        log.info("Получен запрос к эндпоинту /admin/events/{eventId}, метод GET, получение события по id = {}", eventId);
-        return eventService.updateByIdFromAdmin(eventId, newEventDto);
+                                   @RequestBody AdminUpdateEventRequest adminUpdateEventRequest) {
+        log.info("Получен запрос к эндпоинту /admin/events/{eventId}, метод PUT, обновление события по id = {}", eventId);
+        return eventService.updateByIdFromAdmin(eventId, adminUpdateEventRequest);
     }
 
     @PatchMapping("/{eventId}/publish")

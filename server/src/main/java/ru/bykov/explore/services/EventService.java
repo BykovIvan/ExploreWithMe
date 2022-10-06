@@ -1,10 +1,7 @@
 package ru.bykov.explore.services;
 
-import ru.bykov.explore.model.dto.event.EventFullDto;
-import ru.bykov.explore.model.dto.event.NewEventDto;
 import ru.bykov.explore.model.dto.ParticipationRequestDto;
-import ru.bykov.explore.model.dto.event.EventShortDto;
-import ru.bykov.explore.model.dto.event.UpdateEventRequest;
+import ru.bykov.explore.model.dto.event.*;
 
 import java.util.List;
 
@@ -29,14 +26,30 @@ public interface EventService {
 
     ParticipationRequestDto confirmRequestByUserIdAndEventIdFromUser(Long userId, Long eventId, Long reqId);
 
-    ParticipationRequestDto rejectRequestByUserIdAndEventId(Long userId, Long eventId, Long reqId);
+    ParticipationRequestDto rejectRequestByUserIdAndEventIdFromUser(Long userId, Long eventId, Long reqId);
 
+    /**
+     * Поиск события по параметрам администратором
+     * Search for an event by parameters by the administrator
+     */
     List<EventFullDto> getByParamFromAdmin(Long[] users, String[] states, Long[] categories, String rangeStart, String rangeEnd, Integer from, Integer size);
 
-    EventFullDto updateByIdFromAdmin(Long eventId, NewEventDto newEventDto);
+    /**
+     * Редактирование события администратором
+     * Editing an event by an administrator
+     */
+    EventFullDto updateByIdFromAdmin(Long eventId, AdminUpdateEventRequest adminUpdateEventRequest);
 
+    /**
+     * Публикация события администратором
+     * Publishing an event by an administrator
+     */
     EventFullDto publishEventByIdFromAdmin(Long eventId);
 
+    /**
+     * Отклонение события администратором
+     * Rejecting an event by an administrator
+     */
     EventFullDto rejectEventByIdFromAdmin(Long eventId);
 
 }

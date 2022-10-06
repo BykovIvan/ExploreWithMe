@@ -2,11 +2,11 @@ package ru.bykov.explore.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.bykov.explore.exceptions.NoParamInRequestException;
 import ru.bykov.explore.exceptions.NotFoundException;
 import ru.bykov.explore.model.Event;
 import ru.bykov.explore.model.Request;
-import ru.bykov.explore.model.User;
 import ru.bykov.explore.model.dto.ParticipationRequestDto;
 import ru.bykov.explore.repositories.EventRepository;
 import ru.bykov.explore.repositories.RequestRepository;
@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class RequestServiceImpl implements RequestService {
 
@@ -47,13 +48,13 @@ public class RequestServiceImpl implements RequestService {
     public ParticipationRequestDto addRequestToEventByUserIdFromUser(Long userId, Long eventId) {
         userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Такого пользователя не существует!"));
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!"));
-        if (event.getInitiator().getId() == userId){
+        if (event.getInitiator().getId() == userId) {
             throw new NoParamInRequestException("Пользователь не может подать запрос на участие в своем событии!");
         }
-        if (event.getState().equals(StateOfEventAndReq.PENDING) || event.getState().equals(StateOfEventAndReq.CANCELED)){
+        if (event.getState().equals(StateOfEventAndReq.PENDING) || event.getState().equals(StateOfEventAndReq.CANCELED)) {
             throw new NoParamInRequestException("Пользователь не может участвовать в неопубликованном событии!");
         }
-        if (requestRepository.countByEvent(eventId) >= event.getParticipantLimit()){
+        if (requestRepository.countByEvent(eventId) >= event.getParticipantLimit()) {
             throw new NoParamInRequestException("Достигнут лимит запросов на участие!");
         }
         Request requestNew = Request.builder()
@@ -62,7 +63,7 @@ public class RequestServiceImpl implements RequestService {
                 .requester(userId)
                 .status(StateOfEventAndReq.PENDING)
                 .build();
-        if (!event.getRequestModeration()){
+        if (!event.getRequestModeration()) {
             requestNew.setStatus(StateOfEventAndReq.PUBLISHED);
         }
         return RequestMapper.toParticipationRequestDto(requestRepository.save(requestNew));
@@ -71,8 +72,16 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public ParticipationRequestDto canselRequestByUserIdAndRequestIdFromUser(Long userId, Long requestId) {
         userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Такого пользователя не существует!"));
-        requestRepository.findById(requestId).orElseThrow(() -> new NotFoundException("Такой заявки не существует!"));
-
-        return null;
+        Request request = requestRepository.findById(requestId).orElseThrow(() -> new NotFoundException("Такой заявки не существует!"));
+        if (request.getRequester() != userId) {
+            throw new NoParamInRequestException("Данный пользователь не является владельцем этой заявки!");
+        }
+        if (request.getStatus().equals(StateOfEventAndReq.PUBLISHED)){
+            Event event = eventRepository.findById(request.getEvent()).orElseThrow(() -> new NotFoundException("Нет такого события!"));
+            event.setConfirmedRequests(event.getConfirmedRequests() - 1);
+            eventRepository.save(event);
+        }
+        request.setStatus(StateOfEventAndReq.CANCELED);
+        return RequestMapper.toParticipationRequestDto(requestRepository.save(request));
     }
 }

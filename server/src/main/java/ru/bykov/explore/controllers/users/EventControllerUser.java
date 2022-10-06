@@ -89,7 +89,7 @@ public class EventControllerUser {
                                                           @PathVariable("eventId") Long eventId,
                                                           @PathVariable("reqId") Long reqId) {
         log.info("Получен запрос к эндпоинту /users/{userID}/events{eventId}/request/{reqId}/confirm отклонение чужой заявки на участие в событии пользователем. Метод PATCH");
-        return eventService.rejectRequestByUserIdAndEventId(userId, eventId, reqId);
+        return eventService.rejectRequestByUserIdAndEventIdFromUser(userId, eventId, reqId);
     }
 
 

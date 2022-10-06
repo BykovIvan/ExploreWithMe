@@ -3,6 +3,7 @@ package ru.bykov.explore.services.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.bykov.explore.clientstat.StatClient;
 import ru.bykov.explore.clientstat.StatisticDto;
 import ru.bykov.explore.exceptions.NoParamInRequestException;
@@ -12,10 +13,7 @@ import ru.bykov.explore.model.Event;
 import ru.bykov.explore.model.Request;
 import ru.bykov.explore.model.User;
 import ru.bykov.explore.model.dto.ParticipationRequestDto;
-import ru.bykov.explore.model.dto.event.EventFullDto;
-import ru.bykov.explore.model.dto.event.EventShortDto;
-import ru.bykov.explore.model.dto.event.NewEventDto;
-import ru.bykov.explore.model.dto.event.UpdateEventRequest;
+import ru.bykov.explore.model.dto.event.*;
 import ru.bykov.explore.repositories.CategoryRepository;
 import ru.bykov.explore.repositories.EventRepository;
 import ru.bykov.explore.repositories.RequestRepository;
@@ -24,6 +22,7 @@ import ru.bykov.explore.services.EventService;
 import ru.bykov.explore.utils.FromSizeSortPageable;
 import ru.bykov.explore.utils.StateOfEventAndReq;
 import ru.bykov.explore.utils.mapperForDto.EventMapper;
+import ru.bykov.explore.utils.mapperForDto.LocationMapper;
 import ru.bykov.explore.utils.mapperForDto.RequestMapper;
 
 import java.time.Duration;
@@ -33,6 +32,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class EventServiceImpl implements EventService {
 
@@ -212,21 +212,27 @@ public class EventServiceImpl implements EventService {
 //            request.setStatus(StateOfEventAndReq.CANCELED);
 //            return RequestMapper.toParticipationRequestDto(requestRepository.save(request));
         }
+        event.setConfirmedRequests(event.getConfirmedRequests() + 1);
+        eventRepository.save(event);
         request.setStatus(StateOfEventAndReq.PUBLISHED);
         return RequestMapper.toParticipationRequestDto(requestRepository.save(request));
     }
 
     @Override
-    public ParticipationRequestDto rejectRequestByUserIdAndEventId(Long userId, Long eventId, Long reqId) {
+    public ParticipationRequestDto rejectRequestByUserIdAndEventIdFromUser(Long userId, Long eventId, Long reqId) {
         //можно вставить метод проверки на все правила что бы не было дубликата!
-        userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!"));
+        userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
         Request request = requestRepository.findById(reqId).orElseThrow(() -> new NotFoundException("Нет такого запроса!"));
         if (event.getInitiator().getId() != userId){
             throw new NoParamInRequestException("Пользователь не является инициатором события!");
         }
         if (event.getParticipantLimit() == 0 || !event.getRequestModeration()){
             throw new NoParamInRequestException("Подтверждение заявки не требуется!");
+        }
+        if (request.getStatus().equals(StateOfEventAndReq.PUBLISHED)){
+            event.setConfirmedRequests(event.getConfirmedRequests() - 1);
+            eventRepository.save(event);
         }
         request.setStatus(StateOfEventAndReq.CANCELED);
         return RequestMapper.toParticipationRequestDto(requestRepository.save(request));
@@ -239,21 +245,65 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventFullDto updateByIdFromAdmin(Long eventId, NewEventDto newEventDto) {
+    public EventFullDto updateByIdFromAdmin(Long eventId, AdminUpdateEventRequest adminUpdateEventRequest) {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!"));
+        if (adminUpdateEventRequest.getAnnotation() != null){
+            event.setAnnotation(adminUpdateEventRequest.getAnnotation());
+        }
+        if (adminUpdateEventRequest.getCategory() != null){
+            event.setCategory(categoryRepository.findById(adminUpdateEventRequest.getCategory()).orElseThrow(() -> new NotFoundException("Нет такой категории!")));
+        }
+        if (adminUpdateEventRequest.getDescription() != null){
+            event.setDescription(adminUpdateEventRequest.getDescription());
+        }
+        if (adminUpdateEventRequest.getEventDate() != null){
+            event.setEventDate(LocalDateTime.parse(adminUpdateEventRequest.getEventDate(), formatter));
+        }
+        if (adminUpdateEventRequest.getLocation() != null){
+            event.setLocation(LocationMapper.toLocation(adminUpdateEventRequest.getLocation()));
+        }
+        if (adminUpdateEventRequest.getPaid() != null){
+            event.setPaid(adminUpdateEventRequest.getPaid());
+        }
+        if (adminUpdateEventRequest.getParticipantLimit() != null){
+            event.setParticipantLimit(adminUpdateEventRequest.getParticipantLimit());
+        }
+        if (adminUpdateEventRequest.getRequestModeration() != null){
+            event.setRequestModeration(adminUpdateEventRequest.getRequestModeration());
+        }
+        if (adminUpdateEventRequest.getTitle() != null){
+            event.setTitle(adminUpdateEventRequest.getTitle());
+        }
+        //TODO сделать запрос клиента на количество просмотров
+        Long views = null;
 
-        return null;
+        return EventMapper.toEventFullDto(eventRepository.save(event), views);
     }
+
+    // Дата начала события должна быть не ранее чем за час от даты публикации.
+    // Событие должно быть в состоянии ожидания публикации
 
     @Override
     public EventFullDto publishEventByIdFromAdmin(Long eventId) {
-        //дата начала события должна быть не ранее чем за час от даты публикации.
-        //событие должно быть в состоянии ожидания публикации
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!"));
+        LocalDateTime dateAndTimeOfEvent = event.getEventDate();
+        Duration duration = Duration.between(LocalDateTime.now(), dateAndTimeOfEvent);
+        event.setPublishedOn(LocalDateTime.now());
+        if (duration.toMinutes() < 60){
+            throw new NoParamInRequestException("Дата начала события должна быть не ранее чем за час от даты публикации");
+        }
+
+
         return null;
     }
 
+    //Событие не должно быть опубликовано
+
     @Override
     public EventFullDto rejectEventByIdFromAdmin(Long eventId) {
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!"));
+
+
         return null;
     }
 
