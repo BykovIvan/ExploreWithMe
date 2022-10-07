@@ -24,22 +24,27 @@ public class CompilationServiceImpl implements CompilationService {
 
     @Override
     public List<CompilationDto> getAllForAll() {
+        //TODO сделать как то про views подумать
+        Long views = 0L;
         return compilationRepository.findAll().stream()
-                .map(CompilationMapper::toCompilationDto)
+                .map((Compilation compilation) -> CompilationMapper.toCompilationDto(compilation, views) )
                 .collect(Collectors.toList());
     }
 
     @Override
     public CompilationDto getByIdForAll(Long compilationId) {
-        return CompilationMapper.toCompilationDto(compilationRepository.findById(compilationId).orElseThrow(() -> new NotFoundException("Нет такой подборки!")));
+        //TODO сделать как то про views подумать
+        Long views = 0L;
+        return CompilationMapper.toCompilationDto(compilationRepository.findById(compilationId).orElseThrow(() -> new NotFoundException("Нет такой подборки!")), views);
     }
 
     @Override
     public CompilationDto createFromAdmin(NewCompilationDto newCompilationDto) {
         List<Event> listOfEvent = eventRepository.findAllById(newCompilationDto.getEvents());
         Compilation compilation = CompilationMapper.toCompilation(newCompilationDto, listOfEvent);
-        //TODO сделать как то про views подумать 
-        return CompilationMapper.toCompilationDto(compilationRepository.save(compilation));
+        //TODO сделать как то про views подумать
+        Long views = 0L;
+        return CompilationMapper.toCompilationDto(compilationRepository.save(compilation), views);
     }
 
     @Override

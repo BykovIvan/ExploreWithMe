@@ -11,6 +11,7 @@ import ru.bykov.explore.repositories.CategoryRepository;
 import ru.bykov.explore.services.CategoryService;
 import ru.bykov.explore.utils.mapperForDto.CategoryMapper;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,7 +30,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDto getByIdForAllUsers(Long id) {
-        return CategoryMapper.toCategoryDto(categoryRepository.findById(id).orElseThrow(() -> new NotFoundException("Нет такой категории!")));
+        return CategoryMapper.toCategoryDto(categoryRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Нет такой категории!")));
     }
 
     @Override

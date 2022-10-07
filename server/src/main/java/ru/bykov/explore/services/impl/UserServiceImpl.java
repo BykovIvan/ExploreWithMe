@@ -23,9 +23,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> getByParamFromAdmin(Long[] ids, Integer from, Integer size) {
-        for (Long id : ids) {
-            userRepository.findById(id).orElseThrow(() -> new NotFoundException("Такого пользователя не существует!"));
-        }
+//        for (Long id : ids) {
+//            userRepository.findById(id).orElseThrow(() -> new NotFoundException("Такого пользователя не существует!"));
+//        }
 
         return userRepository.findByIdIn(ids, FromSizeSortPageable.of(from, size, Sort.by(Sort.Direction.ASC, "id")))
                 .stream()
