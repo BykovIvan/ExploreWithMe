@@ -20,6 +20,7 @@ public class Event {
     private Long id;
     private String annotation;
     @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id", insertable = false, updatable = false)
     private Category category;
     @Column(name = "confirmed_requests")
     private Long confirmedRequests;
@@ -29,8 +30,10 @@ public class Event {
     @Column(name = "event_date")
     private LocalDateTime eventDate;
     @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id", insertable = false, updatable = false)
     private User initiator;
     @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id", insertable = false, updatable = false)
     private Location location;
     @Column(nullable = false, columnDefinition = "false")
     private Boolean paid;
@@ -40,6 +43,7 @@ public class Event {
     private LocalDateTime publishedOn;
     @Column(name = "request_moderation", nullable = false, columnDefinition = "true")
     private Boolean requestModeration;
+//    @Column(nullable = false, columnDefinition = "PENDING")
     @Enumerated(EnumType.STRING)
     private StateOfEventAndReq state;
     private String title;

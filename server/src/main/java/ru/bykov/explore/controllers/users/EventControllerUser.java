@@ -18,7 +18,6 @@ import java.util.List;
 
 @RestController
 @Slf4j
-@Validated
 @RequiredArgsConstructor
 @RequestMapping(path = "/users")
 public class EventControllerUser {

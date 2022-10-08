@@ -3,11 +3,13 @@ package ru.bykov.explore.repositories;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 import ru.bykov.explore.model.Request;
 import ru.bykov.explore.utils.StateOfEventAndReq;
 
 import java.util.List;
 
+@Repository
 public interface RequestRepository extends JpaRepository<Request, Long> {
     List<Request> findByRequester(Long userId);
 

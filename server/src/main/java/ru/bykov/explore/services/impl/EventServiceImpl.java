@@ -6,18 +6,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.bykov.explore.clientstat.StatClient;
 import ru.bykov.explore.clientstat.StatisticDto;
-import ru.bykov.explore.exceptions.NoParamInRequestException;
-import ru.bykov.explore.exceptions.NotFoundException;
-import ru.bykov.explore.model.Category;
-import ru.bykov.explore.model.Event;
-import ru.bykov.explore.model.Request;
-import ru.bykov.explore.model.User;
+import ru.bykov.explore.exceptions.EntityNotFoundException;
+import ru.bykov.explore.exceptions.ValidationException;
+import ru.bykov.explore.model.*;
 import ru.bykov.explore.model.dto.ParticipationRequestDto;
 import ru.bykov.explore.model.dto.event.*;
-import ru.bykov.explore.repositories.CategoryRepository;
-import ru.bykov.explore.repositories.EventRepository;
-import ru.bykov.explore.repositories.RequestRepository;
-import ru.bykov.explore.repositories.UserRepository;
+import ru.bykov.explore.repositories.*;
 import ru.bykov.explore.services.EventService;
 import ru.bykov.explore.utils.FromSizeSortPageable;
 import ru.bykov.explore.utils.StateOfEventAndReq;
@@ -32,7 +26,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class EventServiceImpl implements EventService {
 
@@ -41,18 +34,21 @@ public class EventServiceImpl implements EventService {
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
     private final RequestRepository requestRepository;
+    private final LocationRepository locationRepository;
     private final StatClient statClient;
 
     @Override
     public List<EventShortDto> getAllForAllUsers(String text, String[] categories, Boolean paid, String rangeStart, String rangeEnd, Boolean onlyAvailable, String sort, Integer from, Integer size) {
-        if (text == null || categories == null || paid == null || rangeStart == null || rangeEnd == null) {
-            throw new NoParamInRequestException("Плохо составленый запрос!");
-        }
+//        if (text == null || categories == null || paid == null || rangeStart == null || rangeEnd == null) {
+//            throw new NoParamInRequestException("Плохо составленый запрос!");
+//        }
         if (from < 0 || size <= 0) {
-            throw new NoParamInRequestException("Введены неверные параметры!");
+            //TODO может разделить
+            throw new ValidationException(Event.class, "from", from.toString(), "Введены неверные параметры!");
         }
         if (!sort.equals("EVENT_DATE") || !sort.equals("VIEWS")) {
-            throw new NoParamInRequestException("Введены неверные параметры!");
+            //TODO может разделить
+            throw new ValidationException(Event.class, "sort", sort, "Причина", "Введены неверные параметры!");
         }
         //TODO
         Long views = null;
@@ -66,14 +62,14 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventFullDto getByIdForAllUsers(Long eventId) {
         //TODO добавить проверки для выставления ошибок
-        return EventMapper.toEventDto(eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!")));
+        return EventMapper.toEventDto(eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString())));
     }
 
 
     //путь Для users/
     @Override
     public List<EventShortDto> findByUserIdFromUser(Long userId, String remoteAddr, String requestURI, Integer from, Integer size) {
-        userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
+        userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
         //запись в сервис статистики
         //Сохранять статистику нужно будет по двум эндпоинтам:
         // GET /events, который отвечает за получение событий с возможностью фильтрации, и
@@ -98,36 +94,36 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventFullDto updateFromUser(Long userId, UpdateEventRequest updateEventRequest) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
 
         //TODO сделать проверка на то что человек ранее именно он опубликовал данную запись
-        Event event = eventRepository.findById(updateEventRequest.getEventId()).orElseThrow(() -> new NotFoundException("Такого события не существует!"));
-        if (event.getInitiator().getId() != user.getId()){
-            throw new NoParamInRequestException("Пользователь не является инициатором данного события!");
+        Event event = eventRepository.findById(updateEventRequest.getEventId()).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", updateEventRequest.getEventId().toString()));
+        if (event.getInitiator().getId() != user.getId()) {
+            throw new ValidationException(Event.class, "Initiator", event.getInitiator().toString(), "Причина", "Пользователь не является инициатором данного события!");
         }
-        if (event.getState().equals(StateOfEventAndReq.PUBLISHED)){
-            throw new NoParamInRequestException("Событие уже опубликовано и его нельзя изменить!");
+        if (event.getState().equals(StateOfEventAndReq.PUBLISHED)) {
+            throw new ValidationException(Event.class, "State", event.getState().toString(), "Причина", "Событие уже опубликовано и его нельзя изменить!");
         }
 
         event.setAnnotation(updateEventRequest.getAnnotation());
         if (updateEventRequest.getCategory() != null) {
-            event.setCategory(categoryRepository.findById(updateEventRequest.getCategory()).orElseThrow(() -> new NotFoundException("Такого категории не существует!")));
+            event.setCategory(categoryRepository.findById(updateEventRequest.getCategory()).orElseThrow(() -> new EntityNotFoundException(Category.class, "id", updateEventRequest.getCategory().toString())));
         }
         event.setDescription(updateEventRequest.getDescription());
-        if (updateEventRequest.getEventDate() != null){
+        if (updateEventRequest.getEventDate() != null) {
             LocalDateTime dateAndTimeOfEvent = LocalDateTime.parse(updateEventRequest.getEventDate(), formatter);
             Duration duration = Duration.between(LocalDateTime.now(), dateAndTimeOfEvent);
-            if (duration.toMinutes() < 120){
-                throw new NoParamInRequestException("Время до события менее 2 часов и поэтому его нельзя изменить!");
+            if (duration.toMinutes() < 120) {
+                throw new ValidationException(Event.class, "EventDate", event.getEventDate().toString(), "Причина", "Время до события менее 2 часов и поэтому его нельзя изменить!");
             }
             event.setEventDate(dateAndTimeOfEvent);
         }
-        if (updateEventRequest.getPaid() != null){
+        if (updateEventRequest.getPaid() != null) {
             event.setPaid(updateEventRequest.getPaid());
         }
         event.setParticipantLimit(updateEventRequest.getParticipantLimit());
         event.setTitle(updateEventRequest.getTitle());
-        if (event.getState().equals(StateOfEventAndReq.CANCELED)){
+        if (event.getState().equals(StateOfEventAndReq.CANCELED)) {
             event.setState(StateOfEventAndReq.PENDING);
         }
         //TODO
@@ -138,19 +134,22 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventFullDto createFromUser(Long userId, NewEventDto newEventDto) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
-        Category category = categoryRepository.findById(newEventDto.getCategory()).orElseThrow(() -> new NotFoundException("Нет такой категории!"));
-        Event event = EventMapper.toEvent(newEventDto, category, user);
+        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
+        Category category = categoryRepository.findById(newEventDto.getCategory()).orElseThrow(() -> new EntityNotFoundException(Category.class, "id", newEventDto.getCategory().toString()));
+        Location location = locationRepository.save(LocationMapper.toLocation(newEventDto.getLocation()));
+        Event event = EventMapper.toEvent(newEventDto, category, user, location);
+        event.setState(StateOfEventAndReq.PENDING);
         //TODO
 //        Long views = statClient.getViewByIdEvent(event.getId()));
         Long views = 0L;
-        return EventMapper.toEventFullDto(eventRepository.save(event), views);
+        Event eventNew = eventRepository.save(event);
+        return EventMapper.toEventFullDto(eventNew, views);
     }
 
     @Override
     public EventFullDto findByUserIdAndEventIdFromUser(Long userId, Long eventId) {
-        userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
-        eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!"));
+        userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
+        eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
         //TODO
 //        Long views = statClient.getViewByIdEvent(event.getId()));
         Long views = 0L;
@@ -159,10 +158,10 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventFullDto canselByUserIdAndEventIdFromUser(Long userId, Long eventId) {
-        userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
-        Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!"));
-        if (event.getState().equals(StateOfEventAndReq.PUBLISHED)){
-            throw new NoParamInRequestException("Событие уже опубликовано!");
+        userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
+        if (event.getState().equals(StateOfEventAndReq.PUBLISHED)) {
+            throw new ValidationException(Event.class, "State", event.getState().toString(), "Причина", "Событие уже опубликовано!");
         }
         event.setState(StateOfEventAndReq.CANCELED);
         //TODO
@@ -173,8 +172,8 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<ParticipationRequestDto> findRequestsByUserIdAndEventIdFromUser(Long userId, Long eventId) {
-        userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
-        eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!"));
+        userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
+        eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
         return requestRepository.findByEventAndRequester(eventId, userId)
                 .stream()
                 .map(RequestMapper::toParticipationRequestDto)
@@ -187,20 +186,20 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public ParticipationRequestDto confirmRequestByUserIdAndEventIdFromUser(Long userId, Long eventId, Long reqId) {
-        userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
-        Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!"));
-        Request request = requestRepository.findById(reqId).orElseThrow(() -> new NotFoundException("Нет такого запроса!"));
-        if (event.getInitiator().getId() != userId){
-            throw new NoParamInRequestException("Пользователь не является инициатором события!");
+        userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
+        Request request = requestRepository.findById(reqId).orElseThrow(() -> new EntityNotFoundException(Request.class, "id", reqId.toString()));
+        if (event.getInitiator().getId() != userId) {
+            throw new ValidationException(Event.class, "Initiator", event.getInitiator().toString(), "Причина", "Пользователь не является инициатором события!");
         }
-        if (event.getParticipantLimit() == 0 || !event.getRequestModeration()){
+        if (event.getParticipantLimit() == 0 || !event.getRequestModeration()) {
             //TODO Проверить
             //если для события отключена пре-модерация запросов на участие, то запрос должен автоматически перейти в состояние подтвержденного
 //            throw new NoParamInRequestException("Подтверждение заявки не требуется!");
             request.setStatus(StateOfEventAndReq.PUBLISHED);
             return RequestMapper.toParticipationRequestDto(requestRepository.save(request));
         }
-        if (requestRepository.countByEvent(eventId) >= event.getParticipantLimit()){
+        if (requestRepository.countByEvent(eventId) >= event.getParticipantLimit()) {
             //TODO Проверить запрос в таблице через запрос, будет ли работать!
             requestRepository.setStatusCanselWhereByStatusAndEventId(StateOfEventAndReq.CANCELED, StateOfEventAndReq.PENDING, eventId);
 
@@ -221,16 +220,17 @@ public class EventServiceImpl implements EventService {
     @Override
     public ParticipationRequestDto rejectRequestByUserIdAndEventIdFromUser(Long userId, Long eventId, Long reqId) {
         //TODO можно вставить метод проверки на все правила что бы не было дубликата!
-        Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!"));
-        userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Нет такого пользователя!"));
-        Request request = requestRepository.findById(reqId).orElseThrow(() -> new NotFoundException("Нет такого запроса!"));
-        if (event.getInitiator().getId() != userId){
-            throw new NoParamInRequestException("Пользователь не является инициатором события!");
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
+        userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
+        Request request = requestRepository.findById(reqId).orElseThrow(() -> new EntityNotFoundException(Request.class, "id", reqId.toString()));
+        if (event.getInitiator().getId() != userId) {
+            throw new ValidationException(Event.class, "Initiator", event.getInitiator().toString(), "Причина", "Пользователь не является инициатором события!");
         }
-        if (event.getParticipantLimit() == 0 || !event.getRequestModeration()){
-            throw new NoParamInRequestException("Подтверждение заявки не требуется!");
+        if (event.getParticipantLimit() == 0 || !event.getRequestModeration()) {
+            //TODO может стоит разделить?
+            throw new ValidationException(Event.class, "ParticipantLimit", event.getParticipantLimit().toString(), "Причина", "Подтверждение заявки не требуется!");
         }
-        if (request.getStatus().equals(StateOfEventAndReq.PUBLISHED)){
+        if (request.getStatus().equals(StateOfEventAndReq.PUBLISHED)) {
             event.setConfirmedRequests(event.getConfirmedRequests() - 1);
             eventRepository.save(event);
         }
@@ -246,32 +246,32 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventFullDto updateByIdFromAdmin(Long eventId, AdminUpdateEventRequest adminUpdateEventRequest) {
-        Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!"));
-        if (adminUpdateEventRequest.getAnnotation() != null){
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
+        if (adminUpdateEventRequest.getAnnotation() != null) {
             event.setAnnotation(adminUpdateEventRequest.getAnnotation());
         }
-        if (adminUpdateEventRequest.getCategory() != null){
-            event.setCategory(categoryRepository.findById(adminUpdateEventRequest.getCategory()).orElseThrow(() -> new NotFoundException("Нет такой категории!")));
+        if (adminUpdateEventRequest.getCategory() != null) {
+            event.setCategory(categoryRepository.findById(adminUpdateEventRequest.getCategory()).orElseThrow(() -> new EntityNotFoundException(Category.class, "id", adminUpdateEventRequest.getCategory().toString())));
         }
-        if (adminUpdateEventRequest.getDescription() != null){
+        if (adminUpdateEventRequest.getDescription() != null) {
             event.setDescription(adminUpdateEventRequest.getDescription());
         }
-        if (adminUpdateEventRequest.getEventDate() != null){
+        if (adminUpdateEventRequest.getEventDate() != null) {
             event.setEventDate(LocalDateTime.parse(adminUpdateEventRequest.getEventDate(), formatter));
         }
-        if (adminUpdateEventRequest.getLocation() != null){
+        if (adminUpdateEventRequest.getLocation() != null) {
             event.setLocation(LocationMapper.toLocation(adminUpdateEventRequest.getLocation()));
         }
-        if (adminUpdateEventRequest.getPaid() != null){
+        if (adminUpdateEventRequest.getPaid() != null) {
             event.setPaid(adminUpdateEventRequest.getPaid());
         }
-        if (adminUpdateEventRequest.getParticipantLimit() != null){
+        if (adminUpdateEventRequest.getParticipantLimit() != null) {
             event.setParticipantLimit(adminUpdateEventRequest.getParticipantLimit());
         }
-        if (adminUpdateEventRequest.getRequestModeration() != null){
+        if (adminUpdateEventRequest.getRequestModeration() != null) {
             event.setRequestModeration(adminUpdateEventRequest.getRequestModeration());
         }
-        if (adminUpdateEventRequest.getTitle() != null){
+        if (adminUpdateEventRequest.getTitle() != null) {
             event.setTitle(adminUpdateEventRequest.getTitle());
         }
         //TODO сделать запрос клиента на количество просмотров
@@ -285,15 +285,15 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventFullDto publishEventByIdFromAdmin(Long eventId) {
-        Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!"));
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
         LocalDateTime dateAndTimeOfEvent = event.getEventDate();
         LocalDateTime dateAndTimeNow = LocalDateTime.now();
         Duration duration = Duration.between(dateAndTimeNow, dateAndTimeOfEvent);
-        if (duration.toMinutes() > 60){
-            throw new NoParamInRequestException("Дата начала события должна быть не ранее чем за час от даты публикации");
+        if (duration.toMinutes() > 60) {
+            throw new ValidationException(Event.class, "EventDate", event.getEventDate().toString(), "Причина", "Дата начала события должна быть не ранее чем за час от даты публикации");
         }
-        if (event.getState().equals(StateOfEventAndReq.CANCELED)){
-            throw new NoParamInRequestException("Событие уже отменено!");
+        if (event.getState().equals(StateOfEventAndReq.CANCELED)) {
+            throw new ValidationException(Event.class, "state", event.getState().toString(), "Причина", "Событие уже отменено!");
         }
         event.setPublishedOn(dateAndTimeNow);
         event.setState(StateOfEventAndReq.PUBLISHED);
@@ -306,9 +306,9 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventFullDto rejectEventByIdFromAdmin(Long eventId) {
-        Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!"));
-        if (event.getState().equals(StateOfEventAndReq.PUBLISHED)){
-            throw new NoParamInRequestException("Событие уже опубликовано!");
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
+        if (event.getState().equals(StateOfEventAndReq.PUBLISHED)) {
+            throw new ValidationException(Event.class, "state", event.getState().toString(), "Причина", "Событие уже опубликовано!");
         }
         event.setState(StateOfEventAndReq.CANCELED);
         //TODO сделать запрос клиента на количество просмотров

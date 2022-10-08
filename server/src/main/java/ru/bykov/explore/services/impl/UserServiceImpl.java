@@ -3,7 +3,7 @@ package ru.bykov.explore.services.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import ru.bykov.explore.exceptions.NotFoundException;
+import ru.bykov.explore.exceptions.EntityNotFoundException;
 import ru.bykov.explore.model.User;
 import ru.bykov.explore.model.dto.user.NewUserRequest;
 import ru.bykov.explore.model.dto.user.UserDto;
@@ -23,10 +23,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> getByParamFromAdmin(Long[] ids, Integer from, Integer size) {
-//        for (Long id : ids) {
-//            userRepository.findById(id).orElseThrow(() -> new NotFoundException("Такого пользователя не существует!"));
-//        }
-
+        for (Long id : ids) {
+            userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(User.class, "id", id.toString()));
+        }
         return userRepository.findByIdIn(ids, FromSizeSortPageable.of(from, size, Sort.by(Sort.Direction.ASC, "id")))
                 .stream()
                 .map(UserMapper::toUserDto)
@@ -41,7 +40,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteByIdFromAdmin(Long userId) {
-        userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Такого пользователя не существует!"));
+        userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
         userRepository.deleteById(userId);
     }
 }

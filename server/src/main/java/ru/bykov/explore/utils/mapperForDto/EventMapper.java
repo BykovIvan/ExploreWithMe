@@ -2,6 +2,7 @@ package ru.bykov.explore.utils.mapperForDto;
 
 import ru.bykov.explore.model.Category;
 import ru.bykov.explore.model.Event;
+import ru.bykov.explore.model.Location;
 import ru.bykov.explore.model.User;
 import ru.bykov.explore.model.dto.event.EventFullDto;
 import ru.bykov.explore.model.dto.event.EventShortDto;
@@ -37,7 +38,7 @@ public class EventMapper {
     }
 
     //TODO
-    public static Event toEvent(NewEventDto newEventDto, Category category, User user) {
+    public static Event toEvent(NewEventDto newEventDto, Category category, User user, Location location) {
         return Event.builder()
                 .annotation(newEventDto.getAnnotation())
                 .category(category)
@@ -46,7 +47,7 @@ public class EventMapper {
                 .description(newEventDto.getDescription())
                 .eventDate(LocalDateTime.parse(newEventDto.getEventDate(), formatter))
                 .initiator(user)
-                .location(LocationMapper.toLocation(newEventDto.getLocation()))
+                .location(location)
                 .paid(newEventDto.getPaid())
                 .participantLimit(newEventDto.getParticipantLimit())
                 .requestModeration(newEventDto.getRequestModeration())
@@ -56,7 +57,7 @@ public class EventMapper {
     }
 
     public static EventFullDto toEventFullDto(Event event, Long views) {
-        return EventFullDto.builder()
+        EventFullDto eventFullDto = EventFullDto.builder()
                 .annotation(event.getAnnotation())
                 .category(event.getCategory())
                 .confirmedRequests(event.getConfirmedRequests())
@@ -68,11 +69,14 @@ public class EventMapper {
                 .location(LocationMapper.toLocationDto(event.getLocation()))
                 .paid(event.getPaid())
                 .participantLimit(event.getParticipantLimit())
-                .publishedOn(event.getPublishedOn().format(formatter))
                 .requestModeration(event.getRequestModeration())
                 .state(event.getState().toString())
                 .title(event.getTitle())
                 .views(views)
                 .build();
+        if (event.getPublishedOn() != null){
+            eventFullDto.setPublishedOn(event.getPublishedOn().format(formatter));
+        }
+        return eventFullDto;
     }
 }

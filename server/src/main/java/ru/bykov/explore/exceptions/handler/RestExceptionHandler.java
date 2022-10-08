@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
-import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -19,69 +18,34 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import ru.bykov.explore.exceptions.ValidationException;
 import ru.bykov.explore.exceptions.model.ApiError;
 
 import javax.persistence.EntityNotFoundException;
 import javax.validation.ConstraintViolationException;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.*;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
 @Slf4j
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
-//    @Override
-//    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-//        String message = "Malformed JSON request";
-//        return buildResponseEntity(new ApiError(BAD_REQUEST, message, ex));
-//    }
-//
-//    @ExceptionHandler(EntityNotFoundException.class)
-//    protected ResponseEntity<Object> handleEntityNotFound(EntityNotFoundException ex) {
-//        String message = "Получение данных не возможно!";
-//        ApiError apiError = new ApiError(NOT_FOUND, message, ex);
-////        apiError.setMessage(ex.getMessage());
-//        return buildResponseEntity(apiError);
-//    }
-//    private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {
-//        return new ResponseEntity<>(apiError, apiError.getStatus());
-//    }
-
     /**
+     * Обработчик исключения MissingServletRequestParameterException. Срабатывает когда отсутствует обязательный параметр запроса
      * Handle MissingServletRequestParameterException. Triggered when a 'required' request parameter is missing.
-     *
      */
     @Override
     protected ResponseEntity<Object> handleMissingServletRequestParameter(
             MissingServletRequestParameterException ex, HttpHeaders headers,
             HttpStatus status, WebRequest request) {
-        String error = ex.getParameterName() + " parameter is missing";
+        String error = ex.getParameterName() + " нет параметров";
         return buildResponseEntity(new ApiError(BAD_REQUEST, error, ex));
     }
 
-
     /**
-     * Handle HttpMediaTypeNotSupportedException. This one triggers when JSON is invalid as well.
-     *
-     */
-    @Override
-    protected ResponseEntity<Object> handleHttpMediaTypeNotSupported(
-            HttpMediaTypeNotSupportedException ex,
-            HttpHeaders headers,
-            HttpStatus status,
-            WebRequest request) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(ex.getContentType());
-        builder.append(" media type is not supported. Supported media types are ");
-        ex.getSupportedMediaTypes().forEach(t -> builder.append(t).append(", "));
-        return buildResponseEntity(new ApiError(HttpStatus.UNSUPPORTED_MEDIA_TYPE, builder.substring(0, builder.length() - 2), ex));
-    }
-
-    /**
+     * Обработчик исключения MethodArgumentNotValidException. Срабатывает при @Valid ошибках.
      * Handle MethodArgumentNotValidException. Triggered when an object fails @Valid validation.
-     *
      */
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
@@ -90,95 +54,112 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             HttpStatus status,
             WebRequest request) {
         ApiError apiError = new ApiError(BAD_REQUEST);
-        apiError.setMessage("Validation error");
+        apiError.setMessage("Ошибка валидации!");
         apiError.addValidationErrors(ex.getBindingResult().getFieldErrors());
         apiError.addValidationError(ex.getBindingResult().getGlobalErrors());
         return buildResponseEntity(apiError);
     }
 
     /**
-     * Handles javax.validation.ConstraintViolationException. Thrown when @Validated fails.
-     *
-     */
-    @ExceptionHandler(javax.validation.ConstraintViolationException.class)
-    protected ResponseEntity<Object> handleConstraintViolation(
-            javax.validation.ConstraintViolationException ex) {
-        ApiError apiError = new ApiError(BAD_REQUEST);
-        apiError.setMessage("Validation error");
-        apiError.addValidationErrors(ex.getConstraintViolations());
-        return buildResponseEntity(apiError);
-    }
-
-    /**
-     * Handles EntityNotFoundException. Created to encapsulate errors with more detail than javax.persistence.EntityNotFoundException.
-     *
-     */
-
-        @ExceptionHandler(EntityNotFoundException.class)
-    protected ResponseEntity<Object> handleEntityNotFound(EntityNotFoundException ex) {
-        String message = "Получение данных не возможно!";
-        ApiError apiError = new ApiError(NOT_FOUND, message, ex);
-//        apiError.setMessage(ex.getMessage());
-        return buildResponseEntity(apiError);
-    }
-
-    /**
+     * Обработчик исключения HttpMessageNotReadableException. Происходит, когда запрос JSON имеет неверный формат.
      * Handle HttpMessageNotReadableException. Happens when request JSON is malformed.
-     *
      */
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         ServletWebRequest servletWebRequest = (ServletWebRequest) request;
         log.info("{} to {}", servletWebRequest.getHttpMethod(), servletWebRequest.getRequest().getServletPath());
-        String error = "Malformed JSON request";
+        String error = "Неверный JSON-запрос";
         return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, error, ex));
     }
 
     /**
+     * Обработчик исключения HttpMessageNotWritableException.
      * Handle HttpMessageNotWritableException.
-     *
      */
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotWritable(HttpMessageNotWritableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        String error = "Error writing JSON output";
+        String error = "Ошибка записи вывода JSON";
         return buildResponseEntity(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, error, ex));
     }
 
     /**
+     * Обработчик исключения NoHandlerFoundException
      * Handle NoHandlerFoundException.
-     *
      */
     @Override
     protected ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         ApiError apiError = new ApiError(BAD_REQUEST);
-        apiError.setMessage(String.format("Could not find the %s method for URL %s", ex.getHttpMethod(), ex.getRequestURL()));
+        apiError.setMessage(String.format("Данного метода %s нет в URL %s", ex.getHttpMethod(), ex.getRequestURL()));
         apiError.setReason(ex.getMessage());
         return buildResponseEntity(apiError);
     }
 
     /**
+     * Обработчик исключения javax.validation.ConstraintViolationException. При @Validated ошибках.
+     * Handles javax.validation.ConstraintViolationException. Thrown when @Validated fails.
+     */
+    @ExceptionHandler(ConstraintViolationException.class)
+    protected ResponseEntity<Object> handleConstraintViolation(ConstraintViolationException ex) {
+        ApiError apiError = new ApiError(BAD_REQUEST);
+        apiError.setMessage("Ошибка валидации!");
+        apiError.addValidationErrors(ex.getConstraintViolations());
+        return buildResponseEntity(apiError);
+    }
+
+    /**
+     * Обработчик исключения EntityNotFoundException
+     * Handles EntityNotFoundException.
+     */
+    @ExceptionHandler(EntityNotFoundException.class)
+    protected ResponseEntity<Object> handleEntityNotFound(EntityNotFoundException ex) {
+        String message = "Ошибка данных!";
+        ApiError apiError = new ApiError(NOT_FOUND, message, ex);
+        return buildResponseEntity(apiError);
+    }
+
+    /**
+     * Обработчик исключения ValidationException
+     * Handles ValidationException.
+     */
+    @ExceptionHandler(ValidationException.class)
+    protected ResponseEntity<Object> handleManualValidation(ValidationException ex) {
+        String message = "Запрос приводит к нарушению целостности данных!";
+        ApiError apiError = new ApiError(CONFLICT, message, ex);
+        return buildResponseEntity(apiError);
+    }
+
+    /**
+     * Обработчик различных исключений БД
      * Handle DataIntegrityViolationException, inspects the cause for different DB causes.
-     *
      */
     @ExceptionHandler(DataIntegrityViolationException.class)
-    protected ResponseEntity<Object> handleDataIntegrityViolation(DataIntegrityViolationException ex,
-                                                                  WebRequest request) {
+    protected ResponseEntity<Object> handleDataIntegrityViolation(DataIntegrityViolationException ex, WebRequest request) {
         if (ex.getCause() instanceof ConstraintViolationException) {
-            return buildResponseEntity(new ApiError(HttpStatus.CONFLICT, "Database error", ex.getCause()));
+            return buildResponseEntity(new ApiError(HttpStatus.CONFLICT, "Ошибка базы данных", ex.getCause()));
         }
         return buildResponseEntity(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, ex));
     }
 
     /**
+     * Обработчик для общих исключений
      * Handle Exception, handle generic Exception.class
-     *
      */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    protected ResponseEntity<Object> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex,
-                                                                      WebRequest request) {
+    protected ResponseEntity<Object> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex, WebRequest request) {
         ApiError apiError = new ApiError(BAD_REQUEST);
-        apiError.setMessage(String.format("The parameter '%s' of value '%s' could not be converted to type '%s'", ex.getName(), ex.getValue(), ex.getRequiredType().getSimpleName()));
+        apiError.setMessage(String.format("Параметр '%s' значения '%s' не может быть конвертирован в тип '%s'", ex.getName(), ex.getValue(), ex.getRequiredType().getSimpleName()));
         apiError.setReason(ex.getMessage());
+        return buildResponseEntity(apiError);
+    }
+
+    /**
+     * Обработчик исключения Throwable
+     * Handles Throwable.
+     */
+    @ExceptionHandler(Throwable.class)
+    protected ResponseEntity<Object> handleManualValidation(Throwable ex) {
+        String message = "Внутренняя ошибка сервера!";
+        ApiError apiError = new ApiError(INTERNAL_SERVER_ERROR, message, ex);
         return buildResponseEntity(apiError);
     }
 
@@ -186,9 +167,5 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {
         return new ResponseEntity<>(apiError, apiError.getStatus());
     }
-
-
-
-
 
 }

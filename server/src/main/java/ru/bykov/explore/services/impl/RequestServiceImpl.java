@@ -3,10 +3,11 @@ package ru.bykov.explore.services.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.bykov.explore.exceptions.NoParamInRequestException;
-import ru.bykov.explore.exceptions.NotFoundException;
+import ru.bykov.explore.exceptions.EntityNotFoundException;
+import ru.bykov.explore.exceptions.ValidationException;
 import ru.bykov.explore.model.Event;
 import ru.bykov.explore.model.Request;
+import ru.bykov.explore.model.User;
 import ru.bykov.explore.model.dto.ParticipationRequestDto;
 import ru.bykov.explore.repositories.EventRepository;
 import ru.bykov.explore.repositories.RequestRepository;
@@ -20,7 +21,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class RequestServiceImpl implements RequestService {
 
@@ -31,7 +31,7 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     public List<ParticipationRequestDto> findByUserIdFromUser(Long userId) {
-        userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Такого пользователя не существует!"));
+        userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
         return requestRepository.findByRequester(userId)
                 .stream()
                 .map(RequestMapper::toParticipationRequestDto)
@@ -46,16 +46,17 @@ public class RequestServiceImpl implements RequestService {
     //если для события отключена пре-модерация запросов на участие, то запрос должен автоматически перейти в состояние подтвержденного
     @Override
     public ParticipationRequestDto addRequestToEventByUserIdFromUser(Long userId, Long eventId) {
-        userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Такого пользователя не существует!"));
-        Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Нет такого события!"));
+        userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
         if (event.getInitiator().getId() == userId) {
-            throw new NoParamInRequestException("Пользователь не может подать запрос на участие в своем событии!");
+            throw new ValidationException(Event.class, "Initiator", event.getInitiator().toString(), "Причина", "Пользователь не может подать запрос на участие в своем событии!");
         }
         if (event.getState().equals(StateOfEventAndReq.PENDING) || event.getState().equals(StateOfEventAndReq.CANCELED)) {
-            throw new NoParamInRequestException("Пользователь не может участвовать в неопубликованном событии!");
+            //TODO может разделить
+            throw new ValidationException(Event.class, "State", event.getState().toString(), "Причина", "Пользователь не может участвовать в неопубликованном событии!");
         }
         if (requestRepository.countByEvent(eventId) >= event.getParticipantLimit()) {
-            throw new NoParamInRequestException("Достигнут лимит запросов на участие!");
+            throw new ValidationException(Event.class, "Сount", requestRepository.countByEvent(eventId).toString(), "Причина", "Достигнут лимит запросов на участие!");
         }
         Request requestNew = Request.builder()
                 .created(LocalDateTime.now())
@@ -71,13 +72,13 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     public ParticipationRequestDto canselRequestByUserIdAndRequestIdFromUser(Long userId, Long requestId) {
-        userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Такого пользователя не существует!"));
-        Request request = requestRepository.findById(requestId).orElseThrow(() -> new NotFoundException("Такой заявки не существует!"));
+        userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
+        Request request = requestRepository.findById(requestId).orElseThrow(() -> new EntityNotFoundException(Request.class, "id", requestId.toString()));
         if (request.getRequester() != userId) {
-            throw new NoParamInRequestException("Данный пользователь не является владельцем этой заявки!");
+            throw new ValidationException(Request.class, "Initiator", request.getRequester().toString(), "Причина", "Данный пользователь не является владельцем этой заявки!");
         }
-        if (request.getStatus().equals(StateOfEventAndReq.PUBLISHED)){
-            Event event = eventRepository.findById(request.getEvent()).orElseThrow(() -> new NotFoundException("Нет такого события!"));
+        if (request.getStatus().equals(StateOfEventAndReq.PUBLISHED)) {
+            Event event = eventRepository.findById(request.getEvent()).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", request.getEvent().toString()));
             event.setConfirmedRequests(event.getConfirmedRequests() - 1);
             eventRepository.save(event);
         }

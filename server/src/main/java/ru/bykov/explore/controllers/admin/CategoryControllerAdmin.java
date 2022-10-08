@@ -12,8 +12,6 @@ import javax.validation.Valid;
 
 @RestController
 @Slf4j
-//TODO проверить для чего
-@Validated
 @RequiredArgsConstructor
 @RequestMapping(path = "admin/categories")
 public class CategoryControllerAdmin {
@@ -21,7 +19,7 @@ public class CategoryControllerAdmin {
     private final CategoryService categoryService;
 
     @PatchMapping
-    public CategoryDto update(@Valid @RequestBody CategoryDto categoryDto) {
+    public CategoryDto update(@Validated @RequestBody CategoryDto categoryDto) {
         log.info("Получен запрос к эндпоинту /admin/categories метод PATCH");
         return categoryService.updateFromAdmin(categoryDto);
     }
