@@ -69,22 +69,13 @@ public class CompilationServiceImpl implements CompilationService {
 
     @Override
     public void deleteCompFromMainPageFromAdmin(Long compId) {
-        Compilation compilation = compilationRepository.findById(compId).orElseThrow(() -> new EntityNotFoundException(Compilation.class, "id", compId.toString()));
-        //TODO сделать и уточнить про главную страницу
-
-
-
-
+        compilationRepository.findById(compId).orElseThrow(() -> new EntityNotFoundException(Compilation.class, "id", compId.toString()));
+        compilationRepository.setPinnedFalseByCompId(false, compId);
     }
 
     @Override
     public void addCompFromMainPageFromAdmin(Long compId) {
-        Compilation compilation = compilationRepository.findById(compId).orElseThrow(() -> new EntityNotFoundException(Compilation.class, "id", compId.toString()));
-        //TODO сделать и уточнить про главную страницу
-
-
-
-
-
+        compilationRepository.findById(compId).orElseThrow(() -> new EntityNotFoundException(Compilation.class, "id", compId.toString()));
+        compilationRepository.setPinnedFalseByCompId(true, compId);
     }
 }

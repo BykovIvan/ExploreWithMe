@@ -10,8 +10,7 @@ import javax.persistence.*;
 @Getter
 @Setter
 @Entity
-@Table(name = "locations",
-        schema = "public")
+@Table(name = "locations", schema = "public")
 public class Location {
 
     //возможно убать id и сделать ключ по 2 

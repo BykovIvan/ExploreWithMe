@@ -14,13 +14,12 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-@Table(name = "compilations",
-        schema = "public")
+@Table(name = "compilations", schema = "public")
 public class Compilation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @OneToMany()
+    @OneToMany(mappedBy = "id",cascade = CascadeType.DETACH, fetch = FetchType.EAGER)
     private List<Event> events;
     private Boolean pinned;
     private String title;

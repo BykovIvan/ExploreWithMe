@@ -19,7 +19,7 @@ public class CategoryControllerAdmin {
     private final CategoryService categoryService;
 
     @PatchMapping
-    public CategoryDto update(@Validated @RequestBody CategoryDto categoryDto) {
+    public CategoryDto update(@Valid @RequestBody CategoryDto categoryDto) {
         log.info("Получен запрос к эндпоинту /admin/categories метод PATCH");
         return categoryService.updateFromAdmin(categoryDto);
     }

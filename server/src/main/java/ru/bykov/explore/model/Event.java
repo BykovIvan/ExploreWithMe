@@ -1,5 +1,6 @@
 package ru.bykov.explore.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import ru.bykov.explore.utils.StateOfEventAndReq;
 
@@ -12,8 +13,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
-@Table(name = "events",
-        schema = "public")
+@Table(name = "events", schema = "public")
 public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,7 +43,6 @@ public class Event {
     private LocalDateTime publishedOn;
     @Column(name = "request_moderation", nullable = false, columnDefinition = "true")
     private Boolean requestModeration;
-//    @Column(nullable = false, columnDefinition = "PENDING")
     @Enumerated(EnumType.STRING)
     private StateOfEventAndReq state;
     private String title;

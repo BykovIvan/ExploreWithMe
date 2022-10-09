@@ -53,7 +53,7 @@ public class EventServiceImpl implements EventService {
         //TODO
         Long views = null;
         //сделать запрос в бд
-        return eventRepository.findByParam(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, FromSizeSortPageable.of(from, size, Sort.by(Sort.Direction.DESC, sort)))
+        return eventRepository.findByParamFromUser(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, FromSizeSortPageable.of(from, size, Sort.by(Sort.Direction.DESC, sort)))
                 .stream()
                 .map((Event event) -> EventMapper.toEventShortDto(event, views))
                 .collect(Collectors.toList());
@@ -240,8 +240,31 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<EventFullDto> getByParamFromAdmin(Long[] users, String[] states, Long[] categories, String rangeStart, String rangeEnd, Integer from, Integer size) {
+        Long views = 0L;
+        StateOfEventAndReq[] stateOfEvent = new StateOfEventAndReq[states.length];
+        for (int i = 0; i < states.length; i++) {
+            stateOfEvent[i] = StateOfEventAndReq.valueOf(states[i]);
+        }
+        LocalDateTime start = LocalDateTime.parse(rangeStart, formatter);
+        LocalDateTime end = LocalDateTime.parse(rangeEnd, formatter);
+
+        return eventRepository.findByParamFromAdmin(users, stateOfEvent, categories, start, end, FromSizeSortPageable.of(from, size, Sort.by(Sort.Direction.ASC, "id")))
+                .stream()
+//                .map((Event event) -> EventMapper.toEventFullDto(event, client.getViews(event.getId())
+                .map((Event event) -> EventMapper.toEventFullDto(event, views))
+                .collect(Collectors.toList());
+
+//        return eventRepository.findByParam1FromAdmin(users, FromSizeSortPageable.of(from, size, Sort.by(Sort.Direction.ASC, "id")))
+//                .stream()
+////                .map((Event event) -> EventMapper.toEventFullDto(event, client.getViews(event.getId())
+//                .map((Event event) -> EventMapper.toEventFullDto(event, views))
+//                .collect(Collectors.toList());
+
+
+
+
+
         //TODO сделать запрос с параметрами
-        return null;
     }
 
     @Override
@@ -282,7 +305,6 @@ public class EventServiceImpl implements EventService {
 
     // Дата начала события должна быть не ранее чем за час от даты публикации.
     // Событие должно быть в состоянии ожидания публикации
-
     @Override
     public EventFullDto publishEventByIdFromAdmin(Long eventId) {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));

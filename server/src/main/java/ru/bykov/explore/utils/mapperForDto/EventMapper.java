@@ -12,32 +12,41 @@ import ru.bykov.explore.utils.StateOfEventAndReq;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-
-//TODO весь класс необходимо сделать
 public class EventMapper {
     private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public static EventFullDto toEventDto(Event event) {
         return EventFullDto.builder()
-                .id(event.getId())
                 .annotation(event.getAnnotation())
+                .category(event.getCategory())
+                .confirmedRequests(event.getConfirmedRequests())
+                .createdOn(event.getCreatedOn().format(formatter))
+                .description(event.getDescription())
+                .eventDate(event.getEventDate().format(formatter))
+                .initiator(UserMapper.toUserShortDto(event.getInitiator()))
+                .location(LocationMapper.toLocationDto(event.getLocation()))
+                .paid(event.getPaid())
+                .participantLimit(event.getParticipantLimit())
+                .requestModeration(event.getRequestModeration())
+                .state(event.getState().toString())
+                .title(event.getTitle())
                 .build();
     }
 
     public static EventShortDto toEventShortDto(Event event, Long views) {
         return EventShortDto.builder()
-                .id(event.getId())
                 .annotation(event.getAnnotation())
+                .category(CategoryMapper.toCategoryDto(event.getCategory()))
+                .confirmedRequests(event.getConfirmedRequests())
+                .eventDate(event.getEventDate().format(formatter))
+                .id(event.getId())
+                .initiator(UserMapper.toUserShortDto(event.getInitiator()))
+                .paid(event.getPaid())
+                .title(event.getTitle())
+                .views(views)
                 .build();
     }
 
-    public static Event toEvent(EventFullDto eventFullDto) {
-        return Event.builder()
-                .annotation(eventFullDto.getAnnotation())
-                .build();
-    }
-
-    //TODO
     public static Event toEvent(NewEventDto newEventDto, Category category, User user, Location location) {
         return Event.builder()
                 .annotation(newEventDto.getAnnotation())

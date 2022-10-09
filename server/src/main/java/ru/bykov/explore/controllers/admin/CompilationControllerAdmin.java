@@ -43,7 +43,6 @@ public class CompilationControllerAdmin {
     @PatchMapping("/{compId}/events/{eventId}")
     public void addEventToCompilation(@PathVariable("compId") Long compId,
                                       @PathVariable("eventId") Long eventId) {
-
         log.info("Получен запрос к эндпоинту /admin/compilations/{compId}/events/{eventId} метод PATCH, добавление события id = {} к подборке id = {}", eventId, compId);
         compilationService.addEventToCompFromAdmin(compId, eventId);
     }
