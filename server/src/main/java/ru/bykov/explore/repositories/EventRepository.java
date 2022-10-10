@@ -19,18 +19,20 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "or UPPER(e.description) like UPPER(concat('%', :text, '%'))) " +
             "AND (e.category.id is null or e.category.id IN (:categories)) " +
             "AND (e.paid is null or e.paid = (:paid)) " +
-            "AND (e.state is null or e.state IN (:states)) " +
+            "AND (e.state is null or e.state IN (:state)) " +
             "AND (e.eventDate is null or e.eventDate > (:rangeStart)) " +
-            "AND (e.eventDate is null or e.eventDate < (:rangeEnd)) " +
+            "AND (e.eventDate is null or e.eventDate < (:rangeEnd))")
+
+//            "AND when (:onlyAvailable) = true then (e.confirmedRequests < e.participantLimit) " +
+//            "when (:onlyAvailable) = true then (e.confirmedRequests > e.participantLimit) end ")
             //TODO
-            "AND (e.paid is null or e.paid = (:onlyAvailable))")
+//            "AND (e.paid is null or e.paid = (:onlyAvailable))")
     Page<Event> findByParamFromUser(@Param("text") String text,
                                     @Param("categories") Long[] categories,
                                     @Param("paid") Boolean paid,
                                     @Param("state") StateOfEventAndReq state,
                                     @Param("rangeStart") LocalDateTime rangeStart,
                                     @Param("rangeEnd") LocalDateTime rangeEnd,
-                                    @Param("onlyAvailable") Boolean onlyAvailable,
                                     Pageable pageable);
 
 

@@ -1,6 +1,7 @@
 package ru.bykov.explore.services.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.bykov.explore.clientstat.StatClient;
@@ -28,7 +29,6 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class EventServiceImpl implements EventService {
-
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
@@ -40,10 +40,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public List<EventShortDto> getAllForAllUsers(String text, Long[] categories, Boolean paid, String rangeStart, String rangeEnd, Boolean onlyAvailable, String sort, Integer from, Integer size) {
         if (from < 0 || size <= 0) {
-            throw new ValidationException(Event.class, "from = " + from + " size = " + size, "Введены неверные параметры!");
-        }
-        if (!sort.equals("EVENT_DATE") || !sort.equals("VIEWS")) {
-            throw new ValidationException(Event.class, "sort = " + sort, "Введены неверные параметры!");
+            throw new ValidationException(Event.class, "from = " + from + ", size = " + size, "Введены неверные параметры!");
         }
         LocalDateTime start = null;
         LocalDateTime end = null;
@@ -54,22 +51,37 @@ public class EventServiceImpl implements EventService {
             end = LocalDateTime.parse(rangeEnd, formatter);
         }
         StateOfEventAndReq state = StateOfEventAndReq.PUBLISHED;
+        //TODO
+//        Boolean onlyAvailable,
 
         //TODO сохранение в базу статистики
 
         //TODO
-        Long views = null;
+        Long views = 1L;
         //TODO
 //        "EVENT_DATE" и "VIEWS" сделать только по stream
         //сделать запрос в бд
         if (sort.equals("EVENT_DATE")) {
-            return eventRepository.findByParamFromUser(text, categories, paid, state, start, end, onlyAvailable, FromSizeSortPageable.of(from, size, Sort.by(Sort.Direction.ASC, "eventDate")))
-                    .stream()
+            Page<Event> getList = eventRepository.findByParamFromUser(text, categories, paid, state, start, end, FromSizeSortPageable.of(from, size, Sort.by(Sort.Direction.ASC, "eventDate")));
+            if (onlyAvailable) {
+                return getList.stream()
+                        .filter((Event event) -> event.getConfirmedRequests() <= event.getParticipantLimit() || event.getParticipantLimit() == 0) // ParticipantLimit = 0 - означает отсутствие ограничения
+                        .map((Event event) -> EventMapper.toEventShortDto(event, views))
+                        .collect(Collectors.toList());
+            }
+            return getList.stream()
                     .map((Event event) -> EventMapper.toEventShortDto(event, views))
                     .collect(Collectors.toList());
         } else if (sort.equals("VIEWS")) {
-            return eventRepository.findByParamFromUser(text, categories, paid, state, start, end, onlyAvailable, FromSizeSortPageable.of(from, size, Sort.by(Sort.Direction.ASC, "id")))
-                    .stream()
+            Page<Event> getList = eventRepository.findByParamFromUser(text, categories, paid, state, start, end, FromSizeSortPageable.of(from, size, Sort.by(Sort.Direction.ASC, "id")));
+            if (onlyAvailable) {
+                return getList.stream()
+                        .filter((Event event) -> event.getConfirmedRequests() <= event.getParticipantLimit() || event.getParticipantLimit() == 0)
+                        .map((Event event) -> EventMapper.toEventShortDto(event, views))
+                        .sorted(Comparator.comparingLong(EventShortDto::getViews))
+                        .collect(Collectors.toList());
+            }
+            return getList.stream()
                     .map((Event event) -> EventMapper.toEventShortDto(event, views))
                     .sorted(Comparator.comparingLong(EventShortDto::getViews))
                     .collect(Collectors.toList());
