@@ -29,6 +29,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     Event findByIdAndInitiatorId(Long eventId, Long userId);
 
     //TODO
+
     @Query("select e from Event e " +
             "JOIN User u on e.initiator.id = u.id " +
             "JOIN Category c on e.category.id = c.id " +
@@ -43,12 +44,6 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                                      @Param("rangeStart") LocalDateTime rangeStart,
                                      @Param("rangeEnd") LocalDateTime rangeEnd,
                                      Pageable pageable);
-
-    @Query("select e from Event e " +
-            "JOIN User u on e.initiator.id = u.id " +
-            "WHERE (e.initiator.id IN (:users))")
-    Page<Event> findByParam1FromAdmin(@Param("users") Long[] users,
-                                      Pageable pageable);
 
 
 //@Query("select u from User u " +
