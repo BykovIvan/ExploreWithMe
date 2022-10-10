@@ -2,6 +2,7 @@ package ru.bykov.explore.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.bykov.explore.exceptions.EntityNotFoundException;
 import ru.bykov.explore.model.Category;
 import ru.bykov.explore.model.dto.category.CategoryDto;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
 
@@ -31,6 +33,7 @@ public class CategoryServiceImpl implements CategoryService {
         return CategoryMapper.toCategoryDto(categoryRepository.findById(catId).orElseThrow(() -> new EntityNotFoundException(Category.class, "id", catId.toString())));
     }
 
+    @Transactional
     @Override
     public CategoryDto updateFromAdmin(CategoryDto categoryDto) {
         Category category = categoryRepository.findById(categoryDto.getId()).orElseThrow(() -> new EntityNotFoundException(Category.class, "id", categoryDto.getId().toString()));
@@ -38,12 +41,14 @@ public class CategoryServiceImpl implements CategoryService {
         return CategoryMapper.toCategoryDto(categoryRepository.save(category));
     }
 
+    @Transactional
     @Override
     public CategoryDto createFromAdmin(NewCategoryDto newCategoryDto) {
         Category category = CategoryMapper.toCategory(newCategoryDto);
         return CategoryMapper.toCategoryDto(categoryRepository.save(category));
     }
 
+    @Transactional
     @Override
     public void deleteFromAdminByCatId(Long catId) {
         categoryRepository.findById(catId).orElseThrow(() -> new EntityNotFoundException(Category.class, "id", catId.toString()));

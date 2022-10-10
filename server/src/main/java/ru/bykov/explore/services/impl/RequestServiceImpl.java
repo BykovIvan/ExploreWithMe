@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class RequestServiceImpl implements RequestService {
 
@@ -44,6 +45,7 @@ public class RequestServiceImpl implements RequestService {
     //нельзя участвовать в неопубликованном событии
     //если у события достигнут лимит запросов на участие - необходимо вернуть ошибку
     //если для события отключена пре-модерация запросов на участие, то запрос должен автоматически перейти в состояние подтвержденного
+    @Transactional
     @Override
     public ParticipationRequestDto addRequestToEventByUserIdFromUser(Long userId, Long eventId) {
         userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
@@ -70,6 +72,7 @@ public class RequestServiceImpl implements RequestService {
         return RequestMapper.toParticipationRequestDto(requestRepository.save(requestNew));
     }
 
+    @Transactional
     @Override
     public ParticipationRequestDto canselRequestByUserIdAndRequestIdFromUser(Long userId, Long requestId) {
         userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));

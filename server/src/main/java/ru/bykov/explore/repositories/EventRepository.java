@@ -22,11 +22,6 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "AND (e.state is null or e.state IN (:state)) " +
             "AND (e.eventDate is null or e.eventDate > (:rangeStart)) " +
             "AND (e.eventDate is null or e.eventDate < (:rangeEnd))")
-
-//            "AND when (:onlyAvailable) = true then (e.confirmedRequests < e.participantLimit) " +
-//            "when (:onlyAvailable) = true then (e.confirmedRequests > e.participantLimit) end ")
-            //TODO
-//            "AND (e.paid is null or e.paid = (:onlyAvailable))")
     Page<Event> findByParamFromUser(@Param("text") String text,
                                     @Param("categories") Long[] categories,
                                     @Param("paid") Boolean paid,

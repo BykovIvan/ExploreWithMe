@@ -1,5 +1,6 @@
 package ru.bykov.explore.services;
 
+import ru.bykov.explore.model.Compilation;
 import ru.bykov.explore.model.dto.copmilation.CompilationDto;
 import ru.bykov.explore.model.dto.copmilation.NewCompilationDto;
 
