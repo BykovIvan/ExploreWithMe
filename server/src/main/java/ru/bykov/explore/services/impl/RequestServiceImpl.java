@@ -49,14 +49,14 @@ public class RequestServiceImpl implements RequestService {
         userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
         if (event.getInitiator().getId() == userId) {
-            throw new ValidationException(Event.class, "Initiator", event.getInitiator().toString(), "Причина", "Пользователь не может подать запрос на участие в своем событии!");
+            throw new ValidationException(Event.class, "Initiator = " + event.getInitiator(), "Пользователь не может подать запрос на участие в своем событии!");
         }
         if (event.getState().equals(StateOfEventAndReq.PENDING) || event.getState().equals(StateOfEventAndReq.CANCELED)) {
             //TODO может разделить
-            throw new ValidationException(Event.class, "State", event.getState().toString(), "Причина", "Пользователь не может участвовать в неопубликованном событии!");
+            throw new ValidationException(Event.class, "State = " + event.getState(), "Пользователь не может участвовать в неопубликованном событии!");
         }
         if (requestRepository.countByEvent(eventId) >= event.getParticipantLimit()) {
-            throw new ValidationException(Event.class, "Сount", requestRepository.countByEvent(eventId).toString(), "Причина", "Достигнут лимит запросов на участие!");
+            throw new ValidationException(Event.class, "Сount = " + requestRepository.countByEvent(eventId), "Достигнут лимит запросов на участие!");
         }
         Request requestNew = Request.builder()
                 .created(LocalDateTime.now())
@@ -75,7 +75,7 @@ public class RequestServiceImpl implements RequestService {
         userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
         Request request = requestRepository.findById(requestId).orElseThrow(() -> new EntityNotFoundException(Request.class, "id", requestId.toString()));
         if (request.getRequester() != userId) {
-            throw new ValidationException(Request.class, "Initiator", request.getRequester().toString(), "Причина", "Данный пользователь не является владельцем этой заявки!");
+            throw new ValidationException(Request.class, "Initiator = " + request.getRequester(), "Данный пользователь не является владельцем этой заявки!");
         }
         if (request.getStatus().equals(StateOfEventAndReq.PUBLISHED)) {
             Event event = eventRepository.findById(request.getEvent()).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", request.getEvent().toString()));

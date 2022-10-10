@@ -7,9 +7,7 @@ import java.util.Map;
 import java.util.stream.IntStream;
 
 public class ValidationException extends RuntimeException {
-//    public ValidationException(String message) {
-//        super(message);
-//    }
+
     public ValidationException(Class clazz, String... searchParamsMap) {
         super(ValidationException.generateMessage(clazz.getSimpleName(), toMap(String.class, String.class, searchParamsMap)));
     }

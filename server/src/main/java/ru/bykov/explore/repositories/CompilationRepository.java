@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import ru.bykov.explore.model.Compilation;
-import ru.bykov.explore.utils.StateOfEventAndReq;
 
 @Repository
 public interface CompilationRepository extends JpaRepository<Compilation, Long> {

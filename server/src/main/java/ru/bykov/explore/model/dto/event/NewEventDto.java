@@ -31,11 +31,8 @@ public class NewEventDto {
     private String eventDate;
     @NotNull
     private LocationDto location;
-    //    default: false
     private Boolean paid;
-    //    default: 0
     private Long participantLimit;
-    //    default: true
     private Boolean requestModeration;
     @NotNull
     @NotBlank

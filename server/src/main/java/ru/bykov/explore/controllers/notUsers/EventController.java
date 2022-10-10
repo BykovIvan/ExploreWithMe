@@ -19,7 +19,7 @@ public class EventController {
 
     @GetMapping
     public List<EventShortDto> allEvents(@RequestParam(value = "text") String text,
-                                         @RequestParam(value = "categories") String[] categories,
+                                         @RequestParam(value = "categories") Long[] categories,
                                          @RequestParam(value = "paid") Boolean paid,
                                          @RequestParam(value = "rangeStart") String rangeStart,
                                          @RequestParam(value = "rangeEnd") String rangeEnd,

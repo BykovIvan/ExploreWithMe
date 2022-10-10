@@ -38,13 +38,13 @@ public class EventControllerAdmin {
 
     @PatchMapping("/{eventId}/publish")
     public EventFullDto publishEvent(@PathVariable("eventId") Long eventId) {
-        log.info("Получен запрос к эндпоинту /admin/events/{eventId}, метод PATCH, публикация события по id = {}", eventId);
+        log.info("Получен запрос к эндпоинту /admin/events/{eventId}/publish, метод PATCH, публикация события по id = {}", eventId);
         return eventService.publishEventByIdFromAdmin(eventId);
     }
 
     @PatchMapping("/{eventId}/reject")
     public EventFullDto rejectEvent(@PathVariable("eventId") Long eventId) {
-        log.info("Получен запрос к эндпоинту /admin/events/{eventId}, метод PATCH, отклонение публикации события по id = {}", eventId);
+        log.info("Получен запрос к эндпоинту /admin/events/{eventId}/reject, метод PATCH, отклонение публикации события по id = {}", eventId);
         return eventService.rejectEventByIdFromAdmin(eventId);
     }
 

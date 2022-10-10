@@ -2,6 +2,7 @@ package ru.bykov.explore.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 import ru.bykov.explore.utils.StateOfEventAndReq;
 
 import javax.persistence.*;
@@ -24,9 +25,11 @@ public class Event {
     private Category category;
     @Column(name = "confirmed_requests")
     private Long confirmedRequests;
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "created_on")
     private LocalDateTime createdOn;
     private String description;
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "event_date")
     private LocalDateTime eventDate;
     @ManyToOne(fetch = FetchType.EAGER)
@@ -39,6 +42,7 @@ public class Event {
     private Boolean paid;
     @Column(name = "participant_limit", nullable = false, columnDefinition = "0")
     private Long participantLimit;
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "published_on")
     private LocalDateTime publishedOn;
     @Column(name = "request_moderation", nullable = false, columnDefinition = "true")

@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface EventService {
 
-    List<EventShortDto> getAllForAllUsers(String text, String[] categories, Boolean paid, String rangeStart, String rangeEnd, Boolean onlyAvailable, String sort, Integer from, Integer size);
+    List<EventShortDto> getAllForAllUsers(String text, Long[] categories, Boolean paid, String rangeStart, String rangeEnd, Boolean onlyAvailable, String sort, Integer from, Integer size);
 
     EventFullDto getByIdForAllUsers(Long eventId);
 

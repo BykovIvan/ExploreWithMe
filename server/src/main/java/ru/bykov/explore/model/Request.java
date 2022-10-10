@@ -19,7 +19,6 @@ public class Request {
     private Long id;
     private LocalDateTime created;
     private Long event;
-//    @Column(unique = true)
     private Long requester;
     @Enumerated(EnumType.STRING)
     private StateOfEventAndReq status;

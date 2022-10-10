@@ -3,7 +3,6 @@ package ru.bykov.explore.services.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ru.bykov.explore.clientstat.StatClient;
 import ru.bykov.explore.clientstat.StatisticDto;
 import ru.bykov.explore.exceptions.EntityNotFoundException;
@@ -22,6 +21,7 @@ import ru.bykov.explore.utils.mapperForDto.RequestMapper;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,25 +38,44 @@ public class EventServiceImpl implements EventService {
     private final StatClient statClient;
 
     @Override
-    public List<EventShortDto> getAllForAllUsers(String text, String[] categories, Boolean paid, String rangeStart, String rangeEnd, Boolean onlyAvailable, String sort, Integer from, Integer size) {
-//        if (text == null || categories == null || paid == null || rangeStart == null || rangeEnd == null) {
-//            throw new NoParamInRequestException("Плохо составленый запрос!");
-//        }
+    public List<EventShortDto> getAllForAllUsers(String text, Long[] categories, Boolean paid, String rangeStart, String rangeEnd, Boolean onlyAvailable, String sort, Integer from, Integer size) {
         if (from < 0 || size <= 0) {
-            //TODO может разделить
-            throw new ValidationException(Event.class, "from", from.toString(), "Введены неверные параметры!");
+            throw new ValidationException(Event.class, "from = " + from + " size = " + size, "Введены неверные параметры!");
         }
         if (!sort.equals("EVENT_DATE") || !sort.equals("VIEWS")) {
-            //TODO может разделить
-            throw new ValidationException(Event.class, "sort", sort, "Причина", "Введены неверные параметры!");
+            throw new ValidationException(Event.class, "sort = " + sort, "Введены неверные параметры!");
         }
+        LocalDateTime start = null;
+        LocalDateTime end = null;
+        if (rangeStart == null || rangeEnd == null) {
+            start = LocalDateTime.now();
+        } else {
+            start = LocalDateTime.parse(rangeStart, formatter);
+            end = LocalDateTime.parse(rangeEnd, formatter);
+        }
+        StateOfEventAndReq state = StateOfEventAndReq.PUBLISHED;
+
+        //TODO сохранение в базу статистики
+
         //TODO
         Long views = null;
+        //TODO
+//        "EVENT_DATE" и "VIEWS" сделать только по stream
         //сделать запрос в бд
-        return eventRepository.findByParamFromUser(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, FromSizeSortPageable.of(from, size, Sort.by(Sort.Direction.DESC, sort)))
-                .stream()
-                .map((Event event) -> EventMapper.toEventShortDto(event, views))
-                .collect(Collectors.toList());
+        if (sort.equals("EVENT_DATE")) {
+            return eventRepository.findByParamFromUser(text, categories, paid, state, start, end, onlyAvailable, FromSizeSortPageable.of(from, size, Sort.by(Sort.Direction.ASC, "eventDate")))
+                    .stream()
+                    .map((Event event) -> EventMapper.toEventShortDto(event, views))
+                    .collect(Collectors.toList());
+        } else if (sort.equals("VIEWS")) {
+            return eventRepository.findByParamFromUser(text, categories, paid, state, start, end, onlyAvailable, FromSizeSortPageable.of(from, size, Sort.by(Sort.Direction.ASC, "id")))
+                    .stream()
+                    .map((Event event) -> EventMapper.toEventShortDto(event, views))
+                    .sorted(Comparator.comparingLong(EventShortDto::getViews))
+                    .collect(Collectors.toList());
+        } else {
+            throw new ValidationException(Event.class, "sort = " + sort, "Введены неверные параметры!");
+        }
     }
 
     @Override
@@ -99,12 +118,11 @@ public class EventServiceImpl implements EventService {
         //TODO сделать проверка на то что человек ранее именно он опубликовал данную запись
         Event event = eventRepository.findById(updateEventRequest.getEventId()).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", updateEventRequest.getEventId().toString()));
         if (event.getInitiator().getId() != user.getId()) {
-            throw new ValidationException(Event.class, "Initiator", event.getInitiator().toString(), "Причина", "Пользователь не является инициатором данного события!");
+            throw new ValidationException(Event.class, "Initiator = " + event.getInitiator(), "Пользователь не является инициатором данного события!");
         }
         if (event.getState().equals(StateOfEventAndReq.PUBLISHED)) {
-            throw new ValidationException(Event.class, "State", event.getState().toString(), "Причина", "Событие уже опубликовано и его нельзя изменить!");
+            throw new ValidationException(Event.class, "State = " + event.getState(), "Событие уже опубликовано и его нельзя изменить!");
         }
-
         event.setAnnotation(updateEventRequest.getAnnotation());
         if (updateEventRequest.getCategory() != null) {
             event.setCategory(categoryRepository.findById(updateEventRequest.getCategory()).orElseThrow(() -> new EntityNotFoundException(Category.class, "id", updateEventRequest.getCategory().toString())));
@@ -114,7 +132,7 @@ public class EventServiceImpl implements EventService {
             LocalDateTime dateAndTimeOfEvent = LocalDateTime.parse(updateEventRequest.getEventDate(), formatter);
             Duration duration = Duration.between(LocalDateTime.now(), dateAndTimeOfEvent);
             if (duration.toMinutes() < 120) {
-                throw new ValidationException(Event.class, "EventDate", event.getEventDate().toString(), "Причина", "Время до события менее 2 часов и поэтому его нельзя изменить!");
+                throw new ValidationException(Event.class, "EventDate = " + event.getEventDate(), "Время до события менее 2 часов и поэтому его нельзя изменить!");
             }
             event.setEventDate(dateAndTimeOfEvent);
         }
@@ -161,7 +179,7 @@ public class EventServiceImpl implements EventService {
         userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
         if (event.getState().equals(StateOfEventAndReq.PUBLISHED)) {
-            throw new ValidationException(Event.class, "State", event.getState().toString(), "Причина", "Событие уже опубликовано!");
+            throw new ValidationException(Event.class, "State = " + event.getState(), "Событие уже опубликовано!");
         }
         event.setState(StateOfEventAndReq.CANCELED);
         //TODO
@@ -190,7 +208,7 @@ public class EventServiceImpl implements EventService {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
         Request request = requestRepository.findById(reqId).orElseThrow(() -> new EntityNotFoundException(Request.class, "id", reqId.toString()));
         if (event.getInitiator().getId() != userId) {
-            throw new ValidationException(Event.class, "Initiator", event.getInitiator().toString(), "Причина", "Пользователь не является инициатором события!");
+            throw new ValidationException(Event.class, "Initiator = " + event.getInitiator(), "Пользователь не является инициатором события!");
         }
         if (event.getParticipantLimit() == 0 || !event.getRequestModeration()) {
             //TODO Проверить
@@ -198,11 +216,9 @@ public class EventServiceImpl implements EventService {
 //            throw new NoParamInRequestException("Подтверждение заявки не требуется!");
             request.setStatus(StateOfEventAndReq.PUBLISHED);
             return RequestMapper.toParticipationRequestDto(requestRepository.save(request));
-        }
-        if (requestRepository.countByEvent(eventId) >= event.getParticipantLimit()) {
+        } else if (event.getConfirmedRequests() >= event.getParticipantLimit()) {
             //TODO Проверить запрос в таблице через запрос, будет ли работать!
             requestRepository.setStatusCanselWhereByStatusAndEventId(StateOfEventAndReq.CANCELED, StateOfEventAndReq.PENDING, eventId);
-
 //            List<Request> listOfReq = requestRepository.findAllByEventAndStatus(eventId, StateOfEventAndReq.PENDING);
 //            for (Request getRequester : listOfReq) {
 //                getRequester.setStatus(StateOfEventAndReq.CANCELED);
@@ -224,11 +240,10 @@ public class EventServiceImpl implements EventService {
         userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
         Request request = requestRepository.findById(reqId).orElseThrow(() -> new EntityNotFoundException(Request.class, "id", reqId.toString()));
         if (event.getInitiator().getId() != userId) {
-            throw new ValidationException(Event.class, "Initiator", event.getInitiator().toString(), "Причина", "Пользователь не является инициатором события!");
+            throw new ValidationException(Event.class, "Initiator = " + event.getInitiator(), "Пользователь не является инициатором события!");
         }
         if (event.getParticipantLimit() == 0 || !event.getRequestModeration()) {
-            //TODO может стоит разделить?
-            throw new ValidationException(Event.class, "ParticipantLimit", event.getParticipantLimit().toString(), "Причина", "Подтверждение заявки не требуется!");
+            throw new ValidationException(Event.class, "ParticipantLimit = " + event.getParticipantLimit() + "RequestModeration = " + event.getParticipantLimit(), "Подтверждение заявки не требуется!");
         }
         if (request.getStatus().equals(StateOfEventAndReq.PUBLISHED)) {
             event.setConfirmedRequests(event.getConfirmedRequests() - 1);
@@ -247,23 +262,11 @@ public class EventServiceImpl implements EventService {
         }
         LocalDateTime start = LocalDateTime.parse(rangeStart, formatter);
         LocalDateTime end = LocalDateTime.parse(rangeEnd, formatter);
-
         return eventRepository.findByParamFromAdmin(users, stateOfEvent, categories, start, end, FromSizeSortPageable.of(from, size, Sort.by(Sort.Direction.ASC, "id")))
                 .stream()
 //                .map((Event event) -> EventMapper.toEventFullDto(event, client.getViews(event.getId())
                 .map((Event event) -> EventMapper.toEventFullDto(event, views))
                 .collect(Collectors.toList());
-
-//        return eventRepository.findByParam1FromAdmin(users, FromSizeSortPageable.of(from, size, Sort.by(Sort.Direction.ASC, "id")))
-//                .stream()
-////                .map((Event event) -> EventMapper.toEventFullDto(event, client.getViews(event.getId())
-//                .map((Event event) -> EventMapper.toEventFullDto(event, views))
-//                .collect(Collectors.toList());
-
-
-
-
-
         //TODO сделать запрос с параметрами
     }
 
@@ -309,15 +312,17 @@ public class EventServiceImpl implements EventService {
     public EventFullDto publishEventByIdFromAdmin(Long eventId) {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
         LocalDateTime dateAndTimeOfEvent = event.getEventDate();
-        LocalDateTime dateAndTimeNow = LocalDateTime.now();
-        Duration duration = Duration.between(dateAndTimeNow, dateAndTimeOfEvent);
-        if (duration.toMinutes() > 60) {
-            throw new ValidationException(Event.class, "EventDate", event.getEventDate().toString(), "Причина", "Дата начала события должна быть не ранее чем за час от даты публикации");
+        LocalDateTime dateAndTimeNowPublish = LocalDateTime.now();
+        if (dateAndTimeOfEvent.isBefore(dateAndTimeNowPublish)) {
+            Duration duration = Duration.between(dateAndTimeOfEvent, dateAndTimeNowPublish);
+            if (duration.toMinutes() > 60) {
+                throw new ValidationException(Event.class, "EventDate = " + event.getEventDate(), "Дата начала события должна быть не ранее чем за час от даты публикации");
+            }
         }
         if (event.getState().equals(StateOfEventAndReq.CANCELED)) {
-            throw new ValidationException(Event.class, "state", event.getState().toString(), "Причина", "Событие уже отменено!");
+            throw new ValidationException(Event.class, "state = " + event.getState(), "Событие уже отменено!");
         }
-        event.setPublishedOn(dateAndTimeNow);
+        event.setPublishedOn(dateAndTimeNowPublish);
         event.setState(StateOfEventAndReq.PUBLISHED);
         //TODO сделать запрос клиента на количество просмотров
         Long views = null;
@@ -330,7 +335,7 @@ public class EventServiceImpl implements EventService {
     public EventFullDto rejectEventByIdFromAdmin(Long eventId) {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
         if (event.getState().equals(StateOfEventAndReq.PUBLISHED)) {
-            throw new ValidationException(Event.class, "state", event.getState().toString(), "Причина", "Событие уже опубликовано!");
+            throw new ValidationException(Event.class, "state = " + event.getState(), "Событие уже опубликовано!");
         }
         event.setState(StateOfEventAndReq.CANCELED);
         //TODO сделать запрос клиента на количество просмотров
