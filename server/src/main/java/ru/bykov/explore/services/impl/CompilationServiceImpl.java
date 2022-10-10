@@ -14,7 +14,6 @@ import ru.bykov.explore.services.CompilationService;
 import ru.bykov.explore.utils.mapperForDto.CompilationMapper;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,6 +24,7 @@ public class CompilationServiceImpl implements CompilationService {
     private final EventRepository eventRepository;
 
     @Override
+    //TODO почитать про Transactions!!!
     public List<CompilationDto> getAllForAll() {
         //TODO сделать как то про views подумать
         Long views = 0L;
@@ -67,12 +67,7 @@ public class CompilationServiceImpl implements CompilationService {
 
     @Override
     public void addEventToCompFromAdmin(Long compId, Long eventId) {
-//        Compilation compilation = compilationRepository.findById(compId).orElseThrow(() -> new EntityNotFoundException(Compilation.class, "id", compId.toString()));
-        Optional<Compilation> compilationOpt = compilationRepository.findById(compId);
-        if (compilationOpt.isEmpty()){
-            throw new EntityNotFoundException(Compilation.class, "id", compId.toString());
-        }
-        Compilation compilation = compilationOpt.get();
+        Compilation compilation = compilationRepository.findById(compId).orElseThrow(() -> new EntityNotFoundException(Compilation.class, "id", compId.toString()));
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
         compilation.getEvents().add(event);
         compilationRepository.save(compilation);
