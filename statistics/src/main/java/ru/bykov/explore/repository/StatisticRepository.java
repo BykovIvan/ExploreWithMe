@@ -33,7 +33,7 @@ public interface StatisticRepository extends JpaRepository<Statistic, Long> {
                                      @Param("end") LocalDateTime timeOfEnd,
                                      @Param("uris") String[] uris);
 
-    @Query("SELECT COUNT(s) from Statistic s " +
+    @Query("SELECT COUNT(s.uri) from Statistic s " +
             "where s.app = :app " +
             "AND s.uri = :uri")
     Long countByAppAndUri(@Param("app") String app,

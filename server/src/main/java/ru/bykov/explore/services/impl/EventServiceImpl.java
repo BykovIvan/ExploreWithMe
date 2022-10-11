@@ -71,23 +71,23 @@ public class EventServiceImpl implements EventService {
             if (onlyAvailable) {
                 return getList.stream()
                         .filter((Event event) -> event.getConfirmedRequests() < event.getParticipantLimit() || event.getParticipantLimit() == 0) // ParticipantLimit = 0 - означает отсутствие ограничения
-                        .map((Event event) -> EventMapper.toEventShortDto(event, (Long) statClient.getViewsOfEvent("Explore With Me App", "event/" + event.getId()).getBody()))
+                        .map((Event event) -> EventMapper.toEventShortDto(event, 1L))
                         .collect(Collectors.toList());
             }
             return getList.stream()
-                    .map((Event event) -> EventMapper.toEventShortDto(event, (Long) statClient.getViewsOfEvent("Explore With Me App", "event/" + event.getId()).getBody()))
+                    .map((Event event) -> EventMapper.toEventShortDto(event, 1L))
                     .collect(Collectors.toList());
         } else if (sort.equals("VIEWS")) {
             Page<Event> getList = eventRepository.findByParamFromUser(text, categories, paid, state, start, end, FromSizeSortPageable.of(from, size, Sort.by(Sort.Direction.ASC, "id")));
             if (onlyAvailable) {
                 return getList.stream()
                         .filter((Event event) -> event.getConfirmedRequests() < event.getParticipantLimit() || event.getParticipantLimit() == 0)
-                        .map((Event event) -> EventMapper.toEventShortDto(event, (Long) statClient.getViewsOfEvent("Explore With Me App", "event/" + event.getId()).getBody()))
+                        .map((Event event) -> EventMapper.toEventShortDto(event, 1L))
                         .sorted(Comparator.comparingLong(EventShortDto::getViews))
                         .collect(Collectors.toList());
             }
             return getList.stream()
-                    .map((Event event) -> EventMapper.toEventShortDto(event, (Long) statClient.getViewsOfEvent("Explore With Me App", "event/" + event.getId()).getBody()))
+                    .map((Event event) -> EventMapper.toEventShortDto(event, 1L))
                     .sorted(Comparator.comparingLong(EventShortDto::getViews))
                     .collect(Collectors.toList());
         } else {
@@ -107,11 +107,11 @@ public class EventServiceImpl implements EventService {
                 .ip(remoteAddr)
                 .build());
 
-        Object resEntObj =  statClient.getViewsOfEvent("Explore With Me App", "event/" + event.getId()).getBody();
-        ViewsDto viewsDto = (ViewsDto) resEntObj;
+        ViewsDto viewsDto =  statClient.getViewsOfEvent("Explore With Me App", "/event/" + event.getId()).getBody();
+
         Long views = viewsDto.getViews();
 
-        return EventMapper.toEventFullDto(event, 1L);
+        return EventMapper.toEventFullDto(event, views);
     }
 
     //путь для users

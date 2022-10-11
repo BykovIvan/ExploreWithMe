@@ -46,6 +46,7 @@ public class StatisticServiceImpl implements StatisticService {
 
     @Override
     public ViewsDto getCountOfEvent(String app, String uri) {
-        return StatisticMapper.toViewsDto(statisticRepository.countByAppAndUri(app, uri));
+        Long views = statisticRepository.countByAppAndUri(app, uri);
+        return StatisticMapper.toViewsDto(views);
     }
 }
