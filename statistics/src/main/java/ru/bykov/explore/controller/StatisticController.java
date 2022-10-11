@@ -31,6 +31,13 @@ public class StatisticController {
         return statisticService.getStatsByParam(start, end, uris, unique);
     }
 
+    @GetMapping("/count")
+    public Long getCount(@RequestParam(value = "app") String app,
+                         @RequestParam(value = "uri") String uri){
+        log.info("Получен запрос к эндпоинту /count, получение количества запросов события");
+        return statisticService.getCountOfEvent(app, uri);
+    }
+
 
 
 }

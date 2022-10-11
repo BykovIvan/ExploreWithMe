@@ -32,14 +32,19 @@ public class StatisticServiceImpl implements StatisticService {
         LocalDateTime timeOfStart = LocalDateTime.parse(start, formatter);
         LocalDateTime timeOfEnd = LocalDateTime.parse(end, formatter);
         if (unique) {
-            return statisticRepository.getByParamUniqIp(timeOfStart, timeOfEnd, uris)
+            return statisticRepository.getByParam(timeOfStart, timeOfEnd, uris)
                     .stream()
                     .map((Statistic statistic) -> StatisticMapper.toViewStats(statistic, statisticRepository.countByAppAndUri(statistic.getApp(), statistic.getUri())))
                     .collect(Collectors.toList());
         }
-        return statisticRepository.getByParam(timeOfStart, timeOfEnd, uris)
+        return statisticRepository.getByParamUniqIp(timeOfStart, timeOfEnd, uris)
                 .stream()
                 .map((Statistic statistic) -> StatisticMapper.toViewStats(statistic, statisticRepository.countByAppAndUri(statistic.getApp(), statistic.getUri())))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Long getCountOfEvent(String app, String uri) {
+        return statisticRepository.countByAppAndUri(app, uri);
     }
 }
