@@ -1,12 +1,13 @@
 package ru.bykov.explore.service;
 
-import ru.bykov.explore.model.Statistic;
-import ru.bykov.explore.model.dto.StatisticDto;
+import ru.bykov.explore.model.dto.EndPointHit;
+import ru.bykov.explore.model.dto.ViewStats;
 
 import java.util.List;
 
 public interface StatisticService {
-    Statistic createStat(StatisticDto statisticDto);
 
-    List<StatisticDto> getStatsByParam(String start, String end, String[] uris, Boolean unique);
+    void createStat(EndPointHit endPointHit);
+
+    List<ViewStats> getStatsByParam(String start, String end, String[] uris, Boolean unique);
 }

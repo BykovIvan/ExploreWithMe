@@ -39,6 +39,7 @@ public class EventServiceImpl implements EventService {
     private final LocationRepository locationRepository;
     private final StatClient statClient;
 
+    //путь для не users
     @Override
     public List<EventShortDto> getAllForAllUsers(String text, Long[] categories, Boolean paid, String rangeStart, String rangeEnd, Boolean onlyAvailable, String sort, Integer from, Integer size) {
         if (from < 0 || size <= 0) {
@@ -67,7 +68,7 @@ public class EventServiceImpl implements EventService {
             Page<Event> getList = eventRepository.findByParamFromUser(text, categories, paid, state, start, end, FromSizeSortPageable.of(from, size, Sort.by(Sort.Direction.ASC, "eventDate")));
             if (onlyAvailable) {
                 return getList.stream()
-                        .filter((Event event) -> event.getConfirmedRequests() <= event.getParticipantLimit() || event.getParticipantLimit() == 0) // ParticipantLimit = 0 - означает отсутствие ограничения
+                        .filter((Event event) -> event.getConfirmedRequests() < event.getParticipantLimit() || event.getParticipantLimit() == 0) // ParticipantLimit = 0 - означает отсутствие ограничения
                         .map((Event event) -> EventMapper.toEventShortDto(event, views))
                         .collect(Collectors.toList());
             }
@@ -78,7 +79,7 @@ public class EventServiceImpl implements EventService {
             Page<Event> getList = eventRepository.findByParamFromUser(text, categories, paid, state, start, end, FromSizeSortPageable.of(from, size, Sort.by(Sort.Direction.ASC, "id")));
             if (onlyAvailable) {
                 return getList.stream()
-                        .filter((Event event) -> event.getConfirmedRequests() <= event.getParticipantLimit() || event.getParticipantLimit() == 0)
+                        .filter((Event event) -> event.getConfirmedRequests() < event.getParticipantLimit() || event.getParticipantLimit() == 0)
                         .map((Event event) -> EventMapper.toEventShortDto(event, views))
                         .sorted(Comparator.comparingLong(EventShortDto::getViews))
                         .collect(Collectors.toList());
@@ -94,12 +95,16 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventFullDto getByIdForAllUsers(Long eventId) {
-        //TODO добавить проверки для выставления ошибок
-        return EventMapper.toEventDto(eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString())));
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
+        if (!event.getState().equals(StateOfEventAndReq.PUBLISHED)){
+            throw new ValidationException(Event.class, "State = " + event.getState(), "Событие не опубликовано!");
+        }
+        //TODO добавить статистику
+        Long views = 1L;
+        return EventMapper.toEventFullDto(event, views);
     }
 
-
-    //путь Для users/
+    //путь для users
     @Override
     public List<EventShortDto> findByUserIdFromUser(Long userId, String remoteAddr, String requestURI, Integer from, Integer size) {
         userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
@@ -108,7 +113,7 @@ public class EventServiceImpl implements EventService {
         // GET /events, который отвечает за получение событий с возможностью фильтрации, и
         // GET /events/{id}, который позволяет получить подробную информацию об опубликованном событии по его идентификатору
         StatisticDto statisticDto = StatisticDto.builder()
-                .app("EventService")
+                .app("EventServiceByUser")
                 .uri(requestURI)
                 .ip(remoteAddr)
                 .timestamp(LocalDateTime.now().format(formatter))
