@@ -3,6 +3,7 @@ package ru.bykov.explore.services.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.bykov.explore.clientstat.StatClient;
@@ -16,6 +17,7 @@ import ru.bykov.explore.repositories.*;
 import ru.bykov.explore.services.EventService;
 import ru.bykov.explore.utils.FromSizeSortPageable;
 import ru.bykov.explore.utils.StateOfEventAndReq;
+import ru.bykov.explore.utils.ViewsDto;
 import ru.bykov.explore.utils.mapperForDto.EventMapper;
 import ru.bykov.explore.utils.mapperForDto.LocationMapper;
 import ru.bykov.explore.utils.mapperForDto.RequestMapper;
@@ -25,6 +27,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,7 +44,7 @@ public class EventServiceImpl implements EventService {
 
     //путь для не users
     @Override
-    public List<EventShortDto> getAllForAllUsers(String text, Long[] categories, Boolean paid, String rangeStart,
+    public List<EventShortDto> findAllForAllUsers(String text, Long[] categories, Boolean paid, String rangeStart,
                                                  String rangeEnd, Boolean onlyAvailable, String sort, Integer from,
                                                  Integer size, String remoteAddr, String requestURI) {
         if (from < 0 || size <= 0) {
@@ -55,7 +58,6 @@ public class EventServiceImpl implements EventService {
             start = LocalDateTime.parse(rangeStart, formatter);
             end = LocalDateTime.parse(rangeEnd, formatter);
         }
-
         StateOfEventAndReq state = StateOfEventAndReq.PUBLISHED;
         StatisticDto statisticDto = StatisticDto.builder()
                 .app("Explore With Me App")
@@ -63,39 +65,29 @@ public class EventServiceImpl implements EventService {
                 .ip(remoteAddr)
                 .build();
         statClient.createStat(statisticDto);
-
         //TODO
-//        Boolean onlyAvailable,
-
-        //TODO сохранение в базу статистики
-
-        //TODO
-        Long views = 1L;
-        //TODO
-//        "EVENT_DATE" и "VIEWS" сделать только по stream
-        //сделать запрос в бд
         if (sort.equals("EVENT_DATE")) {
             Page<Event> getList = eventRepository.findByParamFromUser(text, categories, paid, state, start, end, FromSizeSortPageable.of(from, size, Sort.by(Sort.Direction.ASC, "eventDate")));
             if (onlyAvailable) {
                 return getList.stream()
                         .filter((Event event) -> event.getConfirmedRequests() < event.getParticipantLimit() || event.getParticipantLimit() == 0) // ParticipantLimit = 0 - означает отсутствие ограничения
-                        .map((Event event) -> EventMapper.toEventShortDto(event, views))
+                        .map((Event event) -> EventMapper.toEventShortDto(event, (Long) statClient.getViewsOfEvent("Explore With Me App", "event/" + event.getId()).getBody()))
                         .collect(Collectors.toList());
             }
             return getList.stream()
-                    .map((Event event) -> EventMapper.toEventShortDto(event, views))
+                    .map((Event event) -> EventMapper.toEventShortDto(event, (Long) statClient.getViewsOfEvent("Explore With Me App", "event/" + event.getId()).getBody()))
                     .collect(Collectors.toList());
         } else if (sort.equals("VIEWS")) {
             Page<Event> getList = eventRepository.findByParamFromUser(text, categories, paid, state, start, end, FromSizeSortPageable.of(from, size, Sort.by(Sort.Direction.ASC, "id")));
             if (onlyAvailable) {
                 return getList.stream()
                         .filter((Event event) -> event.getConfirmedRequests() < event.getParticipantLimit() || event.getParticipantLimit() == 0)
-                        .map((Event event) -> EventMapper.toEventShortDto(event, views))
+                        .map((Event event) -> EventMapper.toEventShortDto(event, (Long) statClient.getViewsOfEvent("Explore With Me App", "event/" + event.getId()).getBody()))
                         .sorted(Comparator.comparingLong(EventShortDto::getViews))
                         .collect(Collectors.toList());
             }
             return getList.stream()
-                    .map((Event event) -> EventMapper.toEventShortDto(event, views))
+                    .map((Event event) -> EventMapper.toEventShortDto(event, (Long) statClient.getViewsOfEvent("Explore With Me App", "event/" + event.getId()).getBody()))
                     .sorted(Comparator.comparingLong(EventShortDto::getViews))
                     .collect(Collectors.toList());
         } else {
@@ -104,21 +96,22 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventFullDto getByIdForAllUsers(Long eventId, String remoteAddr, String requestURI) {
+    public EventFullDto findByIdForAllUsers(Long eventId, String remoteAddr, String requestURI) {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
         if (!event.getState().equals(StateOfEventAndReq.PUBLISHED)){
             throw new ValidationException(Event.class, "State = " + event.getState(), "Событие не опубликовано!");
         }
-        StateOfEventAndReq state = StateOfEventAndReq.PUBLISHED;
-        StatisticDto statisticDto = StatisticDto.builder()
+        statClient.createStat(StatisticDto.builder()
                 .app("Explore With Me App")
                 .uri(requestURI)
                 .ip(remoteAddr)
-                .build();
-        statClient.createStat(statisticDto);
-        //TODO добавить статистику
-        Long views = 1L;
-        return EventMapper.toEventFullDto(event, views);
+                .build());
+
+        Object resEntObj =  statClient.getViewsOfEvent("Explore With Me App", "event/" + event.getId()).getBody();
+        ViewsDto viewsDto = (ViewsDto) resEntObj;
+        Long views = viewsDto.getViews();
+
+        return EventMapper.toEventFullDto(event, 1L);
     }
 
     //путь для users
@@ -282,7 +275,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public List<EventFullDto> getByParamFromAdmin(Long[] users, String[] states, Long[] categories, String rangeStart, String rangeEnd, Integer from, Integer size) {
+    public List<EventFullDto> findByParamFromAdmin(Long[] users, String[] states, Long[] categories, String rangeStart, String rangeEnd, Integer from, Integer size) {
         Long views = 0L;
         StateOfEventAndReq[] stateOfEvent = new StateOfEventAndReq[states.length];
         for (int i = 0; i < states.length; i++) {

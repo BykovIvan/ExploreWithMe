@@ -8,6 +8,7 @@ import ru.bykov.explore.model.dto.ViewStats;
 import ru.bykov.explore.repository.StatisticRepository;
 import ru.bykov.explore.service.StatisticService;
 import ru.bykov.explore.utils.StatisticMapper;
+import ru.bykov.explore.utils.ViewsDto;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -44,7 +45,7 @@ public class StatisticServiceImpl implements StatisticService {
     }
 
     @Override
-    public Long getCountOfEvent(String app, String uri) {
-        return statisticRepository.countByAppAndUri(app, uri);
+    public ViewsDto getCountOfEvent(String app, String uri) {
+        return StatisticMapper.toViewsDto(statisticRepository.countByAppAndUri(app, uri));
     }
 }

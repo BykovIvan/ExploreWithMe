@@ -3,16 +3,14 @@ package ru.bykov.explore.controllers.users;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.bykov.explore.model.dto.event.EventFullDto;
 import ru.bykov.explore.model.dto.ParticipationRequestDto;
+import ru.bykov.explore.model.dto.event.EventFullDto;
 import ru.bykov.explore.model.dto.event.EventShortDto;
 import ru.bykov.explore.model.dto.event.NewEventDto;
 import ru.bykov.explore.model.dto.event.UpdateEventRequest;
 import ru.bykov.explore.services.EventService;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -52,7 +50,6 @@ public class EventControllerUser {
     public EventFullDto eventByUserIdAndEventIdFromUser(@PathVariable("userId") Long userId,
                                                         @PathVariable("eventId") Long eventId) {
         log.info("Получен запрос к эндпоинту /users/{userID}/events{eventId} получение события по id пользователя и id события. Метод GET");
-        //TODO нужна запись в статистику
         return eventService.findByUserIdAndEventIdFromUser(userId, eventId);
     }
 

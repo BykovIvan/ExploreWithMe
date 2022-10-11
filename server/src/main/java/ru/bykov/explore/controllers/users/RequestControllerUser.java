@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.bykov.explore.services.RequestService;
 import ru.bykov.explore.model.dto.ParticipationRequestDto;
+import ru.bykov.explore.services.RequestService;
 
 import java.util.List;
 
@@ -26,14 +26,14 @@ public class RequestControllerUser {
     @PostMapping("/{userId}/request")
     @ResponseStatus(HttpStatus.CREATED)
     public ParticipationRequestDto addRequest(@PathVariable("userId") Long userId,
-                                              @RequestParam(value = "eventId") Long eventId){
+                                              @RequestParam(value = "eventId") Long eventId) {
         log.info("Получен запрос к эндпоинту /users/{userID}/request добаление запроса от пользователя id = {} на участие в событии id = {}", userId, eventId);
         return requestService.addRequestToEventByUserIdFromUser(userId, eventId);
     }
 
     @PatchMapping("/{userId}/request/{requestId}/cansel")
     public ParticipationRequestDto canselRequest(@PathVariable("userId") Long userId,
-                                                 @PathVariable("requestId") Long requestId){
+                                                 @PathVariable("requestId") Long requestId) {
         log.info("Получен запрос к эндпоинту /users/{userID}/request/{requestId}/cansel отмена запроса от пользователя id = {} на участие с id = {}", userId, requestId);
         return requestService.canselRequestByUserIdAndRequestIdFromUser(userId, requestId);
     }

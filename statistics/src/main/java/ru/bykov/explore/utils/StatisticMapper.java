@@ -25,4 +25,9 @@ public class StatisticMapper {
                 .build();
     }
 
+    public static ViewsDto toViewsDto(Long countByAppAndUri) {
+        return ViewsDto.builder()
+                .views(countByAppAndUri)
+                .build();
+    }
 }

@@ -22,14 +22,14 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
 
     @Override
-    public List<CategoryDto> getAllForAllUsers() {
+    public List<CategoryDto> findAllForAllUsers() {
         return categoryRepository.findAll().stream()
                 .map(CategoryMapper::toCategoryDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public CategoryDto getByIdForAllUsers(Long catId) {
+    public CategoryDto findByIdForAllUsers(Long catId) {
         return CategoryMapper.toCategoryDto(categoryRepository.findById(catId).orElseThrow(() -> new EntityNotFoundException(Category.class, "id", catId.toString())));
     }
 

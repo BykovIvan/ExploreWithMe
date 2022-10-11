@@ -23,13 +23,13 @@ public class CategoryController {
     @GetMapping
     public List<CategoryDto> allCategories() {
         log.info("Получен запрос к эндпоинту /categories получение всех. Метод GET");
-        return categoryService.getAllForAllUsers();
+        return categoryService.findAllForAllUsers();
     }
 
     @GetMapping("/{catId}")
     public CategoryDto categoryById(@PathVariable("catId") Long categoryId) {
         log.info("Получен запрос к эндпоинту /categories получение по id. Метод GET");
-        return categoryService.getByIdForAllUsers(categoryId);
+        return categoryService.findByIdForAllUsers(categoryId);
     }
 
 }

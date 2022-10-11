@@ -8,9 +8,9 @@ import java.util.List;
 
 public interface CompilationService {
 
-    List<CompilationDto> getAllForAll();
+    List<CompilationDto> findAllForAll();
 
-    CompilationDto getByIdForAll(Long compilationId);
+    CompilationDto findByIdForAll(Long compilationId);
 
     CompilationDto createFromAdmin(NewCompilationDto newCompilationDto);
 

@@ -32,7 +32,7 @@ public class EventController {
         log.info("Получен запрос к эндпоинту /events получение всех. Метод GET");
         log.info("client ip: {}", request.getRemoteAddr());
         log.info("endpoint path: {}", request.getRequestURI());
-        return eventService.getAllForAllUsers(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size, request.getRemoteAddr(), request.getRequestURI());
+        return eventService.findAllForAllUsers(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size, request.getRemoteAddr(), request.getRequestURI());
     }
 
     @GetMapping("/{eventId}")
@@ -41,7 +41,7 @@ public class EventController {
         log.info("Получен запрос к эндпоинту /events получение по id. Метод GET");
         log.info("client ip: {}", request.getRemoteAddr());
         log.info("endpoint path: {}", request.getRequestURI());
-        return eventService.getByIdForAllUsers(eventId, request.getRemoteAddr(), request.getRequestURI());
+        return eventService.findByIdForAllUsers(eventId, request.getRemoteAddr(), request.getRequestURI());
     }
 
 }

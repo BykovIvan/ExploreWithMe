@@ -11,13 +11,13 @@ public interface CategoryService {
      * Получение категорий всеми пользователями
      * Getting categories for all users
      */
-    List<CategoryDto> getAllForAllUsers();
+    List<CategoryDto> findAllForAllUsers();
 
     /**
      * Получение информации о категории по ее идентификатором всеми пользователями
      * Getting information about a category by its ID by all users
      */
-    CategoryDto getByIdForAllUsers(Long id);
+    CategoryDto findByIdForAllUsers(Long id);
 
     /**
      * Изменение категории администратором

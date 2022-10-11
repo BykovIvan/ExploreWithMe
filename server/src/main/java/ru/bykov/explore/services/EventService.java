@@ -7,9 +7,9 @@ import java.util.List;
 
 public interface EventService {
 
-    List<EventShortDto> getAllForAllUsers(String text, Long[] categories, Boolean paid, String rangeStart, String rangeEnd, Boolean onlyAvailable, String sort, Integer from, Integer size, String remoteAddr, String requestURI);
+    List<EventShortDto> findAllForAllUsers(String text, Long[] categories, Boolean paid, String rangeStart, String rangeEnd, Boolean onlyAvailable, String sort, Integer from, Integer size, String remoteAddr, String requestURI);
 
-    EventFullDto getByIdForAllUsers(Long eventId, String remoteAddr, String requestURI);
+    EventFullDto findByIdForAllUsers(Long eventId, String remoteAddr, String requestURI);
 
     //Получение событий, добавленных текущим пользователем
     List<EventShortDto> findByUserIdFromUser(Long userId, Integer from, Integer size);
@@ -32,7 +32,7 @@ public interface EventService {
      * Поиск события по параметрам администратором
      * Search for an event by parameters by the administrator
      */
-    List<EventFullDto> getByParamFromAdmin(Long[] users, String[] states, Long[] categories, String rangeStart, String rangeEnd, Integer from, Integer size);
+    List<EventFullDto> findByParamFromAdmin(Long[] users, String[] states, Long[] categories, String rangeStart, String rangeEnd, Integer from, Integer size);
 
     /**
      * Редактирование события администратором

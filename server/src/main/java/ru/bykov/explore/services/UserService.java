@@ -11,7 +11,7 @@ public interface UserService {
      * Получение информации о пользователях
      * Getting information about users
      */
-    List<UserDto> getByParamFromAdmin(Long[] ids, Integer from, Integer size);
+    List<UserDto> findByParamFromAdmin(Long[] ids, Integer from, Integer size);
 
     /**
      * Добавление нового пользователя

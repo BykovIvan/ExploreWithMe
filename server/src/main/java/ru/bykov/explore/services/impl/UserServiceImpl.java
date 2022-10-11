@@ -24,7 +24,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    public List<UserDto> getByParamFromAdmin(Long[] ids, Integer from, Integer size) {
+    public List<UserDto> findByParamFromAdmin(Long[] ids, Integer from, Integer size) {
         for (Long id : ids) {
             userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(User.class, "id", id.toString()));
         }

@@ -23,13 +23,13 @@ public class CompilationController {
     @GetMapping
     public List<CompilationDto> allCompilations() {
         log.info("Получен запрос к эндпоинту /compilations получение всех. Метод GET");
-        return compilationService.getAllForAll();
+        return compilationService.findAllForAll();
     }
 
     @GetMapping("/{compilationId}")
     public CompilationDto compilationById(@PathVariable("compilationId") Long compilationId) {
         log.info("Получен запрос к эндпоинту /compilations получение по id. Метод GET");
-        return compilationService.getByIdForAll(compilationId);
+        return compilationService.findByIdForAll(compilationId);
     }
 
 }

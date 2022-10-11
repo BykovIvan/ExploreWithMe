@@ -25,7 +25,7 @@ public class CompilationServiceImpl implements CompilationService {
 
     @Override
     //TODO почитать про Transactions!!!
-    public List<CompilationDto> getAllForAll() {
+    public List<CompilationDto> findAllForAll() {
         //TODO сделать как то про views подумать
         Long views = 0L;
         return compilationRepository.findAll().stream()
@@ -34,7 +34,7 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     @Override
-    public CompilationDto getByIdForAll(Long compId) {
+    public CompilationDto findByIdForAll(Long compId) {
         //TODO сделать как то про views подумать
         Long views = 0L;
         return CompilationMapper.toCompilationDto(compilationRepository.findById(compId).orElseThrow(() -> new EntityNotFoundException(Compilation.class, "id", compId.toString())), views);

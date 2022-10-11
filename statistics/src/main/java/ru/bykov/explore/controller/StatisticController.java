@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.bykov.explore.model.dto.EndPointHit;
 import ru.bykov.explore.model.dto.ViewStats;
 import ru.bykov.explore.service.StatisticService;
+import ru.bykov.explore.utils.ViewsDto;
 
 import java.util.List;
 
@@ -32,9 +33,9 @@ public class StatisticController {
     }
 
     @GetMapping("/count")
-    public Long getCount(@RequestParam(value = "app") String app,
-                         @RequestParam(value = "uri") String uri){
-        log.info("Получен запрос к эндпоинту /count, получение количества запросов события");
+    public ViewsDto getCount(@RequestParam(value = "app") String app,
+                             @RequestParam(value = "uri") String uri){
+        log.info("Получен запрос к эндпоинту /count, получение количества запросов события, app = {}, uri = {}", app, uri);
         return statisticService.getCountOfEvent(app, uri);
     }
 

@@ -18,15 +18,15 @@ public class EventControllerAdmin {
     private final EventService eventService;
 
     @GetMapping
-    public List<EventFullDto> getByParam(@RequestParam(value = "users", required = false) Long[] users,            //список id пользователей, чьи события нужно найти
-                                         @RequestParam(value = "states", required = false) String[] states,        //список состояний в которых находятся искомые события
-                                         @RequestParam(value = "categories", required = false) Long[] categories,  //список id категорий в которых будет вестись поиск
-                                         @RequestParam(value = "rangeStart", required = false) String rangeStart,  //дата и время не раньше которых должно произойти событие
-                                         @RequestParam(value = "rangeEnd", required = false) String rangeEnd,      //дата и время не позже которых должно произойти событие
-                                         @RequestParam(value = "from", required = false, defaultValue = "0") Integer from,
-                                         @RequestParam(value = "size", required = false, defaultValue = "10") Integer size) {
+    public List<EventFullDto> findByParam(@RequestParam(value = "users", required = false) Long[] users,            //список id пользователей, чьи события нужно найти
+                                          @RequestParam(value = "states", required = false) String[] states,        //список состояний в которых находятся искомые события
+                                          @RequestParam(value = "categories", required = false) Long[] categories,  //список id категорий в которых будет вестись поиск
+                                          @RequestParam(value = "rangeStart", required = false) String rangeStart,  //дата и время не раньше которых должно произойти событие
+                                          @RequestParam(value = "rangeEnd", required = false) String rangeEnd,      //дата и время не позже которых должно произойти событие
+                                          @RequestParam(value = "from", required = false, defaultValue = "0") Integer from,
+                                          @RequestParam(value = "size", required = false, defaultValue = "10") Integer size) {
         log.info("Получен запрос к эндпоинту /admin/events, метод GET, получение событий по параметрам");
-        return eventService.getByParamFromAdmin(users, states, categories, rangeStart, rangeEnd, from, size);
+        return eventService.findByParamFromAdmin(users, states, categories, rangeStart, rangeEnd, from, size);
     }
 
     @PutMapping("/{eventId}")

@@ -2,13 +2,11 @@ package ru.bykov.explore.controllers.admin;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.bykov.explore.model.dto.user.NewUserRequest;
 import ru.bykov.explore.model.dto.user.UserDto;
 import ru.bykov.explore.services.UserService;
 
-import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -25,7 +23,7 @@ public class UserControllerAdmin {
                                   @RequestParam(value = "from", required = false, defaultValue = "0") Integer from,
                                   @RequestParam(value = "size", required = false, defaultValue = "10") Integer size) {
         log.info("Получен запрос к эндпоинту /admin/users получение пользователей по param. Метод GET");
-        return userService.getByParamFromAdmin(ids, from, size);
+        return userService.findByParamFromAdmin(ids, from, size);
     }
 
     @PostMapping
