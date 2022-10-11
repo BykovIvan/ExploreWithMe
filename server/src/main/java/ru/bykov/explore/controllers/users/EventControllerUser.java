@@ -26,13 +26,10 @@ public class EventControllerUser {
 
     @GetMapping("/{userId}/events")
     public List<EventShortDto> userById(@PathVariable("userId") Long userId,
-                                        HttpServletRequest request,
                                         @RequestParam(value = "from", required = false, defaultValue = "0") Integer from,
                                         @RequestParam(value = "size", required = false, defaultValue = "10") Integer size) {
         log.info("Получен запрос к эндпоинту /users/{userID}/events получение событий пользователя. Метод GET");
-        log.info("client ip: {}", request.getRemoteAddr());
-        log.info("endpoint path: {}", request.getRequestURI());
-        return eventService.findByUserIdFromUser(userId, request.getRemoteAddr(), request.getRequestURI(), from, size);
+        return eventService.findByUserIdFromUser(userId, from, size);
     }
 
     @PatchMapping("/{userId}/events")

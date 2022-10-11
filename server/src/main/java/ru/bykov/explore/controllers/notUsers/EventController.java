@@ -7,6 +7,7 @@ import ru.bykov.explore.model.dto.event.EventFullDto;
 import ru.bykov.explore.model.dto.event.EventShortDto;
 import ru.bykov.explore.services.EventService;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -26,15 +27,21 @@ public class EventController {
                                          @RequestParam(value = "onlyAvailable", required = false, defaultValue = "false") Boolean onlyAvailable,//Default value : false
                                          @RequestParam(value = "sort") String sort,                                                             //Available values : EVENT_DATE, VIEWS
                                          @RequestParam(value = "from", required = false, defaultValue = "0") Integer from,                      //Default value : 0
-                                         @RequestParam(value = "size", required = false, defaultValue = "10") Integer size) {                   //Default value : 10
+                                         @RequestParam(value = "size", required = false, defaultValue = "10") Integer size,
+                                         HttpServletRequest request) {                   //Default value : 10
         log.info("Получен запрос к эндпоинту /events получение всех. Метод GET");
-        return eventService.getAllForAllUsers(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
+        log.info("client ip: {}", request.getRemoteAddr());
+        log.info("endpoint path: {}", request.getRequestURI());
+        return eventService.getAllForAllUsers(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size, request.getRemoteAddr(), request.getRequestURI());
     }
 
     @GetMapping("/{eventId}")
-    public EventFullDto categoryById(@PathVariable("eventId") Long eventId) {
+    public EventFullDto categoryById(@PathVariable("eventId") Long eventId,
+                                     HttpServletRequest request) {
         log.info("Получен запрос к эндпоинту /events получение по id. Метод GET");
-        return eventService.getByIdForAllUsers(eventId);
+        log.info("client ip: {}", request.getRemoteAddr());
+        log.info("endpoint path: {}", request.getRequestURI());
+        return eventService.getByIdForAllUsers(eventId, request.getRemoteAddr(), request.getRequestURI());
     }
 
 }

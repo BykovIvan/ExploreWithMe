@@ -7,12 +7,12 @@ import java.util.List;
 
 public interface EventService {
 
-    List<EventShortDto> getAllForAllUsers(String text, Long[] categories, Boolean paid, String rangeStart, String rangeEnd, Boolean onlyAvailable, String sort, Integer from, Integer size);
+    List<EventShortDto> getAllForAllUsers(String text, Long[] categories, Boolean paid, String rangeStart, String rangeEnd, Boolean onlyAvailable, String sort, Integer from, Integer size, String remoteAddr, String requestURI);
 
-    EventFullDto getByIdForAllUsers(Long eventId);
+    EventFullDto getByIdForAllUsers(Long eventId, String remoteAddr, String requestURI);
 
     //Получение событий, добавленных текущим пользователем
-    List<EventShortDto> findByUserIdFromUser(Long userId, String remoteAddr, String requestURI, Integer from, Integer size);
+    List<EventShortDto> findByUserIdFromUser(Long userId, Integer from, Integer size);
 
     EventFullDto updateFromUser(Long userId, UpdateEventRequest updateEventRequest);
 

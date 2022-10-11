@@ -41,7 +41,9 @@ public class EventServiceImpl implements EventService {
 
     //путь для не users
     @Override
-    public List<EventShortDto> getAllForAllUsers(String text, Long[] categories, Boolean paid, String rangeStart, String rangeEnd, Boolean onlyAvailable, String sort, Integer from, Integer size) {
+    public List<EventShortDto> getAllForAllUsers(String text, Long[] categories, Boolean paid, String rangeStart,
+                                                 String rangeEnd, Boolean onlyAvailable, String sort, Integer from,
+                                                 Integer size, String remoteAddr, String requestURI) {
         if (from < 0 || size <= 0) {
             throw new ValidationException(Event.class, "from = " + from + ", size = " + size, "Введены неверные параметры!");
         }
@@ -53,7 +55,15 @@ public class EventServiceImpl implements EventService {
             start = LocalDateTime.parse(rangeStart, formatter);
             end = LocalDateTime.parse(rangeEnd, formatter);
         }
+
         StateOfEventAndReq state = StateOfEventAndReq.PUBLISHED;
+        StatisticDto statisticDto = StatisticDto.builder()
+                .app("Explore With Me App")
+                .uri(requestURI)
+                .ip(remoteAddr)
+                .build();
+        statClient.createStat(statisticDto);
+
         //TODO
 //        Boolean onlyAvailable,
 
@@ -94,11 +104,18 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventFullDto getByIdForAllUsers(Long eventId) {
+    public EventFullDto getByIdForAllUsers(Long eventId, String remoteAddr, String requestURI) {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
         if (!event.getState().equals(StateOfEventAndReq.PUBLISHED)){
             throw new ValidationException(Event.class, "State = " + event.getState(), "Событие не опубликовано!");
         }
+        StateOfEventAndReq state = StateOfEventAndReq.PUBLISHED;
+        StatisticDto statisticDto = StatisticDto.builder()
+                .app("Explore With Me App")
+                .uri(requestURI)
+                .ip(remoteAddr)
+                .build();
+        statClient.createStat(statisticDto);
         //TODO добавить статистику
         Long views = 1L;
         return EventMapper.toEventFullDto(event, views);
@@ -106,19 +123,10 @@ public class EventServiceImpl implements EventService {
 
     //путь для users
     @Override
-    public List<EventShortDto> findByUserIdFromUser(Long userId, String remoteAddr, String requestURI, Integer from, Integer size) {
+    public List<EventShortDto> findByUserIdFromUser(Long userId, Integer from, Integer size) {
         userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
-        //запись в сервис статистики
-        //Сохранять статистику нужно будет по двум эндпоинтам:
-        // GET /events, который отвечает за получение событий с возможностью фильтрации, и
-        // GET /events/{id}, который позволяет получить подробную информацию об опубликованном событии по его идентификатору
-        StatisticDto statisticDto = StatisticDto.builder()
-                .app("EventServiceByUser")
-                .uri(requestURI)
-                .ip(remoteAddr)
-                .timestamp(LocalDateTime.now().format(formatter))
-                .build();
-        statClient.createStat(statisticDto);
+
+
         //виюшка должна быть у конкретного события????
         Long views = null;
         //добавить views
@@ -187,6 +195,7 @@ public class EventServiceImpl implements EventService {
     public EventFullDto findByUserIdAndEventIdFromUser(Long userId, Long eventId) {
         userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
         eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
+
         //TODO
 //        Long views = statClient.getViewByIdEvent(event.getId()));
         Long views = 0L;
