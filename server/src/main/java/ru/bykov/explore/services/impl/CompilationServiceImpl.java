@@ -90,11 +90,11 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     @Transactional
     public void addEventToCompFromAdmin(Long compId, Long eventId) {
-        Optional<Event> eventGet = eventRepository.findById(eventId);
-        Event eventNew;
-        if (eventGet.isPresent()){
-            eventNew = eventGet.get();
-        }
+//        Optional<Event> eventGet = eventRepository.findById(eventId);
+//        Event eventNew;
+//        if (eventGet.isPresent()){
+//            eventNew = eventGet.get();
+//        }
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
         Compilation compilation = compilationRepository.findById(compId).orElseThrow(() -> new EntityNotFoundException(Compilation.class, "id", compId.toString()));
         compilation.getEvents().add(event);
@@ -102,12 +102,14 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     @Override
+    @Transactional
     public void deleteCompFromMainPageFromAdmin(Long compId) {
         compilationRepository.findById(compId).orElseThrow(() -> new EntityNotFoundException(Compilation.class, "id", compId.toString()));
         compilationRepository.setPinnedByCompId(false, compId);
     }
 
     @Override
+    @Transactional
     public void addCompFromMainPageFromAdmin(Long compId) {
         compilationRepository.findById(compId).orElseThrow(() -> new EntityNotFoundException(Compilation.class, "id", compId.toString()));
         compilationRepository.setPinnedByCompId(true, compId);
