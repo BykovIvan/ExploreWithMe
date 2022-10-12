@@ -7,9 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
-import ru.bykov.explore.utils.ViewsDto;
+import ru.bykov.explore.utils.ViewStats;
 
-import javax.validation.ValidationException;
 import java.util.Map;
 
 @RequiredArgsConstructor
@@ -48,37 +47,6 @@ public class BaseClient {
     }
 
     private static ResponseEntity<Object> prepareGatewayResponse(ResponseEntity<Object> response) {
-        if (response.getStatusCode().is2xxSuccessful()) {
-            return response;
-        }
-        ResponseEntity.BodyBuilder responseBuilder = ResponseEntity.status(response.getStatusCode());
-        if (response.hasBody()) {
-            return responseBuilder.body(response.getBody());
-        }
-        return responseBuilder.build();
-    }
-
-    //Подсчет views для каждого события
-    protected ResponseEntity<ViewsDto> getViews(String path, @Nullable Map<String, Object> parameters) {
-        return makeAndSendRequestViews(HttpMethod.GET, path, parameters, null);
-    }
-
-    private <T> ResponseEntity<ViewsDto> makeAndSendRequestViews(HttpMethod method, String path, @Nullable Map<String, Object> parameters, @Nullable T body) {
-        HttpEntity<T> requestEntity = new HttpEntity<>(body);
-        ResponseEntity<ViewsDto> statServerResponse;
-        try {
-            if (parameters != null) {
-                statServerResponse = rest.exchange(path, method, requestEntity, ViewsDto.class, parameters);
-            } else {
-                statServerResponse = rest.exchange(path, method, requestEntity, ViewsDto.class);
-            }
-        } catch (HttpStatusCodeException e) {
-            throw new ValidationException();
-        }
-        return prepareGatewayResponseViews(statServerResponse);
-    }
-
-    private static ResponseEntity<ViewsDto> prepareGatewayResponseViews(ResponseEntity<ViewsDto> response) {
         if (response.getStatusCode().is2xxSuccessful()) {
             return response;
         }

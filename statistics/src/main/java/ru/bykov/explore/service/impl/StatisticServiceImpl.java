@@ -9,22 +9,21 @@ import ru.bykov.explore.model.dto.ViewStats;
 import ru.bykov.explore.repository.StatisticRepository;
 import ru.bykov.explore.service.StatisticService;
 import ru.bykov.explore.utils.StatisticMapper;
-import ru.bykov.explore.utils.ViewsDto;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
+
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class StatisticServiceImpl implements StatisticService {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private final StatisticRepository statisticRepository;
 
-    @Transactional
     @Override
+    @Transactional
     public void createStat(EndPointHit endPointHit) {
         LocalDateTime timeOfGetEvents = LocalDateTime.now();
         Statistic statistic = StatisticMapper.toStatistic(endPointHit, timeOfGetEvents);
@@ -36,20 +35,9 @@ public class StatisticServiceImpl implements StatisticService {
         LocalDateTime timeOfStart = LocalDateTime.parse(start, formatter);
         LocalDateTime timeOfEnd = LocalDateTime.parse(end, formatter);
         if (unique) {
-            return statisticRepository.getByParam(timeOfStart, timeOfEnd, uris)
-                    .stream()
-                    .map((Statistic statistic) -> StatisticMapper.toViewStats(statistic, statisticRepository.countByAppAndUri(statistic.getApp(), statistic.getUri())))
-                    .collect(Collectors.toList());
+            return statisticRepository.findByParamByUniqueIp(timeOfStart, timeOfEnd, uris);
         }
-        return statisticRepository.getByParamUniqIp(timeOfStart, timeOfEnd, uris)
-                .stream()
-                .map((Statistic statistic) -> StatisticMapper.toViewStats(statistic, statisticRepository.countByAppAndUri(statistic.getApp(), statistic.getUri())))
-                .collect(Collectors.toList());
+        return statisticRepository.findByParam(timeOfStart, timeOfEnd, uris);
     }
 
-    @Override
-    public ViewsDto getCountOfEvent(String app, String uri) {
-        Long views = statisticRepository.countByAppAndUri(app, uri);
-        return StatisticMapper.toViewsDto(views);
-    }
 }

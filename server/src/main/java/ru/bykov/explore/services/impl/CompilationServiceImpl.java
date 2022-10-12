@@ -17,7 +17,6 @@ import ru.bykov.explore.utils.mapperForDto.EventMapper;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,7 +32,7 @@ public class CompilationServiceImpl implements CompilationService {
     public List<CompilationDto> findAllForAll() {
         return compilationRepository.findAll().stream()
                 .map((Compilation compilation) -> CompilationMapper.toCompilationDto(compilation, compilation.getEvents().stream()
-                        .map((Event event) -> EventMapper.toEventShortDto(event, statClient.getViewsOfEvent("Explore With Me App", "/events/" + event.getId()).getBody().getViews()))
+                        .map((Event event) -> EventMapper.toEventShortDto(event, 999L))
                         .collect(Collectors.toList())))
                 .collect(Collectors.toList());
     }
@@ -42,7 +41,7 @@ public class CompilationServiceImpl implements CompilationService {
     public CompilationDto findByIdForAll(Long compId) {
         Compilation compilation = compilationRepository.findById(compId).orElseThrow(() -> new EntityNotFoundException(Compilation.class, "id", compId.toString()));
         return CompilationMapper.toCompilationDto(compilation, compilation.getEvents().stream()
-                .map((Event event) -> EventMapper.toEventShortDto(event, statClient.getViewsOfEvent("Explore With Me App", "/events/" + event.getId()).getBody().getViews()))
+                .map((Event event) -> EventMapper.toEventShortDto(event, 999L))
                 .collect(Collectors.toList()));
     }
 
@@ -58,7 +57,7 @@ public class CompilationServiceImpl implements CompilationService {
         List<Event> listOfEvent = eventRepository.findAllById(newCompilationDto.getEvents());
         Compilation compilation = CompilationMapper.toCompilation(newCompilationDto, listOfEvent);
         return CompilationMapper.toCompilationDto(compilationRepository.save(compilation), compilation.getEvents().stream()
-                .map((Event event) -> EventMapper.toEventShortDto(event, statClient.getViewsOfEvent("Explore With Me App", "/events/" + event.getId()).getBody().getViews()))
+                .map((Event event) -> EventMapper.toEventShortDto(event, 999L))
                 .collect(Collectors.toList()));
     }
 

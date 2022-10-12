@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.bykov.explore.model.dto.EndPointHit;
 import ru.bykov.explore.model.dto.ViewStats;
 import ru.bykov.explore.service.StatisticService;
-import ru.bykov.explore.utils.ViewsDto;
 
 import java.util.List;
 
@@ -18,7 +17,7 @@ public class StatisticController {
     private final StatisticService statisticService;
 
     @PostMapping("/hit")
-    public void createStat(@RequestBody EndPointHit endPointHit){
+    public void createStat(@RequestBody EndPointHit endPointHit) {
         log.info("Получен запрос к эндпоинту /hit, сохранение статистики");
         statisticService.createStat(endPointHit);
     }
@@ -27,18 +26,8 @@ public class StatisticController {
     public List<ViewStats> getStatByParam(@RequestParam(value = "start") String start,
                                           @RequestParam(value = "end") String end,
                                           @RequestParam(value = "uris", required = false) String[] uris,
-                                          @RequestParam(value = "unique", required = false, defaultValue = "false") Boolean unique){
+                                          @RequestParam(value = "unique", required = false, defaultValue = "false") Boolean unique) {
         log.info("Получен запрос к эндпоинту /stats, получение статистики по параметрам");
         return statisticService.getStatsByParam(start, end, uris, unique);
     }
-
-    @GetMapping("/count")
-    public ViewsDto getCount(@RequestParam(value = "app") String app,
-                             @RequestParam(value = "uri") String uri){
-        log.info("Получен запрос к эндпоинту /count, получение количества запросов события, app = {}, uri = {}", app, uri);
-        return statisticService.getCountOfEvent(app, uri);
-    }
-
-
-
 }

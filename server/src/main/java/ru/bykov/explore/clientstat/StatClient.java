@@ -8,7 +8,7 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.bykov.explore.clientstat.client.BaseClient;
-import ru.bykov.explore.utils.ViewsDto;
+import ru.bykov.explore.utils.ViewStats;
 
 import java.util.Map;
 
@@ -31,13 +31,6 @@ public class StatClient extends BaseClient {
         post("hit", statisticDto);
     }
 
-    public ResponseEntity<ViewsDto> getViewsOfEvent(String app, String uri) {
-        Map<String, Object> parameters = Map.of(
-                "app", app,
-                "uri", uri
-        );
-        return getViews("count" + "?app={app}&uri={uri}", parameters);
-    }
 
     public ResponseEntity<Object> getStatByParam(String start, String end, String[] uris, Boolean unique) {
         Map<String, Object> parameters = Map.of(
