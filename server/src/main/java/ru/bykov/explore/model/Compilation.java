@@ -19,8 +19,9 @@ public class Compilation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @OneToMany(mappedBy = "id",cascade = CascadeType.DETACH, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "id", cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
     private List<Event> events;
+    @Column(nullable = false, columnDefinition = "false")
     private Boolean pinned;
     private String title;
 }

@@ -2,6 +2,7 @@ package ru.bykov.explore.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.bykov.explore.model.Statistic;
 import ru.bykov.explore.model.dto.EndPointHit;
 import ru.bykov.explore.model.dto.ViewStats;
@@ -16,11 +17,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class StatisticServiceImpl implements StatisticService {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private final StatisticRepository statisticRepository;
 
+    @Transactional
     @Override
     public void createStat(EndPointHit endPointHit) {
         LocalDateTime timeOfGetEvents = LocalDateTime.now();

@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ViewsDto {
-    @JsonProperty("views")
+//    @JsonProperty("views")
     private Long views;
 }

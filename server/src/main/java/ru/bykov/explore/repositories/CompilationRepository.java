@@ -7,11 +7,15 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.bykov.explore.model.Compilation;
 
+import java.util.Optional;
+
 @Repository
 public interface CompilationRepository extends JpaRepository<Compilation, Long> {
 
+    @Query(value = "SELECT * FROM compilations WHERE id = ?1", nativeQuery = true)
+    Optional<Compilation> findById(Long compId);
     @Modifying
-    @Query("update Compilation c set c.pinned = :pinner where c.id = :comp_id")
-    void setPinnedByCompId(@Param("pinner") Boolean pinned,
+    @Query("update Compilation c set c.pinned = :pinned where c.id = :comp_id")
+    void setPinnedByCompId(@Param("pinned") Boolean pinned,
                            @Param("comp_id") Long compId);
 }

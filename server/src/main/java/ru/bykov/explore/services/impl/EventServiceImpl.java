@@ -3,7 +3,6 @@ package ru.bykov.explore.services.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.bykov.explore.clientstat.StatClient;
@@ -17,7 +16,6 @@ import ru.bykov.explore.repositories.*;
 import ru.bykov.explore.services.EventService;
 import ru.bykov.explore.utils.FromSizeSortPageable;
 import ru.bykov.explore.utils.StateOfEventAndReq;
-import ru.bykov.explore.utils.ViewsDto;
 import ru.bykov.explore.utils.mapperForDto.EventMapper;
 import ru.bykov.explore.utils.mapperForDto.LocationMapper;
 import ru.bykov.explore.utils.mapperForDto.RequestMapper;
@@ -27,11 +25,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class EventServiceImpl implements EventService {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -43,10 +39,11 @@ public class EventServiceImpl implements EventService {
     private final StatClient statClient;
 
     //путь для не users
+    @Transactional
     @Override
     public List<EventShortDto> findAllForAllUsers(String text, Long[] categories, Boolean paid, String rangeStart,
-                                                 String rangeEnd, Boolean onlyAvailable, String sort, Integer from,
-                                                 Integer size, String remoteAddr, String requestURI) {
+                                                  String rangeEnd, Boolean onlyAvailable, String sort, Integer from,
+                                                  Integer size, String remoteAddr, String requestURI) {
         if (from < 0 || size <= 0) {
             throw new ValidationException(Event.class, "from = " + from + ", size = " + size, "Введены неверные параметры!");
         }
@@ -65,29 +62,29 @@ public class EventServiceImpl implements EventService {
                 .ip(remoteAddr)
                 .build();
         statClient.createStat(statisticDto);
-        //TODO
+        //TODO stat
         if (sort.equals("EVENT_DATE")) {
             Page<Event> getList = eventRepository.findByParamFromUser(text, categories, paid, state, start, end, FromSizeSortPageable.of(from, size, Sort.by(Sort.Direction.ASC, "eventDate")));
             if (onlyAvailable) {
                 return getList.stream()
                         .filter((Event event) -> event.getConfirmedRequests() < event.getParticipantLimit() || event.getParticipantLimit() == 0) // ParticipantLimit = 0 - означает отсутствие ограничения
-                        .map((Event event) -> EventMapper.toEventShortDto(event, 1L))
+                        .map((Event event) -> EventMapper.toEventShortDto(event, statClient.getViewsOfEvent("Explore With Me App", "/events/" + event.getId()).getBody().getViews()))
                         .collect(Collectors.toList());
             }
             return getList.stream()
-                    .map((Event event) -> EventMapper.toEventShortDto(event, 1L))
+                    .map((Event event) -> EventMapper.toEventShortDto(event, statClient.getViewsOfEvent("Explore With Me App", "/events/" + event.getId()).getBody().getViews()))
                     .collect(Collectors.toList());
         } else if (sort.equals("VIEWS")) {
             Page<Event> getList = eventRepository.findByParamFromUser(text, categories, paid, state, start, end, FromSizeSortPageable.of(from, size, Sort.by(Sort.Direction.ASC, "id")));
             if (onlyAvailable) {
                 return getList.stream()
                         .filter((Event event) -> event.getConfirmedRequests() < event.getParticipantLimit() || event.getParticipantLimit() == 0)
-                        .map((Event event) -> EventMapper.toEventShortDto(event, 1L))
+                        .map((Event event) -> EventMapper.toEventShortDto(event, statClient.getViewsOfEvent("Explore With Me App", "/events/" + event.getId()).getBody().getViews()))
                         .sorted(Comparator.comparingLong(EventShortDto::getViews))
                         .collect(Collectors.toList());
             }
             return getList.stream()
-                    .map((Event event) -> EventMapper.toEventShortDto(event, 1L))
+                    .map((Event event) -> EventMapper.toEventShortDto(event, statClient.getViewsOfEvent("Explore With Me App", "/events/" + event.getId()).getBody().getViews()))
                     .sorted(Comparator.comparingLong(EventShortDto::getViews))
                     .collect(Collectors.toList());
         } else {
@@ -95,10 +92,11 @@ public class EventServiceImpl implements EventService {
         }
     }
 
+    @Transactional
     @Override
     public EventFullDto findByIdForAllUsers(Long eventId, String remoteAddr, String requestURI) {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
-        if (!event.getState().equals(StateOfEventAndReq.PUBLISHED)){
+        if (!event.getState().equals(StateOfEventAndReq.PUBLISHED)) {
             throw new ValidationException(Event.class, "State = " + event.getState(), "Событие не опубликовано!");
         }
         statClient.createStat(StatisticDto.builder()
@@ -106,31 +104,26 @@ public class EventServiceImpl implements EventService {
                 .uri(requestURI)
                 .ip(remoteAddr)
                 .build());
-
-        ViewsDto viewsDto =  statClient.getViewsOfEvent("Explore With Me App", "/event/" + event.getId()).getBody();
-
-        Long views = viewsDto.getViews();
-
-        return EventMapper.toEventFullDto(event, views);
+//        ViewsDto viewsDto = statClient.getViewsOfEvent("Explore With Me App", "/events/" + event.getId()).getBody();
+//        Long views = null;
+//        if (viewsDto != null) {
+//            views = viewsDto.getViews();
+//        }
+        return EventMapper.toEventFullDto(event, statClient.getViewsOfEvent("Explore With Me App", "/events/" + event.getId()).getBody().getViews());
     }
 
     //путь для users
+    @Transactional
     @Override
     public List<EventShortDto> findByUserIdFromUser(Long userId, Integer from, Integer size) {
         userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
-
-
-        //виюшка должна быть у конкретного события????
-        Long views = null;
-        //добавить views
         return eventRepository.findAllByInitiatorId(userId, FromSizeSortPageable.of(from, size, Sort.by(Sort.Direction.ASC, "id")))
                 .stream()
-                .map((Event event) -> EventMapper.toEventShortDto(event, views))
-                //то что правильно :
-//                .map((Event event) -> EventMapper.toEventShortDto(event, statClient.getViewByIdEvent(event.getId())))
+                .map((Event event) -> EventMapper.toEventShortDto(event, statClient.getViewsOfEvent("Explore With Me App", "/events/" + event.getId()).getBody().getViews()))
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     @Override
     public EventFullDto updateFromUser(Long userId, UpdateEventRequest updateEventRequest) {
         User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
@@ -164,12 +157,10 @@ public class EventServiceImpl implements EventService {
         if (event.getState().equals(StateOfEventAndReq.CANCELED)) {
             event.setState(StateOfEventAndReq.PENDING);
         }
-        //TODO
-//        Long views = statClient.getViewByIdEvent(event.getId()));
-        Long views = 0L;
-        return EventMapper.toEventFullDto(eventRepository.save(event), views);
+        return EventMapper.toEventFullDto(eventRepository.save(event), statClient.getViewsOfEvent("Explore With Me App", "/events/" + event.getId()).getBody().getViews());
     }
 
+    @Transactional
     @Override
     public EventFullDto createFromUser(Long userId, NewEventDto newEventDto) {
         User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
@@ -177,24 +168,20 @@ public class EventServiceImpl implements EventService {
         Location location = locationRepository.save(LocationMapper.toLocation(newEventDto.getLocation()));
         Event event = EventMapper.toEvent(newEventDto, category, user, location);
         event.setState(StateOfEventAndReq.PENDING);
-        //TODO
-//        Long views = statClient.getViewByIdEvent(event.getId()));
-        Long views = 0L;
         Event eventNew = eventRepository.save(event);
-        return EventMapper.toEventFullDto(eventNew, views);
+        return EventMapper.toEventFullDto(eventNew, 0L);
     }
 
+    @Transactional
     @Override
     public EventFullDto findByUserIdAndEventIdFromUser(Long userId, Long eventId) {
         userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
         eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
-
-        //TODO
-//        Long views = statClient.getViewByIdEvent(event.getId()));
-        Long views = 0L;
-        return EventMapper.toEventFullDto(eventRepository.findByIdAndInitiatorId(eventId, userId), views);
+        Event event = eventRepository.findByIdAndInitiatorId(eventId, userId);
+        return EventMapper.toEventFullDto(event, statClient.getViewsOfEvent("Explore With Me App", "/events/" + event.getId()).getBody().getViews());
     }
 
+    @Transactional
     @Override
     public EventFullDto canselByUserIdAndEventIdFromUser(Long userId, Long eventId) {
         userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
@@ -203,12 +190,10 @@ public class EventServiceImpl implements EventService {
             throw new ValidationException(Event.class, "State = " + event.getState(), "Событие уже опубликовано!");
         }
         event.setState(StateOfEventAndReq.CANCELED);
-        //TODO
-//        Long views = statClient.getViewByIdEvent(event.getId()));
-        Long views = 0L;
-        return EventMapper.toEventFullDto(eventRepository.save(event), views);
+        return EventMapper.toEventFullDto(eventRepository.save(event), statClient.getViewsOfEvent("Explore With Me App", "/events/" + event.getId()).getBody().getViews());
     }
 
+    @Transactional
     @Override
     public List<ParticipationRequestDto> findRequestsByUserIdAndEventIdFromUser(Long userId, Long eventId) {
         userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
@@ -219,10 +204,7 @@ public class EventServiceImpl implements EventService {
                 .collect(Collectors.toList());
     }
 
-    //если для события лимит заявок равен 0 или отключена пре-модерация заявок, то подтверждение заявок не требуется
-    //нельзя подтвердить заявку, если уже достигнут лимит по заявкам на данное событие
-    //если при подтверждении данной заявки, лимит заявок для события исчерпан, то все неподтверждённые заявки необходимо отклонить
-
+    @Transactional
     @Override
     public ParticipationRequestDto confirmRequestByUserIdAndEventIdFromUser(Long userId, Long eventId, Long reqId) {
         userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
@@ -254,6 +236,7 @@ public class EventServiceImpl implements EventService {
         return RequestMapper.toParticipationRequestDto(requestRepository.save(request));
     }
 
+    @Transactional
     @Override
     public ParticipationRequestDto rejectRequestByUserIdAndEventIdFromUser(Long userId, Long eventId, Long reqId) {
         //TODO можно вставить метод проверки на все правила что бы не было дубликата!
@@ -274,9 +257,9 @@ public class EventServiceImpl implements EventService {
         return RequestMapper.toParticipationRequestDto(requestRepository.save(request));
     }
 
+    @Transactional
     @Override
     public List<EventFullDto> findByParamFromAdmin(Long[] users, String[] states, Long[] categories, String rangeStart, String rangeEnd, Integer from, Integer size) {
-        Long views = 0L;
         StateOfEventAndReq[] stateOfEvent = new StateOfEventAndReq[states.length];
         for (int i = 0; i < states.length; i++) {
             stateOfEvent[i] = StateOfEventAndReq.valueOf(states[i]);
@@ -285,12 +268,11 @@ public class EventServiceImpl implements EventService {
         LocalDateTime end = LocalDateTime.parse(rangeEnd, formatter);
         return eventRepository.findByParamFromAdmin(users, stateOfEvent, categories, start, end, FromSizeSortPageable.of(from, size, Sort.by(Sort.Direction.ASC, "id")))
                 .stream()
-//                .map((Event event) -> EventMapper.toEventFullDto(event, client.getViews(event.getId())
-                .map((Event event) -> EventMapper.toEventFullDto(event, views))
+                .map((Event event) -> EventMapper.toEventFullDto(event, statClient.getViewsOfEvent("Explore With Me App", "/events/" + event.getId()).getBody().getViews()))
                 .collect(Collectors.toList());
-        //TODO сделать запрос с параметрами
     }
 
+    @Transactional
     @Override
     public EventFullDto updateByIdFromAdmin(Long eventId, AdminUpdateEventRequest adminUpdateEventRequest) {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
@@ -321,14 +303,10 @@ public class EventServiceImpl implements EventService {
         if (adminUpdateEventRequest.getTitle() != null) {
             event.setTitle(adminUpdateEventRequest.getTitle());
         }
-        //TODO сделать запрос клиента на количество просмотров
-        Long views = null;
-
-        return EventMapper.toEventFullDto(eventRepository.save(event), views);
+        return EventMapper.toEventFullDto(eventRepository.save(event), statClient.getViewsOfEvent("Explore With Me App", "/events/" + event.getId()).getBody().getViews());
     }
 
-    // Дата начала события должна быть не ранее чем за час от даты публикации.
-    // Событие должно быть в состоянии ожидания публикации
+    @Transactional
     @Override
     public EventFullDto publishEventByIdFromAdmin(Long eventId) {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
@@ -345,13 +323,10 @@ public class EventServiceImpl implements EventService {
         }
         event.setPublishedOn(dateAndTimeNowPublish);
         event.setState(StateOfEventAndReq.PUBLISHED);
-        //TODO сделать запрос клиента на количество просмотров
-        Long views = null;
-        return EventMapper.toEventFullDto(eventRepository.save(event), views);
+        return EventMapper.toEventFullDto(eventRepository.save(event), statClient.getViewsOfEvent("Explore With Me App", "/events/" + event.getId()).getBody().getViews());
     }
 
-    //Событие не должно быть опубликовано
-
+    @Transactional
     @Override
     public EventFullDto rejectEventByIdFromAdmin(Long eventId) {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
@@ -359,9 +334,7 @@ public class EventServiceImpl implements EventService {
             throw new ValidationException(Event.class, "state = " + event.getState(), "Событие уже опубликовано!");
         }
         event.setState(StateOfEventAndReq.CANCELED);
-        //TODO сделать запрос клиента на количество просмотров
-        Long views = null;
-        return EventMapper.toEventFullDto(eventRepository.save(event), views);
+        return EventMapper.toEventFullDto(eventRepository.save(event), statClient.getViewsOfEvent("Explore With Me App", "/events/" + event.getId()).getBody().getViews());
     }
 
 }

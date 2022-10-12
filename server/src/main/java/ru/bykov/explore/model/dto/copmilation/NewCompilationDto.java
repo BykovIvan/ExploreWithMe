@@ -18,9 +18,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class NewCompilationDto {
-    @OneToMany(fetch = FetchType.EAGER)
     private List<Long> events;
-    @Column(nullable = false, columnDefinition = "false")
+    @NotNull
     private Boolean pinned;
     @NotNull
     @NotBlank

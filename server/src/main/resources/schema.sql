@@ -30,7 +30,6 @@ CREATE TABLE IF NOT EXISTS events (
     request_moderation boolean NOT NULL DEFAULT FALSE,
     state VARCHAR(64) NOT NULL,
     title VARCHAR(120) NOT NULL,
-    compilation BIGINT,
 
     CONSTRAINT pk_event PRIMARY KEY (id)
 );
@@ -75,8 +74,6 @@ ALTER TABLE events ADD FOREIGN KEY (initiator) REFERENCES users (id);
 ALTER TABLE events ADD FOREIGN KEY (location) REFERENCES locations (id);
 
 ALTER TABLE events ADD FOREIGN KEY (category) REFERENCES categories (id);
-
-ALTER TABLE events ADD FOREIGN KEY (compilation) REFERENCES compilations (id);
 
 ALTER TABLE requests ADD FOREIGN KEY (event) REFERENCES events (id);
 

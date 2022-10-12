@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
 
@@ -33,23 +33,23 @@ public class CategoryServiceImpl implements CategoryService {
         return CategoryMapper.toCategoryDto(categoryRepository.findById(catId).orElseThrow(() -> new EntityNotFoundException(Category.class, "id", catId.toString())));
     }
 
-    @Transactional
     @Override
+    @Transactional
     public CategoryDto updateFromAdmin(CategoryDto categoryDto) {
         Category category = categoryRepository.findById(categoryDto.getId()).orElseThrow(() -> new EntityNotFoundException(Category.class, "id", categoryDto.getId().toString()));
         category.setName(categoryDto.getName());
         return CategoryMapper.toCategoryDto(categoryRepository.save(category));
     }
 
-    @Transactional
     @Override
+    @Transactional
     public CategoryDto createFromAdmin(NewCategoryDto newCategoryDto) {
         Category category = CategoryMapper.toCategory(newCategoryDto);
         return CategoryMapper.toCategoryDto(categoryRepository.save(category));
     }
 
-    @Transactional
     @Override
+    @Transactional
     public void deleteFromAdminByCatId(Long catId) {
         categoryRepository.findById(catId).orElseThrow(() -> new EntityNotFoundException(Category.class, "id", catId.toString()));
         categoryRepository.deleteById(catId);
