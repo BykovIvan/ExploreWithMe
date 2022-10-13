@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class RequestServiceImpl implements RequestService {
 
@@ -45,25 +44,26 @@ public class RequestServiceImpl implements RequestService {
     //нельзя участвовать в неопубликованном событии
     //если у события достигнут лимит запросов на участие - необходимо вернуть ошибку
     //если для события отключена пре-модерация запросов на участие, то запрос должен автоматически перейти в состояние подтвержденного
-    @Transactional
     @Override
+    @Transactional
     public ParticipationRequestDto addRequestToEventByUserIdFromUser(Long userId, Long eventId) {
-        userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
+        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
         if (event.getInitiator().getId() == userId) {
-            throw new ValidationException(Event.class, "Initiator = " + event.getInitiator(), "Пользователь не может подать запрос на участие в своем событии!");
+            throw new ValidationException(Event.class, "Initiator", event.getInitiator() + "! Пользователь не может подать запрос на участие в своем событии!");
         }
         if (event.getState().equals(StateOfEventAndReq.PENDING) || event.getState().equals(StateOfEventAndReq.CANCELED)) {
-            //TODO может разделить
-            throw new ValidationException(Event.class, "State = " + event.getState(), "Пользователь не может участвовать в неопубликованном событии!");
+            throw new ValidationException(Event.class, "State", event.getState() +  "! Пользователь не может участвовать в неопубликованном событии!");
         }
-        if (requestRepository.countByEvent(eventId) >= event.getParticipantLimit()) {
-            throw new ValidationException(Event.class, "Сount = " + requestRepository.countByEvent(eventId), "Достигнут лимит запросов на участие!");
+        if (event.getParticipantLimit() != 0){
+            if (requestRepository.countByEvent(eventId) >= event.getParticipantLimit()) {
+                throw new ValidationException(Event.class, "Сount", requestRepository.countByEvent(eventId) + "! Достигнут лимит запросов на участие!");
+            }
         }
         Request requestNew = Request.builder()
                 .created(LocalDateTime.now())
-                .event(eventId)
-                .requester(userId)
+                .event(event)
+                .requester(user)
                 .status(StateOfEventAndReq.PENDING)
                 .build();
         if (!event.getRequestModeration()) {
@@ -72,16 +72,16 @@ public class RequestServiceImpl implements RequestService {
         return RequestMapper.toParticipationRequestDto(requestRepository.save(requestNew));
     }
 
-    @Transactional
     @Override
+    @Transactional
     public ParticipationRequestDto canselRequestByUserIdAndRequestIdFromUser(Long userId, Long requestId) {
         userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
         Request request = requestRepository.findById(requestId).orElseThrow(() -> new EntityNotFoundException(Request.class, "id", requestId.toString()));
-        if (request.getRequester() != userId) {
+        if (request.getRequester().getId() != userId) {
             throw new ValidationException(Request.class, "Initiator = " + request.getRequester(), "Данный пользователь не является владельцем этой заявки!");
         }
         if (request.getStatus().equals(StateOfEventAndReq.PUBLISHED)) {
-            Event event = eventRepository.findById(request.getEvent()).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", request.getEvent().toString()));
+            Event event = eventRepository.findById(request.getEvent().getId()).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", request.getEvent().toString()));
             event.setConfirmedRequests(event.getConfirmedRequests() - 1);
             eventRepository.save(event);
         }

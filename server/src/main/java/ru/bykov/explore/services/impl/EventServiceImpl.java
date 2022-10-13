@@ -59,9 +59,6 @@ public class EventServiceImpl implements EventService {
             start = LocalDateTime.parse(rangeStart, formatter);
             end = LocalDateTime.parse(rangeEnd, formatter);
         }
-
-
-
         if (sort.equals("EVENT_DATE")) {
             Page<Event> getList = eventRepository.findByParamFromUser(text, categories, paid, StateOfEventAndReq.PUBLISHED, start, end, FromSizeSortPageable.of(from, size, Sort.by(Sort.Direction.ASC, "eventDate")));
             for (Event event : getList) {
@@ -220,21 +217,10 @@ public class EventServiceImpl implements EventService {
             throw new ValidationException(Event.class, "Initiator = " + event.getInitiator(), "Пользователь не является инициатором события!");
         }
         if (event.getParticipantLimit() == 0 || !event.getRequestModeration()) {
-            //TODO Проверить
-            //если для события отключена пре-модерация запросов на участие, то запрос должен автоматически перейти в состояние подтвержденного
-//            throw new NoParamInRequestException("Подтверждение заявки не требуется!");
             request.setStatus(StateOfEventAndReq.PUBLISHED);
             return RequestMapper.toParticipationRequestDto(requestRepository.save(request));
         } else if (event.getConfirmedRequests() >= event.getParticipantLimit()) {
-            //TODO Проверить запрос в таблице через запрос, будет ли работать!
             requestRepository.setStatusCanselWhereByStatusAndEventId(StateOfEventAndReq.CANCELED, StateOfEventAndReq.PENDING, eventId);
-//            List<Request> listOfReq = requestRepository.findAllByEventAndStatus(eventId, StateOfEventAndReq.PENDING);
-//            for (Request getRequester : listOfReq) {
-//                getRequester.setStatus(StateOfEventAndReq.CANCELED);
-//                requestRepository.save(getRequester);
-//            }
-//            request.setStatus(StateOfEventAndReq.CANCELED);
-//            return RequestMapper.toParticipationRequestDto(requestRepository.save(request));
         }
         event.setConfirmedRequests(event.getConfirmedRequests() + 1);
         eventRepository.save(event);
@@ -245,7 +231,6 @@ public class EventServiceImpl implements EventService {
     @Transactional
     @Override
     public ParticipationRequestDto rejectRequestByUserIdAndEventIdFromUser(Long userId, Long eventId, Long reqId) {
-        //TODO можно вставить метод проверки на все правила что бы не было дубликата!
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
         userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
         Request request = requestRepository.findById(reqId).orElseThrow(() -> new EntityNotFoundException(Request.class, "id", reqId.toString()));

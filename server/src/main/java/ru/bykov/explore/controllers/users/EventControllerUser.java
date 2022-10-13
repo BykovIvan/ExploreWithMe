@@ -38,7 +38,7 @@ public class EventControllerUser {
     }
 
     @PostMapping("/{userId}/events")
-    @ResponseStatus(HttpStatus.CREATED)
+//    @ResponseStatus(HttpStatus.CREATED)
     public EventFullDto createFromUser(@PathVariable("userId") Long userId,
                                        @Valid @RequestBody NewEventDto newEventDto) {
         log.info("Получен запрос к эндпоинту /users/{userID}/events создание события пользователем. Метод POST");

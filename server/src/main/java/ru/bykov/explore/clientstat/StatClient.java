@@ -10,6 +10,9 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.bykov.explore.clientstat.client.BaseClient;
 import ru.bykov.explore.model.Event;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
@@ -35,9 +38,11 @@ public class StatClient extends BaseClient {
     }
 
     public ResponseEntity<ViewStats[]> getStatByParam(String start, String end, String[] uris, Boolean unique) {
+        String encStart = encodeValue(start);
+        String encEnd = encodeValue(end);
         Map<String, Object> parameters = Map.of(
-                "start", start,
-                "end", end,
+                "start", encStart,
+                "end", encEnd,
                 "uris", uris,
                 "unique", unique
         );
@@ -54,5 +59,13 @@ public class StatClient extends BaseClient {
             return viewStats[0].getHits();
         }
         return 0L;
+    }
+
+    private String encodeValue(String value) {
+        try {
+            return URLEncoder.encode(value, StandardCharsets.UTF_8.toString());
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

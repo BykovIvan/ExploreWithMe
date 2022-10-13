@@ -9,21 +9,21 @@ public class RequestMapper {
     public static ParticipationRequestDto toParticipationRequestDto(Request request){
         return ParticipationRequestDto.builder()
                 .created(request.getCreated())
-                .event(request.getEvent())
+                .event(request.getEvent().getId())
                 .id(request.getId())
-                .requester(request.getRequester())
+                .requester(request.getRequester().getId())
                 .status(String.valueOf(request.getStatus()))
                 .build();
     }
 
-    public static Request toRequest(ParticipationRequestDto participationRequestDto){
-        return Request.builder()
-                .created(participationRequestDto.getCreated())
-                .event(participationRequestDto.getEvent())
-                .id(participationRequestDto.getId())
-                .requester(participationRequestDto.getRequester())
-                .status(StateOfEventAndReq.valueOf(participationRequestDto.getStatus()))
-                .build();
-    }
+//    public static Request toRequest(ParticipationRequestDto participationRequestDto){
+//        return Request.builder()
+//                .created(participationRequestDto.getCreated())
+//                .event(participationRequestDto.getEvent())
+//                .id(participationRequestDto.getId())
+//                .requester(participationRequestDto.getRequester())
+//                .status(StateOfEventAndReq.valueOf(participationRequestDto.getStatus()))
+//                .build();
+//    }
 
 }

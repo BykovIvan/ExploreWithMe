@@ -1,6 +1,5 @@
 package ru.bykov.explore.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import ru.bykov.explore.utils.StateOfEventAndReq;
@@ -21,7 +20,7 @@ public class Event {
     private Long id;
     private String annotation;
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "category")
     private Category category;
     @Column(name = "confirmed_requests")
     private Long confirmedRequests;
@@ -33,10 +32,10 @@ public class Event {
     @Column(name = "event_date")
     private LocalDateTime eventDate;
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "initiator")
     private User initiator;
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "location")
     private Location location;
     @Column(nullable = false, columnDefinition = "false")
     private Boolean paid;

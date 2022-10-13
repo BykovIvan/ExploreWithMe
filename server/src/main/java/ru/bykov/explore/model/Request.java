@@ -18,8 +18,12 @@ public class Request {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private LocalDateTime created;
-    private Long event;
-    private Long requester;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "event", referencedColumnName = "id")
+    private Event event;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "requester", referencedColumnName = "id")
+    private User requester;
     @Enumerated(EnumType.STRING)
     private StateOfEventAndReq status;
 }

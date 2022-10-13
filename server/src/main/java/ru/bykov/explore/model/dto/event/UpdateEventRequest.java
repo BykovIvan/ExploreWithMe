@@ -22,7 +22,6 @@ public class UpdateEventRequest {
     @NotBlank
     @Size(min = 20, max = 7000)
     private String description;
-    @Future
     private String eventDate;
     @NotNull
     @Positive

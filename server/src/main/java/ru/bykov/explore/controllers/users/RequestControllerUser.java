@@ -17,13 +17,13 @@ public class RequestControllerUser {
 
     private final RequestService requestService;
 
-    @GetMapping("/{userId}/request")
+    @GetMapping("/{userId}/requests")
     public List<ParticipationRequestDto> findByUserId(@PathVariable("userId") Long userId) {
         log.info("Получен запрос к эндпоинту /users/{userID}/request получение информации о заявках текущего пользователя с id = {} на участие в чужих событиях", userId);
         return requestService.findByUserIdFromUser(userId);
     }
 
-    @PostMapping("/{userId}/request")
+    @PostMapping("/{userId}/requests")
     @ResponseStatus(HttpStatus.CREATED)
     public ParticipationRequestDto addRequest(@PathVariable("userId") Long userId,
                                               @RequestParam(value = "eventId") Long eventId) {
@@ -31,7 +31,7 @@ public class RequestControllerUser {
         return requestService.addRequestToEventByUserIdFromUser(userId, eventId);
     }
 
-    @PatchMapping("/{userId}/request/{requestId}/cansel")
+    @PatchMapping("/{userId}/requests/{requestId}/cancel")
     public ParticipationRequestDto canselRequest(@PathVariable("userId") Long userId,
                                                  @PathVariable("requestId") Long requestId) {
         log.info("Получен запрос к эндпоинту /users/{userID}/request/{requestId}/cansel отмена запроса от пользователя id = {} на участие с id = {}", userId, requestId);

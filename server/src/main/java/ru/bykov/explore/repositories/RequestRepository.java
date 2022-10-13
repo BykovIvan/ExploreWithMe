@@ -17,8 +17,6 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
 
     Long countByEvent(Long eventId);
 
-//    List<Request> findAllByEventAndStatus(Long eventId, StateOfEventAndReq status);
-
     @Modifying
     @Query("update Request r set r.status = ?1 where r.event = ?2 and r.status = ?3")
     void setStatusCanselWhereByStatusAndEventId(StateOfEventAndReq newStatus, StateOfEventAndReq oldStatus, Long eventId);
