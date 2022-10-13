@@ -2,12 +2,8 @@ package ru.bykov.explore.controllers.notUsers;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.bykov.explore.model.dto.copmilation.CompilationDto;
-import ru.bykov.explore.model.dto.copmilation.NewCompilationDto;
 import ru.bykov.explore.services.CompilationService;
 
 import java.util.List;
@@ -21,9 +17,11 @@ public class CompilationController {
     private final CompilationService compilationService;
 
     @GetMapping
-    public List<CompilationDto> allCompilations() {
-        log.info("Получен запрос к эндпоинту /compilations получение всех. Метод GET");
-        return compilationService.findAllForAll();
+    public List<CompilationDto> allCompilationsByParam(@RequestParam(value = "pinned") Boolean pinned,
+                                                       @RequestParam(value = "from", required = false, defaultValue = "0") Integer from,
+                                                       @RequestParam(value = "size", required = false, defaultValue = "10") Integer size) {
+        log.info("Получен запрос к эндпоинту /compilations получение всех по параметрам. Метод GET");
+        return compilationService.findAllForAllByParam(pinned, from, size);
     }
 
     @GetMapping("/{compilationId}")

@@ -2,10 +2,7 @@ package ru.bykov.explore.controllers.notUsers;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.bykov.explore.model.dto.category.CategoryDto;
 import ru.bykov.explore.model.dto.category.NewCategoryDto;
 import ru.bykov.explore.services.CategoryService;
@@ -21,9 +18,10 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @GetMapping
-    public List<CategoryDto> allCategories() {
+    public List<CategoryDto> allCategories(@RequestParam(value = "from", required = false, defaultValue = "0") Integer from,
+                                           @RequestParam(value = "size", required = false, defaultValue = "10") Integer size) {
         log.info("Получен запрос к эндпоинту /categories получение всех. Метод GET");
-        return categoryService.findAllForAllUsers();
+        return categoryService.findAllForAllUsers(from, size);
     }
 
     @GetMapping("/{catId}")

@@ -11,7 +11,7 @@ public interface CategoryService {
      * Получение категорий всеми пользователями
      * Getting categories for all users
      */
-    List<CategoryDto> findAllForAllUsers();
+    List<CategoryDto> findAllForAllUsers(Integer from, Integer size);
 
     /**
      * Получение информации о категории по ее идентификатором всеми пользователями

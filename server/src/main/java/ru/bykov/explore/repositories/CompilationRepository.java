@@ -1,5 +1,7 @@
 package ru.bykov.explore.repositories;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -12,6 +14,7 @@ import java.util.Optional;
 @Repository
 public interface CompilationRepository extends JpaRepository<Compilation, Long> {
 
+    Page<Compilation> findAllByPinned(Boolean pinned, Pageable pageable);
     @Query(value = "SELECT * FROM compilations WHERE id = ?1", nativeQuery = true)
     Optional<Compilation> findById(Long compId);
     @Modifying

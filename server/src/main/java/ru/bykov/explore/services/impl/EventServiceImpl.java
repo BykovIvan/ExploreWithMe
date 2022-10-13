@@ -201,7 +201,7 @@ public class EventServiceImpl implements EventService {
     public List<ParticipationRequestDto> findRequestsByUserIdAndEventIdFromUser(Long userId, Long eventId) {
         userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
         eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
-        return requestRepository.findByEventAndRequester(eventId, userId)
+        return requestRepository.findByEventIdAndRequesterId(eventId, userId)
                 .stream()
                 .map(RequestMapper::toParticipationRequestDto)
                 .collect(Collectors.toList());

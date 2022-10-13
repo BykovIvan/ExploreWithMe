@@ -1,6 +1,5 @@
 package ru.bykov.explore.services;
 
-import ru.bykov.explore.model.Compilation;
 import ru.bykov.explore.model.dto.copmilation.CompilationDto;
 import ru.bykov.explore.model.dto.copmilation.NewCompilationDto;
 
@@ -8,7 +7,7 @@ import java.util.List;
 
 public interface CompilationService {
 
-    List<CompilationDto> findAllForAll();
+    List<CompilationDto> findAllForAllByParam(Boolean pinned, Integer from, Integer size);
 
     CompilationDto findByIdForAll(Long compilationId);
 
@@ -23,4 +22,5 @@ public interface CompilationService {
     void deleteCompFromMainPageFromAdmin(Long compId);
 
     void addCompFromMainPageFromAdmin(Long compId);
+
 }

@@ -1,6 +1,7 @@
 package ru.bykov.explore.services.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.bykov.explore.exceptions.EntityNotFoundException;
@@ -9,6 +10,7 @@ import ru.bykov.explore.model.dto.category.CategoryDto;
 import ru.bykov.explore.model.dto.category.NewCategoryDto;
 import ru.bykov.explore.repositories.CategoryRepository;
 import ru.bykov.explore.services.CategoryService;
+import ru.bykov.explore.utils.FromSizeSortPageable;
 import ru.bykov.explore.utils.mapperForDto.CategoryMapper;
 
 import java.util.List;
@@ -22,8 +24,8 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
 
     @Override
-    public List<CategoryDto> findAllForAllUsers() {
-        return categoryRepository.findAll().stream()
+    public List<CategoryDto> findAllForAllUsers(Integer from, Integer size) {
+        return categoryRepository.findAll(FromSizeSortPageable.of(from, size, Sort.by(Sort.Direction.ASC, "id"))).stream()
                 .map(CategoryMapper::toCategoryDto)
                 .collect(Collectors.toList());
     }

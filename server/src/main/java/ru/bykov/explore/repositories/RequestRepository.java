@@ -11,11 +11,11 @@ import java.util.List;
 
 @Repository
 public interface RequestRepository extends JpaRepository<Request, Long> {
-    List<Request> findByRequester(Long userId);
+    List<Request> findByRequesterId(Long userId);
 
-    List<Request> findByEventAndRequester(Long eventId, Long userId);
+    List<Request> findByEventIdAndRequesterId(Long eventId, Long userId);
 
-    Long countByEvent(Long eventId);
+    Long countByEventId(Long eventId);
 
     @Modifying
     @Query("update Request r set r.status = ?1 where r.event = ?2 and r.status = ?3")

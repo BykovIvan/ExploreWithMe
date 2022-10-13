@@ -1,6 +1,7 @@
 package ru.bykov.explore.services.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.bykov.explore.clientstat.StatClient;
@@ -12,6 +13,7 @@ import ru.bykov.explore.model.dto.copmilation.NewCompilationDto;
 import ru.bykov.explore.repositories.CompilationRepository;
 import ru.bykov.explore.repositories.EventRepository;
 import ru.bykov.explore.services.CompilationService;
+import ru.bykov.explore.utils.FromSizeSortPageable;
 import ru.bykov.explore.utils.mapperForDto.CompilationMapper;
 import ru.bykov.explore.utils.mapperForDto.EventMapper;
 
@@ -29,8 +31,8 @@ public class CompilationServiceImpl implements CompilationService {
     private final StatClient statClient;
 
     @Override
-    public List<CompilationDto> findAllForAll() {
-        return compilationRepository.findAll().stream()
+    public List<CompilationDto> findAllForAllByParam(Boolean pinned, Integer from, Integer size) {
+        return compilationRepository.findAllByPinned(pinned, FromSizeSortPageable.of(from, size, Sort.by(Sort.Direction.ASC, "id"))).stream()
                 .map((Compilation compilation) -> CompilationMapper.toCompilationDto(compilation, compilation.getEvents().stream()
                         .map((Event event) -> EventMapper.toEventShortDto(event, statClient.getViews(event)))
                         .collect(Collectors.toList())))
@@ -61,7 +63,6 @@ public class CompilationServiceImpl implements CompilationService {
                 .collect(Collectors.toList()));
     }
 
-
     @Override
     @Transactional
     public void deleteByIdFromAdmin(Long compId) {
@@ -84,7 +85,6 @@ public class CompilationServiceImpl implements CompilationService {
         compilation.setEvents(listOfEvents);
         compilationRepository.save(compilation);
     }
-
 
     @Override
     @Transactional
