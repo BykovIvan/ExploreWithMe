@@ -32,7 +32,7 @@ public class CompilationServiceImpl implements CompilationService {
     public List<CompilationDto> findAllForAll() {
         return compilationRepository.findAll().stream()
                 .map((Compilation compilation) -> CompilationMapper.toCompilationDto(compilation, compilation.getEvents().stream()
-                        .map((Event event) -> EventMapper.toEventShortDto(event, 999L))
+                        .map((Event event) -> EventMapper.toEventShortDto(event, statClient.getViews(event)))
                         .collect(Collectors.toList())))
                 .collect(Collectors.toList());
     }
@@ -41,7 +41,7 @@ public class CompilationServiceImpl implements CompilationService {
     public CompilationDto findByIdForAll(Long compId) {
         Compilation compilation = compilationRepository.findById(compId).orElseThrow(() -> new EntityNotFoundException(Compilation.class, "id", compId.toString()));
         return CompilationMapper.toCompilationDto(compilation, compilation.getEvents().stream()
-                .map((Event event) -> EventMapper.toEventShortDto(event, 999L))
+                .map((Event event) -> EventMapper.toEventShortDto(event, statClient.getViews(event)))
                 .collect(Collectors.toList()));
     }
 
@@ -57,7 +57,7 @@ public class CompilationServiceImpl implements CompilationService {
         List<Event> listOfEvent = eventRepository.findAllById(newCompilationDto.getEvents());
         Compilation compilation = CompilationMapper.toCompilation(newCompilationDto, listOfEvent);
         return CompilationMapper.toCompilationDto(compilationRepository.save(compilation), compilation.getEvents().stream()
-                .map((Event event) -> EventMapper.toEventShortDto(event, 999L))
+                .map((Event event) -> EventMapper.toEventShortDto(event, statClient.getViews(event)))
                 .collect(Collectors.toList()));
     }
 
@@ -89,11 +89,6 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     @Transactional
     public void addEventToCompFromAdmin(Long compId, Long eventId) {
-//        Optional<Event> eventGet = eventRepository.findById(eventId);
-//        Event eventNew;
-//        if (eventGet.isPresent()){
-//            eventNew = eventGet.get();
-//        }
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
         Compilation compilation = compilationRepository.findById(compId).orElseThrow(() -> new EntityNotFoundException(Compilation.class, "id", compId.toString()));
         compilation.getEvents().add(event);

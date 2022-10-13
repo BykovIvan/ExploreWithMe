@@ -1,4 +1,4 @@
-package ru.bykov.explore.utils;
+package ru.bykov.explore.clientstat;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

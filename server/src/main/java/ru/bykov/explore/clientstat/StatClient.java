@@ -8,13 +8,16 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.bykov.explore.clientstat.client.BaseClient;
-import ru.bykov.explore.utils.ViewStats;
+import ru.bykov.explore.model.Event;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 @Service
 public class StatClient extends BaseClient {
 
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static final String API_PREFIX = "/";
 
     @Autowired
@@ -31,8 +34,7 @@ public class StatClient extends BaseClient {
         post("hit", statisticDto);
     }
 
-
-    public ResponseEntity<Object> getStatByParam(String start, String end, String[] uris, Boolean unique) {
+    public ResponseEntity<ViewStats[]> getStatByParam(String start, String end, String[] uris, Boolean unique) {
         Map<String, Object> parameters = Map.of(
                 "start", start,
                 "end", end,
@@ -42,4 +44,15 @@ public class StatClient extends BaseClient {
         return get("stats" + "?start={start}&end={end}&uris={uris}&unique={unique}", parameters);
     }
 
+    public Long getViews(Event event) {
+        ResponseEntity<ViewStats[]> str = getStatByParam(event.getCreatedOn().minusMinutes(1).format(formatter),
+                LocalDateTime.now().plusMinutes(1).format(formatter),
+                new String[]{"/events/" + event.getId()},
+                false);
+        ViewStats[] viewStats = str.getBody();
+        if (viewStats != null && viewStats.length > 0){
+            return viewStats[0].getHits();
+        }
+        return 0L;
+    }
 }

@@ -19,7 +19,7 @@ public class CompilationControllerAdmin {
     private final CompilationService compilationService;
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
+//    @ResponseStatus(HttpStatus.CREATED)
     public CompilationDto create(@Valid @RequestBody NewCompilationDto newCompilationDto) {
         log.info("Получен запрос к эндпоинту /admin/compilations метод POST");
         return compilationService.createFromAdmin(newCompilationDto);
