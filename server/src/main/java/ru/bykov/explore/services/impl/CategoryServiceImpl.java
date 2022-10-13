@@ -14,6 +14,7 @@ import ru.bykov.explore.utils.FromSizeSortPageable;
 import ru.bykov.explore.utils.mapperForDto.CategoryMapper;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,7 +33,13 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDto findByIdForAllUsers(Long catId) {
-        return CategoryMapper.toCategoryDto(categoryRepository.findById(catId).orElseThrow(() -> new EntityNotFoundException(Category.class, "id", catId.toString())));
+        Optional<Category> category = categoryRepository.findById(catId);
+        if (category.isEmpty()){
+            return null;
+        }
+
+//                .orElseThrow(() -> new EntityNotFoundException(Category.class, "id", catId.toString()));
+        return CategoryMapper.toCategoryDto(category.get());
     }
 
     @Override

@@ -15,24 +15,6 @@ import java.time.format.DateTimeFormatter;
 public class EventMapper {
     private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    public static EventFullDto toEventDto(Event event) {
-        return EventFullDto.builder()
-                .annotation(event.getAnnotation())
-                .category(event.getCategory())
-                .confirmedRequests(event.getConfirmedRequests())
-                .createdOn(event.getCreatedOn().format(formatter))
-                .description(event.getDescription())
-                .eventDate(event.getEventDate().format(formatter))
-                .initiator(UserMapper.toUserShortDto(event.getInitiator()))
-                .location(LocationMapper.toLocationDto(event.getLocation()))
-                .paid(event.getPaid())
-                .participantLimit(event.getParticipantLimit())
-                .requestModeration(event.getRequestModeration())
-                .state(event.getState().toString())
-                .title(event.getTitle())
-                .build();
-    }
-
     public static EventShortDto toEventShortDto(Event event, Long views) {
         EventShortDto eventShortDto = EventShortDto.builder()
                 .annotation(event.getAnnotation())
@@ -44,7 +26,7 @@ public class EventMapper {
                 .paid(event.getPaid())
                 .title(event.getTitle())
                 .build();
-        if (views != null){
+        if (views != null) {
             eventShortDto.setViews(views);
         }
         return eventShortDto;
@@ -85,10 +67,10 @@ public class EventMapper {
                 .state(event.getState().toString())
                 .title(event.getTitle())
                 .build();
-        if (event.getPublishedOn() != null){
+        if (event.getPublishedOn() != null) {
             eventFullDto.setPublishedOn(event.getPublishedOn().format(formatter));
         }
-        if (views != null){
+        if (views != null) {
             eventFullDto.setViews(views);
         }
         return eventFullDto;

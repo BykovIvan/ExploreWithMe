@@ -18,10 +18,10 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import ru.bykov.explore.exceptions.EntityNotFoundException;
 import ru.bykov.explore.exceptions.ValidationException;
 import ru.bykov.explore.exceptions.model.ApiError;
 
-import javax.persistence.EntityNotFoundException;
 import javax.validation.ConstraintViolationException;
 
 import static org.springframework.http.HttpStatus.*;
@@ -158,7 +158,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler(Throwable.class)
     protected ResponseEntity<Object> handleManualValidation(Throwable ex) {
-        String message = "Внутренняя ошибка сервера!";
+//        String message = "Внутренняя ошибка сервера!";
+        String message = ex.getClass().getName();
         ApiError apiError = new ApiError(INTERNAL_SERVER_ERROR, message, ex);
         return buildResponseEntity(apiError);
     }

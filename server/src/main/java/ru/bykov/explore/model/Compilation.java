@@ -20,8 +20,9 @@ public class Compilation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @OneToMany(mappedBy = "id", cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
+//    @OneToMany(mappedBy = "id", fetch = FetchType.EAGER)
     private List<Event> events;
     @Column(nullable = false, columnDefinition = "false")
-    private Boolean pinned;
-    private String title;
+    private Boolean pinned;                 //Закреплена ли подборка на главной странице сайта
+    private String title;                   //Заголовок подборки
 }

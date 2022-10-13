@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class EventServiceImpl implements EventService {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -43,7 +44,6 @@ public class EventServiceImpl implements EventService {
     private final StatClient statClient;
 
     //путь для не users
-    @Transactional
     @Override
     public List<EventShortDto> findAllForAllUsers(String text, Long[] categories, Boolean paid, String rangeStart,
                                                   String rangeEnd, Boolean onlyAvailable, String sort, Integer from,
@@ -78,7 +78,8 @@ public class EventServiceImpl implements EventService {
                     .map((Event event) -> EventMapper.toEventShortDto(event, statClient.getViews(event)))
                     .collect(Collectors.toList());
         } else if (sort.equals("VIEWS")) {
-            Page<Event> getList = eventRepository.findByParamFromUser(text, categories, paid, StateOfEventAndReq.PUBLISHED, start, end, FromSizeSortPageable.of(from, size, Sort.by(Sort.Direction.ASC, "id")));
+            Page<Event> getList = eventRepository.findByParamFromUser(text, categories, paid, StateOfEventAndReq.PUBLISHED,
+                                                                      start, end, FromSizeSortPageable.of(from, size, Sort.by(Sort.Direction.ASC, "id")));
             for (Event event : getList) {
                 statClient.createStat(StatisticDto.builder()
                         .app("Explore With Me App")
@@ -102,7 +103,6 @@ public class EventServiceImpl implements EventService {
         }
     }
 
-    @Transactional
     @Override
     public EventFullDto findByIdForAllUsers(Long eventId, String remoteAddr, String requestURI) {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
@@ -118,7 +118,6 @@ public class EventServiceImpl implements EventService {
     }
 
     //путь для users
-    @Transactional
     @Override
     public List<EventShortDto> findByUserIdFromUser(Long userId, Integer from, Integer size) {
         userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
@@ -128,8 +127,8 @@ public class EventServiceImpl implements EventService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional
     @Override
+    @Transactional
     public EventFullDto updateFromUser(Long userId, UpdateEventRequest updateEventRequest) {
         User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
         Event event = eventRepository.findById(updateEventRequest.getEventId()).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", updateEventRequest.getEventId().toString()));
@@ -163,8 +162,8 @@ public class EventServiceImpl implements EventService {
         return EventMapper.toEventFullDto(eventRepository.save(event), statClient.getViews(event));
     }
 
-    @Transactional
     @Override
+    @Transactional
     public EventFullDto createFromUser(Long userId, NewEventDto newEventDto) {
         User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
         Category category = categoryRepository.findById(newEventDto.getCategory()).orElseThrow(() -> new EntityNotFoundException(Category.class, "id", newEventDto.getCategory().toString()));
@@ -175,7 +174,6 @@ public class EventServiceImpl implements EventService {
         return EventMapper.toEventFullDto(eventNew, statClient.getViews(event));
     }
 
-    @Transactional
     @Override
     public EventFullDto findByUserIdAndEventIdFromUser(Long userId, Long eventId) {
         userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
@@ -184,8 +182,8 @@ public class EventServiceImpl implements EventService {
         return EventMapper.toEventFullDto(event, statClient.getViews(event));
     }
 
-    @Transactional
     @Override
+    @Transactional
     public EventFullDto canselByUserIdAndEventIdFromUser(Long userId, Long eventId) {
         userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
@@ -196,8 +194,8 @@ public class EventServiceImpl implements EventService {
         return EventMapper.toEventFullDto(eventRepository.save(event), statClient.getViews(event));
     }
 
-    @Transactional
     @Override
+    @Transactional
     public List<ParticipationRequestDto> findRequestsByUserIdAndEventIdFromUser(Long userId, Long eventId) {
         userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
         eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
@@ -207,8 +205,8 @@ public class EventServiceImpl implements EventService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional
     @Override
+    @Transactional
     public ParticipationRequestDto confirmRequestByUserIdAndEventIdFromUser(Long userId, Long eventId, Long reqId) {
         userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
@@ -228,8 +226,8 @@ public class EventServiceImpl implements EventService {
         return RequestMapper.toParticipationRequestDto(requestRepository.save(request));
     }
 
-    @Transactional
     @Override
+    @Transactional
     public ParticipationRequestDto rejectRequestByUserIdAndEventIdFromUser(Long userId, Long eventId, Long reqId) {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
         userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
@@ -248,7 +246,7 @@ public class EventServiceImpl implements EventService {
         return RequestMapper.toParticipationRequestDto(requestRepository.save(request));
     }
 
-    @Transactional
+    //путь для admin
     @Override
     public List<EventFullDto> findByParamFromAdmin(Long[] users, String[] states, Long[] categories, String rangeStart, String rangeEnd, Integer from, Integer size) {
         StateOfEventAndReq[] stateOfEvent = new StateOfEventAndReq[states.length];
@@ -263,8 +261,8 @@ public class EventServiceImpl implements EventService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional
     @Override
+    @Transactional
     public EventFullDto updateByIdFromAdmin(Long eventId, AdminUpdateEventRequest adminUpdateEventRequest) {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
         if (adminUpdateEventRequest.getAnnotation() != null) {
@@ -297,8 +295,8 @@ public class EventServiceImpl implements EventService {
         return EventMapper.toEventFullDto(eventRepository.save(event), statClient.getViews(event));
     }
 
-    @Transactional
     @Override
+    @Transactional
     public EventFullDto publishEventByIdFromAdmin(Long eventId) {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
         LocalDateTime dateAndTimeOfEvent = event.getEventDate();
@@ -317,8 +315,8 @@ public class EventServiceImpl implements EventService {
         return EventMapper.toEventFullDto(eventRepository.save(event), statClient.getViews(event));
     }
 
-    @Transactional
     @Override
+    @Transactional
     public EventFullDto rejectEventByIdFromAdmin(Long eventId) {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
         if (event.getState().equals(StateOfEventAndReq.PUBLISHED)) {

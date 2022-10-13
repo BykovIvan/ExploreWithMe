@@ -52,9 +52,7 @@ public class CompilationServiceImpl implements CompilationService {
     public CompilationDto createFromAdmin(NewCompilationDto newCompilationDto) {
         if (newCompilationDto.getEvents() == null || newCompilationDto.getEvents().isEmpty()) {
             Compilation compilation = CompilationMapper.toCompilation(newCompilationDto, null);
-            Compilation compilationNew = compilationRepository.save(compilation);
-            compilationRepository.flush();
-            return CompilationMapper.toCompilationDto(compilationNew, null);
+            return CompilationMapper.toCompilationDto(compilationRepository.save(compilation), null);
         }
         List<Event> listOfEvent = eventRepository.findAllById(newCompilationDto.getEvents());
         Compilation compilation = CompilationMapper.toCompilation(newCompilationDto, listOfEvent);

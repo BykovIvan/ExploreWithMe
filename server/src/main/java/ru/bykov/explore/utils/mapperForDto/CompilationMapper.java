@@ -16,7 +16,7 @@ public class CompilationMapper {
                 .pinned(compilation.getPinned())
                 .title(compilation.getTitle())
                 .build();
-        if (eventShortDto != null){
+        if (eventShortDto != null) {
             compilationDto.setEvents(eventShortDto);
         } else {
             compilationDto.setEvents(new ArrayList<>());
@@ -29,7 +29,7 @@ public class CompilationMapper {
                 .pinned(newCompilationDto.getPinned())
                 .title(newCompilationDto.getTitle())
                 .build();
-        if (listOdEvent != null){
+        if (listOdEvent != null) {
             compilation.setEvents(listOdEvent);
         } else {
             compilation.setEvents(new ArrayList<>());

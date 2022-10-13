@@ -8,20 +8,20 @@ import java.util.List;
 public interface UserService {
 
     /**
-     * Получение информации о пользователях
-     * Getting information about users
+     * Получение информации о пользователях администратором
+     * Getting information about users by an administrator
      */
     List<UserDto> findByParamFromAdmin(Long[] ids, Integer from, Integer size);
 
     /**
-     * Добавление нового пользователя
-     * Adding a new user
+     * Добавление нового пользователя администратором
+     * Adding a new user by an administrator
      */
     UserDto createFromAdmin(NewUserRequest newUserRequest);
 
     /**
-     * Удаление пользователя
-     * Deleting a user
+     * Удаление пользователя администратором
+     * Deleting a user by an administrator
      */
     void deleteByIdFromAdmin(Long userId);
 
