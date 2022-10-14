@@ -4,6 +4,7 @@ import ru.bykov.explore.model.dto.copmilation.CompilationDto;
 import ru.bykov.explore.model.dto.copmilation.NewCompilationDto;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CompilationService {
 

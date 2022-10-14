@@ -9,10 +9,6 @@ import ru.bykov.explore.model.dto.user.UserShortDto;
 
 import java.time.LocalDateTime;
 
-/**
- * Класс который возвращается не зарегистрированным пользователям
- * The class that is returned to unregistered users
- */
 @Data
 @Builder
 @NoArgsConstructor

@@ -44,15 +44,11 @@ public class Event {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "location")
     private Location location;
-//    @Column(nullable = false, columnDefinition = "false")
-    @Column(columnDefinition = "boolean default false")
     private Boolean paid;
-//    @Column(name = "participant_limit", nullable = false, columnDefinition = "0")
     private Long participantLimit;
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "published_on")
     private LocalDateTime publishedOn;
-//    @Column(name = "request_moderation", nullable = false, columnDefinition = "true")
     private Boolean requestModeration;
     @NotNull
     @Enumerated(EnumType.STRING)

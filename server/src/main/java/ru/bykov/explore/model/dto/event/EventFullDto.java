@@ -8,10 +8,6 @@ import ru.bykov.explore.model.Category;
 import ru.bykov.explore.model.dto.LocationDto;
 import ru.bykov.explore.model.dto.user.UserShortDto;
 
-/**
- * Класс который возвращается зарегистрированным пользователям
- * The class that is returned to registered users
- */
 @Data
 @Builder
 @NoArgsConstructor

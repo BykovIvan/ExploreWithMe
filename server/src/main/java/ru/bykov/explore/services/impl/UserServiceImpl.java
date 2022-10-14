@@ -25,9 +25,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> findByParamFromAdmin(Long[] ids, Integer from, Integer size) {
-        for (Long id : ids) {
-            userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(User.class, "id", id.toString()));
-        }
         return userRepository.findByIdIn(ids, FromSizeSortPageable.of(from, size, Sort.by(Sort.Direction.ASC, "id")))
                 .stream()
                 .map(UserMapper::toUserDto)

@@ -1,6 +1,7 @@
 package ru.bykov.explore.model;
 
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 import ru.bykov.explore.utils.StateOfEventAndReq;
 
 import javax.persistence.*;
@@ -17,6 +18,7 @@ public class Request {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime created;
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "event", referencedColumnName = "id")

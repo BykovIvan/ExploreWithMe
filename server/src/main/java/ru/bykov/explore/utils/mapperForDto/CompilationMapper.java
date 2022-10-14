@@ -29,6 +29,11 @@ public class CompilationMapper {
                 .pinned(newCompilationDto.getPinned())
                 .title(newCompilationDto.getTitle())
                 .build();
+        if (newCompilationDto.getPinned() != null){
+            compilation.setPinned(newCompilationDto.getPinned());
+        } else {
+            compilation.setPinned(false);
+        }
         if (listOdEvent != null) {
             compilation.setEvents(listOdEvent);
         } else {

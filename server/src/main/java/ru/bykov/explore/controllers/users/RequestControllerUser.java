@@ -24,7 +24,7 @@ public class RequestControllerUser {
     }
 
     @PostMapping("/{userId}/requests")
-    @ResponseStatus(HttpStatus.CREATED)
+//    @ResponseStatus(HttpStatus.CREATED)
     public ParticipationRequestDto addRequest(@PathVariable("userId") Long userId,
                                               @RequestParam(value = "eventId") Long eventId) {
         log.info("Получен запрос к эндпоинту /users/{userID}/request добаление запроса от пользователя id = {} на участие в событии id = {}", userId, eventId);

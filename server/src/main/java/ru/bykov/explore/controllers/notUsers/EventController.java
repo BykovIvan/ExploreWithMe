@@ -38,7 +38,7 @@ public class EventController {
     @GetMapping("/{eventId}")
     public EventFullDto eventById(@PathVariable("eventId") Long eventId,
                                   HttpServletRequest request) {
-        log.info("Получен запрос к эндпоинту /events получение по id. Метод GET");
+        log.info("Получен запрос к эндпоинту /events получение по id = {}. Метод GET.", eventId);
         log.info("client ip: {}", request.getRemoteAddr());
         log.info("endpoint path: {}", request.getRequestURI());
         return eventService.findByIdForAllUsers(eventId, request.getRemoteAddr(), request.getRequestURI());

@@ -26,6 +26,7 @@ public class EventMapper {
                 .paid(event.getPaid())
                 .title(event.getTitle())
                 .build();
+//        eventShortDto.setViews(views != null ? views : 0);
         if (views != null) eventShortDto.setViews(views);
         return eventShortDto;
     }
@@ -44,9 +45,12 @@ public class EventMapper {
                 .state(StateOfEventAndReq.PENDING)
                 .title(newEventDto.getTitle())
                 .build();
-        if (newEventDto.getPaid() != null) event.setPaid(newEventDto.getPaid());
-        if (newEventDto.getParticipantLimit() != null) event.setParticipantLimit(newEventDto.getParticipantLimit());
-        if (newEventDto.getRequestModeration() != null) event.setRequestModeration(newEventDto.getRequestModeration());
+        event.setPaid(newEventDto.getPaid() != null ? newEventDto.getPaid() : false);
+        event.setParticipantLimit(newEventDto.getParticipantLimit() != null ? newEventDto.getParticipantLimit() : 0L);
+        event.setRequestModeration(newEventDto.getRequestModeration() != null ? newEventDto.getRequestModeration() : false);
+//        if (newEventDto.getPaid() != null) event.setPaid(newEventDto.getPaid());
+//        if (newEventDto.getParticipantLimit() != null) event.setParticipantLimit(newEventDto.getParticipantLimit());
+//        if (newEventDto.getRequestModeration() != null) event.setRequestModeration(newEventDto.getRequestModeration());
         return event;
     }
 
@@ -68,6 +72,7 @@ public class EventMapper {
                 .title(event.getTitle())
                 .build();
         if (event.getPublishedOn() != null) eventFullDto.setPublishedOn(event.getPublishedOn().format(formatter));
+//        eventFullDto.setViews(views != null ? views : 0);
         if (views != null) eventFullDto.setViews(views);
         return eventFullDto;
     }

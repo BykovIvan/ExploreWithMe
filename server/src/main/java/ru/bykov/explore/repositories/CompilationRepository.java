@@ -14,7 +14,9 @@ import java.util.Optional;
 @Repository
 public interface CompilationRepository extends JpaRepository<Compilation, Long> {
 
-    Page<Compilation> findAllByPinned(Boolean pinned, Pageable pageable);
+    @Query("select c from Compilation c " +
+            "WHERE c.pinned is null or c.pinned = (:pinned)")
+    Page<Compilation> findAllByPinned(@Param("pinned") Boolean pinned, Pageable pageable);
     @Query(value = "SELECT * FROM compilations WHERE id = ?1", nativeQuery = true)
     Optional<Compilation> findById(Long compId);
     @Modifying

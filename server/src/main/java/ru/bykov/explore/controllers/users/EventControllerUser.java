@@ -64,7 +64,7 @@ public class EventControllerUser {
     @GetMapping("/{userId}/events/{eventId}/request")
     public List<ParticipationRequestDto> requestEventById(@PathVariable("userId") Long userId,
                                                           @PathVariable("eventId") Long eventId) {
-        log.info("Получен запрос к эндпоинту /users/{userID}/events{eventId}/request получение информации о запросах на участие в событиях. Метод GET");
+        log.info("Получен запрос к эндпоинту /users/{userID}/events{eventId}/request получение информации о запросах на участие в событиях. Метод GET. Где userId = {}, eventId={}", userId, eventId);
         return eventService.findRequestsByUserIdAndEventIdFromUser(userId, eventId);
     }
 
