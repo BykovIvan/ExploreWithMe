@@ -13,7 +13,8 @@ import ru.bykov.explore.repositories.EventRepository;
 import ru.bykov.explore.repositories.RequestRepository;
 import ru.bykov.explore.repositories.UserRepository;
 import ru.bykov.explore.services.RequestService;
-import ru.bykov.explore.utils.StateOfEventAndReq;
+import ru.bykov.explore.utils.EventState;
+import ru.bykov.explore.utils.RequestState;
 import ru.bykov.explore.utils.mapperForDto.RequestMapper;
 
 import java.time.LocalDateTime;
@@ -47,7 +48,7 @@ public class RequestServiceImpl implements RequestService {
         if (event.getInitiator().getId() == userId) {
             throw new ValidationException(Event.class, "Initiator", event.getInitiator() + "! Пользователь не может подать запрос на участие в своем событии!");
         }
-        if (!event.getState().equals(StateOfEventAndReq.PUBLISHED)) {
+        if (!event.getState().equals(EventState.PUBLISHED)) {
             throw new ValidationException(Event.class, "State", event.getState() + "! Пользователь не может участвовать в неопубликованном событии!");
         }
         if (event.getParticipantLimit() != 0) {
@@ -59,10 +60,10 @@ public class RequestServiceImpl implements RequestService {
                 .created(LocalDateTime.now())
                 .event(event)
                 .requester(user)
-                .status(StateOfEventAndReq.PENDING)
+                .status(RequestState.PENDING)
                 .build();
         if (!event.getRequestModeration()) {
-            requestNew.setStatus(StateOfEventAndReq.PUBLISHED);
+            requestNew.setStatus(RequestState.CONFIRMED);
         }
         return RequestMapper.toParticipationRequestDto(requestRepository.save(requestNew));
     }
@@ -75,12 +76,12 @@ public class RequestServiceImpl implements RequestService {
         if (request.getRequester().getId() != userId) {
             throw new ValidationException(Request.class, "Initiator=", request.getRequester() + "! Данный пользователь не является владельцем этой заявки!");
         }
-        if (request.getStatus().equals(StateOfEventAndReq.PUBLISHED)) {
+        if (request.getStatus().equals(RequestState.CONFIRMED)) {
             Event event = eventRepository.findById(request.getEvent().getId()).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", request.getEvent().toString()));
             event.setConfirmedRequests(event.getConfirmedRequests() - 1);
             eventRepository.save(event);
         }
-        request.setStatus(StateOfEventAndReq.CANCELED);
+        request.setStatus(RequestState.CANCELED);
         return RequestMapper.toParticipationRequestDto(requestRepository.save(request));
     }
 }

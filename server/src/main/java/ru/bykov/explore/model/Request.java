@@ -2,7 +2,8 @@ package ru.bykov.explore.model;
 
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
-import ru.bykov.explore.utils.StateOfEventAndReq;
+import ru.bykov.explore.utils.EventState;
+import ru.bykov.explore.utils.RequestState;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -27,5 +28,5 @@ public class Request {
     @JoinColumn(name = "requester", referencedColumnName = "id")
     private User requester;
     @Enumerated(EnumType.STRING)
-    private StateOfEventAndReq status;
+    private RequestState status;
 }

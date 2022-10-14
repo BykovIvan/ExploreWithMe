@@ -61,14 +61,15 @@ public class EventControllerUser {
     }
 
     //Получение информации о запросах на участие в событиях текущего пользователя
-    @GetMapping("/{userId}/events/{eventId}/request")
+    @GetMapping("/{userId}/events/{eventId}/requests")
     public List<ParticipationRequestDto> requestEventById(@PathVariable("userId") Long userId,
                                                           @PathVariable("eventId") Long eventId) {
-        log.info("Получен запрос к эндпоинту /users/{userID}/events{eventId}/request получение информации о запросах на участие в событиях. Метод GET. Где userId = {}, eventId={}", userId, eventId);
+        log.info("Получен запрос к эндпоинту /users/{userID}/events{eventId}/request " +
+                "получение информации о запросах на участие в событиях. Метод GET. Где userId = {}, eventId={}", userId, eventId);
         return eventService.findRequestsByUserIdAndEventIdFromUser(userId, eventId);
     }
 
-    @PatchMapping("/{userId}/events/{eventId}/request/{reqId}/confirm")
+    @PatchMapping("/{userId}/events/{eventId}/requests/{reqId}/confirm")
     public ParticipationRequestDto requestConfirmEventById(@PathVariable("userId") Long userId,
                                                            @PathVariable("eventId") Long eventId,
                                                            @PathVariable("reqId") Long reqId) {
@@ -76,7 +77,7 @@ public class EventControllerUser {
         return eventService.confirmRequestByUserIdAndEventIdFromUser(userId, eventId, reqId);
     }
 
-    @PatchMapping("/{userId}/events/{eventId}/request/{reqId}/reject")
+    @PatchMapping("/{userId}/events/{eventId}/requests/{reqId}/reject")
     public ParticipationRequestDto requestRejectEventById(@PathVariable("userId") Long userId,
                                                           @PathVariable("eventId") Long eventId,
                                                           @PathVariable("reqId") Long reqId) {

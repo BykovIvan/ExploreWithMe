@@ -7,7 +7,7 @@ import ru.bykov.explore.model.User;
 import ru.bykov.explore.model.dto.event.EventFullDto;
 import ru.bykov.explore.model.dto.event.EventShortDto;
 import ru.bykov.explore.model.dto.event.NewEventDto;
-import ru.bykov.explore.utils.StateOfEventAndReq;
+import ru.bykov.explore.utils.EventState;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -42,7 +42,7 @@ public class EventMapper {
                 .initiator(user)
                 .location(location)
                 .requestModeration(newEventDto.getRequestModeration())
-                .state(StateOfEventAndReq.PENDING)
+                .state(EventState.PENDING)
                 .title(newEventDto.getTitle())
                 .build();
         event.setPaid(newEventDto.getPaid() != null ? newEventDto.getPaid() : false);

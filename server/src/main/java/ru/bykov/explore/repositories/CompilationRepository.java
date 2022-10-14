@@ -17,8 +17,7 @@ public interface CompilationRepository extends JpaRepository<Compilation, Long> 
     @Query("select c from Compilation c " +
             "WHERE c.pinned is null or c.pinned = (:pinned)")
     Page<Compilation> findAllByPinned(@Param("pinned") Boolean pinned, Pageable pageable);
-    @Query(value = "SELECT * FROM compilations WHERE id = ?1", nativeQuery = true)
-    Optional<Compilation> findById(Long compId);
+
     @Modifying
     @Query("update Compilation c set c.pinned = :pinned where c.id = :comp_id")
     void setPinnedByCompId(@Param("pinned") Boolean pinned,

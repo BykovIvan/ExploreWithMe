@@ -2,7 +2,7 @@ package ru.bykov.explore.model;
 
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
-import ru.bykov.explore.utils.StateOfEventAndReq;
+import ru.bykov.explore.utils.EventState;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -52,7 +52,7 @@ public class Event {
     private Boolean requestModeration;
     @NotNull
     @Enumerated(EnumType.STRING)
-    private StateOfEventAndReq state;
+    private EventState state;
     private String title;
 
 

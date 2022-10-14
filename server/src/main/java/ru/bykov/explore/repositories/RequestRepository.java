@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import ru.bykov.explore.model.Request;
-import ru.bykov.explore.utils.StateOfEventAndReq;
+import ru.bykov.explore.utils.EventState;
 
 import java.util.List;
 
@@ -19,5 +19,5 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
 
     @Modifying
     @Query("update Request r set r.status = ?1 where r.event = ?2 and r.status = ?3")
-    void setStatusCanselWhereByStatusAndEventId(StateOfEventAndReq newStatus, StateOfEventAndReq oldStatus, Long eventId);
+    void setStatusCanselWhereByStatusAndEventId(EventState newStatus, EventState oldStatus, Long eventId);
 }

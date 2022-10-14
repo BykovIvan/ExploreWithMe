@@ -27,7 +27,7 @@ public class RequestControllerUser {
 //    @ResponseStatus(HttpStatus.CREATED)
     public ParticipationRequestDto addRequest(@PathVariable("userId") Long userId,
                                               @RequestParam(value = "eventId") Long eventId) {
-        log.info("Получен запрос к эндпоинту /users/{userID}/request добаление запроса от пользователя id = {} на участие в событии id = {}", userId, eventId);
+        log.info("Получен запрос к эндпоинту /users/{userID}/request добавление запроса от пользователя id = {} на участие в событии id = {}. Метод POST.", userId, eventId);
         return requestService.addRequestToEventByUserIdFromUser(userId, eventId);
     }
 

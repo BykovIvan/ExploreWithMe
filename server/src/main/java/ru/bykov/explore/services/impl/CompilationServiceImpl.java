@@ -43,11 +43,6 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     @Transactional
     public CompilationDto findByIdForAll(Long compId) {
-//        Optional<Compilation> compilationGet = compilationRepository.findById(compId);
-//        return compilationGet.map((Compilation compilation) -> CompilationMapper.toCompilationDto(compilation, compilation.getEvents().stream()
-//                .map((Event event) -> EventMapper.toEventShortDto(event, statClient.getViews(event)))
-//                .collect(Collectors.toList()))).get();
-
         Compilation compilation = compilationRepository.findById(compId).orElseThrow(() -> new EntityNotFoundException(Compilation.class, "id", compId.toString()));
         return CompilationMapper.toCompilationDto(compilation, compilation.getEvents() != null ? compilation.getEvents().stream()
                 .map((Event event) -> EventMapper.toEventShortDto(event, statClient.getViews(event)))

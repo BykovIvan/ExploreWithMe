@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.bykov.explore.model.Event;
-import ru.bykov.explore.utils.StateOfEventAndReq;
+import ru.bykov.explore.utils.EventState;
 
 import java.time.LocalDateTime;
 
@@ -25,7 +25,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     Page<Event> findByParamFromUser(@Param("text") String text,
                                     @Param("categories") Long[] categories,
                                     @Param("paid") Boolean paid,
-                                    @Param("state") StateOfEventAndReq state,
+                                    @Param("state") EventState state,
                                     @Param("rangeStart") LocalDateTime rangeStart,
                                     @Param("rangeEnd") LocalDateTime rangeEnd,
                                     Pageable pageable);
@@ -44,7 +44,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "AND (e.eventDate is null or e.eventDate > (:rangeStart)) " +
             "AND (e.eventDate is null or e.eventDate < (:rangeEnd))")
     Page<Event> findByParamFromAdmin(@Param("users") Long[] users,
-                                     @Param("states") StateOfEventAndReq[] states,
+                                     @Param("states") EventState[] states,
                                      @Param("categories") Long[] categories,
                                      @Param("rangeStart") LocalDateTime rangeStart,
                                      @Param("rangeEnd") LocalDateTime rangeEnd,
