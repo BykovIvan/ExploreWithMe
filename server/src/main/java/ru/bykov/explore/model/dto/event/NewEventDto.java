@@ -15,7 +15,6 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 @AllArgsConstructor
 public class NewEventDto {
-
     @NotNull
     @NotBlank
     @Size(min = 20, max = 2000)

@@ -19,16 +19,16 @@ public class EventController {
     private final EventService eventService;
 
     @GetMapping
-    public List<EventShortDto> allEvents(@RequestParam(value = "text") String text,
-                                         @RequestParam(value = "categories") Long[] categories,
-                                         @RequestParam(value = "paid") Boolean paid,
-                                         @RequestParam(value = "rangeStart") String rangeStart,
-                                         @RequestParam(value = "rangeEnd") String rangeEnd,
-                                         @RequestParam(value = "onlyAvailable", required = false, defaultValue = "false") Boolean onlyAvailable,//Default value : false
-                                         @RequestParam(value = "sort") String sort,                                                             //Available values : EVENT_DATE, VIEWS
-                                         @RequestParam(value = "from", required = false, defaultValue = "0") Integer from,                      //Default value : 0
-                                         @RequestParam(value = "size", required = false, defaultValue = "10") Integer size,
-                                         HttpServletRequest request) {                   //Default value : 10
+    public List<EventShortDto> allEventsByParam(@RequestParam(value = "text") String text,
+                                                @RequestParam(value = "categories") Long[] categories,
+                                                @RequestParam(value = "paid") Boolean paid,
+                                                @RequestParam(value = "rangeStart", required = false) String rangeStart,
+                                                @RequestParam(value = "rangeEnd", required = false) String rangeEnd,
+                                                @RequestParam(value = "onlyAvailable", required = false, defaultValue = "false") Boolean onlyAvailable,//Default value : false
+                                                @RequestParam(value = "sort") String sort,                                                             //Available values : EVENT_DATE, VIEWS
+                                                @RequestParam(value = "from", required = false, defaultValue = "0") Integer from,                      //Default value : 0
+                                                @RequestParam(value = "size", required = false, defaultValue = "10") Integer size,                     //Default value : 10
+                                                HttpServletRequest request) {
         log.info("Получен запрос к эндпоинту /events получение всех. Метод GET");
         log.info("client ip: {}", request.getRemoteAddr());
         log.info("endpoint path: {}", request.getRequestURI());
@@ -36,8 +36,8 @@ public class EventController {
     }
 
     @GetMapping("/{eventId}")
-    public EventFullDto categoryById(@PathVariable("eventId") Long eventId,
-                                     HttpServletRequest request) {
+    public EventFullDto eventById(@PathVariable("eventId") Long eventId,
+                                  HttpServletRequest request) {
         log.info("Получен запрос к эндпоинту /events получение по id. Метод GET");
         log.info("client ip: {}", request.getRemoteAddr());
         log.info("endpoint path: {}", request.getRequestURI());

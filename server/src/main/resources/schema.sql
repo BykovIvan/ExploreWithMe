@@ -41,9 +41,9 @@ CREATE TABLE IF NOT EXISTS events (
     initiator BIGINT REFERENCES users (id),
     location BIGINT REFERENCES locations (id),
     paid boolean NOT NULL DEFAULT FALSE,
-    participant_limit BIGINT NOT NULL DEFAULT 0,
+    participant_limit BIGINT DEFAULT 0,
     published_on timestamp WITHOUT TIME ZONE,
-    request_moderation boolean NOT NULL DEFAULT FALSE,
+    request_moderation boolean DEFAULT FALSE,
     state VARCHAR(64) NOT NULL,
     title VARCHAR(120) NOT NULL,
 

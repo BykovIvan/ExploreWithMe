@@ -26,14 +26,12 @@ public class EventMapper {
                 .paid(event.getPaid())
                 .title(event.getTitle())
                 .build();
-        if (views != null) {
-            eventShortDto.setViews(views);
-        }
+        if (views != null) eventShortDto.setViews(views);
         return eventShortDto;
     }
 
     public static Event toEvent(NewEventDto newEventDto, Category category, User user, Location location) {
-        return Event.builder()
+        Event event = Event.builder()
                 .annotation(newEventDto.getAnnotation())
                 .category(category)
                 .confirmedRequests(0L)
@@ -42,12 +40,14 @@ public class EventMapper {
                 .eventDate(LocalDateTime.parse(newEventDto.getEventDate(), formatter))
                 .initiator(user)
                 .location(location)
-                .paid(newEventDto.getPaid())
-                .participantLimit(newEventDto.getParticipantLimit())
                 .requestModeration(newEventDto.getRequestModeration())
                 .state(StateOfEventAndReq.PENDING)
                 .title(newEventDto.getTitle())
                 .build();
+        if (newEventDto.getPaid() != null) event.setPaid(newEventDto.getPaid());
+        if (newEventDto.getParticipantLimit() != null) event.setParticipantLimit(newEventDto.getParticipantLimit());
+        if (newEventDto.getRequestModeration() != null) event.setRequestModeration(newEventDto.getRequestModeration());
+        return event;
     }
 
     public static EventFullDto toEventFullDto(Event event, Long views) {
@@ -67,12 +67,8 @@ public class EventMapper {
                 .state(event.getState().toString())
                 .title(event.getTitle())
                 .build();
-        if (event.getPublishedOn() != null) {
-            eventFullDto.setPublishedOn(event.getPublishedOn().format(formatter));
-        }
-        if (views != null) {
-            eventFullDto.setViews(views);
-        }
+        if (event.getPublishedOn() != null) eventFullDto.setPublishedOn(event.getPublishedOn().format(formatter));
+        if (views != null) eventFullDto.setViews(views);
         return eventFullDto;
     }
 }

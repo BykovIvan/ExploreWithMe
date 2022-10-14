@@ -4,6 +4,7 @@ import ru.bykov.explore.model.dto.category.CategoryDto;
 import ru.bykov.explore.model.dto.category.NewCategoryDto;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CategoryService {
 
@@ -17,7 +18,7 @@ public interface CategoryService {
      * Получение информации о категории по ее идентификатором всеми пользователями
      * Getting information about a category by its ID by all users
      */
-    CategoryDto findByIdForAllUsers(Long id);
+    Optional<CategoryDto> findByIdForAllUsers(Long id);
 
     /**
      * Изменение категории администратором

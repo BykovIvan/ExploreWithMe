@@ -1,7 +1,6 @@
 package ru.bykov.explore.services.impl;
 
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -21,6 +20,7 @@ import ru.bykov.explore.utils.mapperForDto.EventMapper;
 import ru.bykov.explore.utils.mapperForDto.LocationMapper;
 import ru.bykov.explore.utils.mapperForDto.RequestMapper;
 
+import javax.validation.Valid;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -49,18 +49,24 @@ public class EventServiceImpl implements EventService {
                                                   String rangeEnd, Boolean onlyAvailable, String sort, Integer from,
                                                   Integer size, String remoteAddr, String requestURI) {
         if (from < 0 || size <= 0) {
-            throw new ValidationException(Event.class, "from = " + from + ", size = " + size, "Введены неверные параметры!");
+            throw new ValidationException(Event.class, "from=", from + "! Введен неверный параметр! Или ", "size=", size + "! Введен неверный параметр!");
         }
         LocalDateTime start = null;
         LocalDateTime end = null;
-        if (rangeStart == null || rangeEnd == null) {
+        if (rangeStart == null && rangeEnd == null) {
             start = LocalDateTime.now();
+        } else if (rangeStart == null && rangeEnd != null) {
+            start = LocalDateTime.now();
+            end = LocalDateTime.parse(rangeEnd, formatter);
+        } else if (rangeStart != null && rangeEnd == null) {
+            start = LocalDateTime.parse(rangeStart, formatter);
         } else {
             start = LocalDateTime.parse(rangeStart, formatter);
             end = LocalDateTime.parse(rangeEnd, formatter);
         }
         if (sort.equals("EVENT_DATE")) {
-            Page<Event> getList = eventRepository.findByParamFromUser(text, categories, paid, StateOfEventAndReq.PUBLISHED, start, end, FromSizeSortPageable.of(from, size, Sort.by(Sort.Direction.ASC, "eventDate")));
+            Page<Event> getList = eventRepository.findByParamFromUser(text, categories, paid, StateOfEventAndReq.PUBLISHED,
+                    start, end, FromSizeSortPageable.of(from, size, Sort.by(Sort.Direction.ASC, "eventDate")));
             for (Event event : getList) {
                 statClient.createStat(StatisticDto.builder()
                         .app("Explore With Me App")
@@ -77,9 +83,10 @@ public class EventServiceImpl implements EventService {
             return getList.stream()
                     .map((Event event) -> EventMapper.toEventShortDto(event, statClient.getViews(event)))
                     .collect(Collectors.toList());
+
         } else if (sort.equals("VIEWS")) {
             Page<Event> getList = eventRepository.findByParamFromUser(text, categories, paid, StateOfEventAndReq.PUBLISHED,
-                                                                      start, end, FromSizeSortPageable.of(from, size, Sort.by(Sort.Direction.ASC, "id")));
+                    start, end, FromSizeSortPageable.of(from, size, Sort.by(Sort.Direction.ASC, "id")));
             for (Event event : getList) {
                 statClient.createStat(StatisticDto.builder()
                         .app("Explore With Me App")
@@ -99,7 +106,7 @@ public class EventServiceImpl implements EventService {
                     .sorted(Comparator.comparingLong(EventShortDto::getViews))
                     .collect(Collectors.toList());
         } else {
-            throw new ValidationException(Event.class, "sort = " + sort, "Введены неверные параметры!");
+            throw new ValidationException(Event.class, "sort=", sort + "! Введены неверные параметры!");
         }
     }
 
@@ -107,7 +114,7 @@ public class EventServiceImpl implements EventService {
     public EventFullDto findByIdForAllUsers(Long eventId, String remoteAddr, String requestURI) {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
         if (!event.getState().equals(StateOfEventAndReq.PUBLISHED)) {
-            throw new ValidationException(Event.class, "State = " + event.getState(), " Событие не опубликовано!");
+            throw new ValidationException(Event.class, "State=", event.getState() + "! Событие не опубликовано!");
         }
         statClient.createStat(StatisticDto.builder()
                 .app("Explore With Me App")
@@ -131,34 +138,29 @@ public class EventServiceImpl implements EventService {
     @Transactional
     public EventFullDto updateFromUser(Long userId, UpdateEventRequest updateEventRequest) {
         User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
+        if (updateEventRequest.getEventId() == null)
+            throw new ValidationException(Event.class, "id=",  "null! В запросе обязательно должен присутствовать id события!");
         Event event = eventRepository.findById(updateEventRequest.getEventId()).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", updateEventRequest.getEventId().toString()));
-        if (event.getInitiator().getId() != user.getId()) {
-            throw new ValidationException(Event.class, "Initiator = " + event.getInitiator(), "Пользователь не является инициатором данного события!");
-        }
-        if (event.getState().equals(StateOfEventAndReq.PUBLISHED)) {
-            throw new ValidationException(Event.class, "State = " + event.getState(), "Событие уже опубликовано и его нельзя изменить!");
-        }
-        event.setAnnotation(updateEventRequest.getAnnotation());
-        if (updateEventRequest.getCategory() != null) {
+        if (event.getInitiator().getId() != user.getId())
+            throw new ValidationException(Event.class, "Initiator=", event.getInitiator() + "! Пользователь не является инициатором данного события!");
+        if (event.getState().equals(StateOfEventAndReq.PUBLISHED))
+            throw new ValidationException(Event.class, "State=", event.getState() + "! Событие уже опубликовано и его нельзя изменить!");
+        if (updateEventRequest.getAnnotation() != null) event.setAnnotation(updateEventRequest.getAnnotation());
+        if (updateEventRequest.getCategory() != null)
             event.setCategory(categoryRepository.findById(updateEventRequest.getCategory()).orElseThrow(() -> new EntityNotFoundException(Category.class, "id", updateEventRequest.getCategory().toString())));
-        }
-        event.setDescription(updateEventRequest.getDescription());
+        if (updateEventRequest.getDescription() != null) event.setDescription(updateEventRequest.getDescription());
         if (updateEventRequest.getEventDate() != null) {
             LocalDateTime dateAndTimeOfEvent = LocalDateTime.parse(updateEventRequest.getEventDate(), formatter);
             Duration duration = Duration.between(LocalDateTime.now(), dateAndTimeOfEvent);
             if (duration.toMinutes() < 120) {
-                throw new ValidationException(Event.class, "EventDate = " + event.getEventDate(), "Время до события менее 2 часов и поэтому его нельзя изменить!");
+                throw new ValidationException(Event.class, "EventDate=", event.getEventDate() + "! Время до события менее 2 часов и поэтому его нельзя изменить!");
             }
             event.setEventDate(dateAndTimeOfEvent);
         }
-        if (updateEventRequest.getPaid() != null) {
-            event.setPaid(updateEventRequest.getPaid());
-        }
-        event.setParticipantLimit(updateEventRequest.getParticipantLimit());
-        event.setTitle(updateEventRequest.getTitle());
-        if (event.getState().equals(StateOfEventAndReq.CANCELED)) {
-            event.setState(StateOfEventAndReq.PENDING);
-        }
+        if (updateEventRequest.getPaid() != null) event.setPaid(updateEventRequest.getPaid());
+        if (updateEventRequest.getParticipantLimit() != null) event.setParticipantLimit(updateEventRequest.getParticipantLimit());
+        if (updateEventRequest.getTitle() != null) event.setTitle(updateEventRequest.getTitle());
+        if (event.getState().equals(StateOfEventAndReq.CANCELED)) event.setState(StateOfEventAndReq.PENDING);
         return EventMapper.toEventFullDto(eventRepository.save(event), statClient.getViews(event));
     }
 
@@ -168,10 +170,9 @@ public class EventServiceImpl implements EventService {
         User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
         Category category = categoryRepository.findById(newEventDto.getCategory()).orElseThrow(() -> new EntityNotFoundException(Category.class, "id", newEventDto.getCategory().toString()));
         Location location = locationRepository.save(LocationMapper.toLocation(newEventDto.getLocation()));
-        Event event = EventMapper.toEvent(newEventDto, category, user, location);
+        @Valid Event event = EventMapper.toEvent(newEventDto, category, user, location);
         event.setState(StateOfEventAndReq.PENDING);
-        Event eventNew = eventRepository.save(event);
-        return EventMapper.toEventFullDto(eventNew, statClient.getViews(event));
+        return EventMapper.toEventFullDto(eventRepository.save(event), statClient.getViews(event));
     }
 
     @Override

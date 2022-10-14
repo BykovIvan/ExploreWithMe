@@ -32,14 +32,9 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryDto findByIdForAllUsers(Long catId) {
+    public Optional<CategoryDto> findByIdForAllUsers(Long catId) {
         Optional<Category> category = categoryRepository.findById(catId);
-        if (category.isEmpty()){
-            return null;
-        }
-
-//                .orElseThrow(() -> new EntityNotFoundException(Category.class, "id", catId.toString()));
-        return CategoryMapper.toCategoryDto(category.get());
+        return category.map(CategoryMapper::toCategoryDto);
     }
 
     @Override
