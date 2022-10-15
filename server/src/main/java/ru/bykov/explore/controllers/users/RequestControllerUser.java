@@ -2,7 +2,6 @@ package ru.bykov.explore.controllers.users;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.bykov.explore.model.dto.ParticipationRequestDto;
 import ru.bykov.explore.services.RequestService;
@@ -19,15 +18,17 @@ public class RequestControllerUser {
 
     @GetMapping("/{userId}/requests")
     public List<ParticipationRequestDto> findByUserId(@PathVariable("userId") Long userId) {
-        log.info("Получен запрос к эндпоинту /users/{userID}/request получение информации о заявках текущего пользователя с id = {} на участие в чужих событиях", userId);
+        log.info("Получен запрос к эндпоинту /users/{userID}/request получение информации о заявках текущего " +
+                "пользователя с id = {} на участие в чужих событиях", userId);
         return requestService.findByUserIdFromUser(userId);
     }
 
     @PostMapping("/{userId}/requests")
-//    @ResponseStatus(HttpStatus.CREATED)
+//    @ResponseStatus(HttpStatus.CREATED) закомментировано для постман
     public ParticipationRequestDto addRequest(@PathVariable("userId") Long userId,
                                               @RequestParam(value = "eventId") Long eventId) {
-        log.info("Получен запрос к эндпоинту /users/{userID}/request добавление запроса от пользователя id = {} на участие в событии id = {}. Метод POST.", userId, eventId);
+        log.info("Получен запрос к эндпоинту /users/{userID}/request добавление запроса от " +
+                "пользователя id = {} на участие в событии id = {}. Метод POST.", userId, eventId);
         return requestService.addRequestToEventByUserIdFromUser(userId, eventId);
     }
 

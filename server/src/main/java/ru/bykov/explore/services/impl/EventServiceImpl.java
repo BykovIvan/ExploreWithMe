@@ -179,7 +179,6 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventFullDto findByUserIdAndEventIdFromUser(Long userId, Long eventId) {
         userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
-        eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
         Event event = eventRepository.findByIdAndInitiatorId(eventId, userId);
         return EventMapper.toEventFullDto(event, statClient.getViews(event));
     }
@@ -189,8 +188,9 @@ public class EventServiceImpl implements EventService {
     public EventFullDto canselByUserIdAndEventIdFromUser(Long userId, Long eventId) {
         userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
-        if (event.getState().equals(EventState.PUBLISHED)) {
-            throw new ValidationException(Event.class, "State = " + event.getState(), "Событие уже опубликовано!");
+        if (event.getInitiator().getId() != userId) throw new ValidationException(Event.class, "Initiator=", event.getInitiator().getId() + "! Событие опубликовал не данный пользователь!");
+        if (event.getState().equals(EventState.PUBLISHED) || event.getState().equals(EventState.CANCELED)) {
+            throw new ValidationException(Event.class, "State=", event.getState() + "! Событие уже опубликовано или уже отменено!");
         }
         event.setState(EventState.CANCELED);
         return EventMapper.toEventFullDto(eventRepository.save(event), statClient.getViews(event));
@@ -200,9 +200,8 @@ public class EventServiceImpl implements EventService {
     @Transactional
     public List<ParticipationRequestDto> findRequestsByUserIdAndEventIdFromUser(Long userId, Long eventId) {
         userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
-        eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
-        List<Request> request = requestRepository.findByEventIdAndRequesterId(eventId, userId);
-        return request.stream()
+        if (eventRepository.findByIdAndInitiatorId(eventId, userId) == null) throw new EntityNotFoundException(Event.class, "id", eventId.toString());
+        return requestRepository.findAllByEventId(eventId).stream()
                 .map(RequestMapper::toParticipationRequestDto)
                 .collect(Collectors.toList());
     }
@@ -211,39 +210,38 @@ public class EventServiceImpl implements EventService {
     @Transactional
     public ParticipationRequestDto confirmRequestByUserIdAndEventIdFromUser(Long userId, Long eventId, Long reqId) {
         userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
-        Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
+        Event event = eventRepository.findByIdAndInitiatorId(eventId, userId);
+        if (event == null) throw new EntityNotFoundException(Event.class, "id", eventId.toString());
         Request request = requestRepository.findById(reqId).orElseThrow(() -> new EntityNotFoundException(Request.class, "id", reqId.toString()));
-        if (event.getInitiator().getId() != userId) {
-            throw new ValidationException(Event.class, "Initiator = " + event.getInitiator(), "Пользователь не является инициатором события!");
-        }
         if (event.getParticipantLimit() == 0 || !event.getRequestModeration()) {
             request.setStatus(RequestState.CONFIRMED);
+            eventRepository.setNewConfirmedRequestsPlusOne(eventId);
             return RequestMapper.toParticipationRequestDto(requestRepository.save(request));
         } else if (event.getConfirmedRequests() >= event.getParticipantLimit()) {
-            requestRepository.setStatusCanselWhereByStatusAndEventId(EventState.CANCELED, EventState.PENDING, eventId);
+            requestRepository.setStatusCanselWhereByStatusAndEventId(RequestState.CANCELED, RequestState.PENDING, eventId);
+            request.setStatus(RequestState.CANCELED);
+            return RequestMapper.toParticipationRequestDto(requestRepository.save(request));
         }
-        event.setConfirmedRequests(event.getConfirmedRequests() + 1);
-        eventRepository.save(event);
         request.setStatus(RequestState.CONFIRMED);
+        eventRepository.setNewConfirmedRequestsPlusOne(eventId);
         return RequestMapper.toParticipationRequestDto(requestRepository.save(request));
+
     }
 
     @Override
     @Transactional
     public ParticipationRequestDto rejectRequestByUserIdAndEventIdFromUser(Long userId, Long eventId, Long reqId) {
-        Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
         userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
-        Request request = requestRepository.findById(reqId).orElseThrow(() -> new EntityNotFoundException(Request.class, "id", reqId.toString()));
-        if (event.getInitiator().getId() != userId) {
-            throw new ValidationException(Event.class, "Initiator = " + event.getInitiator(), "Пользователь не является инициатором события!");
-        }
+        Event event = eventRepository.findByIdAndInitiatorId(eventId, userId);
+        if (event == null) throw new EntityNotFoundException(Event.class, "id", eventId.toString());
+        Request request = requestRepository.findByIdAndEventId(reqId, eventId);
+        if (request == null) throw new EntityNotFoundException(Request.class, "id", reqId.toString());
         if (event.getParticipantLimit() == 0 || !event.getRequestModeration()) {
-            throw new ValidationException(Event.class, "ParticipantLimit = " + event.getParticipantLimit() + "RequestModeration = " + event.getParticipantLimit(), "Подтверждение заявки не требуется!");
+            throw new ValidationException(Event.class, "ParticipantLimit = " + event.getParticipantLimit() + "RequestModeration = " +
+                    event.getParticipantLimit(), "Подтверждение заявки не требуется!");
         }
-        if (request.getStatus().equals(RequestState.CONFIRMED)) {
-            event.setConfirmedRequests(event.getConfirmedRequests() - 1);
-            eventRepository.save(event);
-        }
+        if (request.getStatus().equals(RequestState.CONFIRMED) && eventRepository.findById(request.getEvent().getId()).get().getConfirmedRequests() != 0)
+            eventRepository.setNewConfirmedRequestsMinusOne(eventId);
         request.setStatus(RequestState.REJECTED);
         return RequestMapper.toParticipationRequestDto(requestRepository.save(request));
     }

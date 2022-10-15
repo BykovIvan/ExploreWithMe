@@ -45,16 +45,12 @@ public class RequestServiceImpl implements RequestService {
     public ParticipationRequestDto addRequestToEventByUserIdFromUser(Long userId, Long eventId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
-        if (event.getInitiator().getId() == userId) {
-            throw new ValidationException(Event.class, "Initiator", event.getInitiator() + "! Пользователь не может подать запрос на участие в своем событии!");
-        }
-        if (!event.getState().equals(EventState.PUBLISHED)) {
-            throw new ValidationException(Event.class, "State", event.getState() + "! Пользователь не может участвовать в неопубликованном событии!");
-        }
-        if (event.getParticipantLimit() != 0) {
-            if (requestRepository.countByEventId(eventId) >= event.getParticipantLimit()) {
-                throw new ValidationException(Event.class, "Сount", requestRepository.countByEventId(eventId) + "! Достигнут лимит запросов на участие!");
-            }
+        if (event.getInitiator().getId() == userId) throw new ValidationException(Event.class, "Initiator", event.getInitiator() + "! Пользователь" +
+                " не может подать запрос на участие в своем событии!");
+        if (!event.getState().equals(EventState.PUBLISHED)) throw new ValidationException(Event.class, "State", event.getState() + "! Пользователь " +
+                "не может участвовать в неопубликованном событии!");
+        if (event.getParticipantLimit() != 0 && requestRepository.countByEventId(eventId) >= event.getParticipantLimit()) {
+            throw new ValidationException(Event.class, "Сount", requestRepository.countByEventId(eventId) + "! Достигнут лимит запросов на участие!");
         }
         Request requestNew = Request.builder()
                 .created(LocalDateTime.now())
@@ -62,7 +58,7 @@ public class RequestServiceImpl implements RequestService {
                 .requester(user)
                 .status(RequestState.PENDING)
                 .build();
-        if (!event.getRequestModeration()) {
+        if (!event.getRequestModeration() && requestRepository.countByEventId(eventId) < event.getParticipantLimit()) {
             requestNew.setStatus(RequestState.CONFIRMED);
         }
         return RequestMapper.toParticipationRequestDto(requestRepository.save(requestNew));
@@ -72,15 +68,10 @@ public class RequestServiceImpl implements RequestService {
     @Transactional
     public ParticipationRequestDto canselRequestByUserIdAndRequestIdFromUser(Long userId, Long requestId) {
         userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
-        Request request = requestRepository.findById(requestId).orElseThrow(() -> new EntityNotFoundException(Request.class, "id", requestId.toString()));
-        if (request.getRequester().getId() != userId) {
-            throw new ValidationException(Request.class, "Initiator=", request.getRequester() + "! Данный пользователь не является владельцем этой заявки!");
-        }
-        if (request.getStatus().equals(RequestState.CONFIRMED)) {
-            Event event = eventRepository.findById(request.getEvent().getId()).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", request.getEvent().toString()));
-            event.setConfirmedRequests(event.getConfirmedRequests() - 1);
-            eventRepository.save(event);
-        }
+        Request request = requestRepository.findByIdAndRequesterId(requestId, userId);
+        if (request == null) throw new EntityNotFoundException(Request.class, "id", requestId.toString());
+        if (request.getStatus().equals(RequestState.CONFIRMED) && eventRepository.findById(request.getEvent().getId()).get().getConfirmedRequests() != 0)
+            eventRepository.setNewConfirmedRequestsMinusOne(request.getEvent().getId());
         request.setStatus(RequestState.CANCELED);
         return RequestMapper.toParticipationRequestDto(requestRepository.save(request));
     }

@@ -26,8 +26,8 @@ public class EventMapper {
                 .paid(event.getPaid())
                 .title(event.getTitle())
                 .build();
-//        eventShortDto.setViews(views != null ? views : 0);
-        if (views != null) eventShortDto.setViews(views);
+        eventShortDto.setViews(views != null ? views : 0);
+//        if (views != null) eventShortDto.setViews(views);
         return eventShortDto;
     }
 
@@ -72,8 +72,8 @@ public class EventMapper {
                 .title(event.getTitle())
                 .build();
         if (event.getPublishedOn() != null) eventFullDto.setPublishedOn(event.getPublishedOn().format(formatter));
-//        eventFullDto.setViews(views != null ? views : 0);
-        if (views != null) eventFullDto.setViews(views);
+        eventFullDto.setViews(views != null ? views : 0);
+//        if (views != null) eventFullDto.setViews(views);
         return eventFullDto;
     }
 }

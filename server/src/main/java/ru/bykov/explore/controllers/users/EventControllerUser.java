@@ -25,14 +25,14 @@ public class EventControllerUser {
     public List<EventShortDto> eventsByUserById(@PathVariable("userId") Long userId,
                                                 @RequestParam(value = "from", required = false, defaultValue = "0") Integer from,
                                                 @RequestParam(value = "size", required = false, defaultValue = "10") Integer size) {
-        log.info("Получен запрос к эндпоинту /users/{userID}/events получение событий пользователя. Метод GET");
+        log.info("Получен запрос к эндпоинту /users/{userID}/events получение событий пользователя id = {}. Метод GET.", userId);
         return eventService.findByUserIdFromUser(userId, from, size);
     }
 
     @PatchMapping("/{userId}/events")
     public EventFullDto updateEventFromUser(@PathVariable("userId") Long userId,
                                             @Valid @RequestBody UpdateEventRequest updateEventRequest) {
-        log.info("Получен запрос к эндпоинту /users/{userID}/events обновление события пользователем. Метод PATCH");
+        log.info("Получен запрос к эндпоинту /users/{userID}/events обновление события пользователем id = {}. Метод PATCH.", userId);
         return eventService.updateFromUser(userId, updateEventRequest);
     }
 
@@ -40,27 +40,26 @@ public class EventControllerUser {
 //    @ResponseStatus(HttpStatus.CREATED)
     public EventFullDto createFromUser(@PathVariable("userId") Long userId,
                                        @Valid @RequestBody NewEventDto newEventDto) {
-        log.info("Получен запрос к эндпоинту /users/{userID}/events создание события пользователем. Метод POST");
+        log.info("Получен запрос к эндпоинту /users/{userID}/events создание события пользователем id = {}. Метод POST", userId);
         return eventService.createFromUser(userId, newEventDto);
     }
 
-    //Получение полной информации о событии добавленном текущим пользователем
     @GetMapping("/{userId}/events/{eventId}")
     public EventFullDto eventByUserIdAndEventIdFromUser(@PathVariable("userId") Long userId,
                                                         @PathVariable("eventId") Long eventId) {
-        log.info("Получен запрос к эндпоинту /users/{userID}/events{eventId} получение события по id пользователя и id события. Метод GET");
+        log.info("Получен запрос к эндпоинту /users/{userID}/events{eventId} получение события по id = {} " +
+                "пользователя и id = {}. Метод GET.", eventId, userId);
         return eventService.findByUserIdAndEventIdFromUser(userId, eventId);
     }
 
-    //отмена события добавленного текущим пользователем
     @PatchMapping("/{userId}/events/{eventId}")
     public EventFullDto canselByUser(@PathVariable("userId") Long userId,
                                      @PathVariable("eventId") Long eventId) {
-        log.info("Получен запрос к эндпоинту /users/{userID}/events/{eventId} отмена события пользователем. Метод PATCH");
+        log.info("Получен запрос к эндпоинту /users/{userID}/events/{eventId} отмена события id = {}, " +
+                "пользователем id = {}. Метод PATCH.", eventId, userId);
         return eventService.canselByUserIdAndEventIdFromUser(userId, eventId);
     }
 
-    //Получение информации о запросах на участие в событиях текущего пользователя
     @GetMapping("/{userId}/events/{eventId}/requests")
     public List<ParticipationRequestDto> requestEventById(@PathVariable("userId") Long userId,
                                                           @PathVariable("eventId") Long eventId) {
@@ -73,7 +72,8 @@ public class EventControllerUser {
     public ParticipationRequestDto requestConfirmEventById(@PathVariable("userId") Long userId,
                                                            @PathVariable("eventId") Long eventId,
                                                            @PathVariable("reqId") Long reqId) {
-        log.info("Получен запрос к эндпоинту /users/{userID}/events{eventId}/request/{reqId}/confirm подтверждение чужой заявки на участие в событии пользователем. Метод PATCH");
+        log.info("Получен запрос к эндпоинту /users/{userID}/events{eventId}/request/{reqId}/confirm подтверждение " +
+                "чужой заявки id = {} на участие в событии id = {} пользователем id = {}. Метод PATCH.", reqId, eventId, userId);
         return eventService.confirmRequestByUserIdAndEventIdFromUser(userId, eventId, reqId);
     }
 
@@ -81,7 +81,8 @@ public class EventControllerUser {
     public ParticipationRequestDto requestRejectEventById(@PathVariable("userId") Long userId,
                                                           @PathVariable("eventId") Long eventId,
                                                           @PathVariable("reqId") Long reqId) {
-        log.info("Получен запрос к эндпоинту /users/{userID}/events{eventId}/request/{reqId}/confirm отклонение чужой заявки на участие в событии пользователем. Метод PATCH");
+        log.info("Получен запрос к эндпоинту /users/{userID}/events{eventId}/request/{reqId}/confirm отклонение " +
+                "чужой заявки id = {} на участие в событии id = {} пользователем id = {}. Метод PATCH.", reqId, eventId, userId);
         return eventService.rejectRequestByUserIdAndEventIdFromUser(userId, eventId, reqId);
     }
 
