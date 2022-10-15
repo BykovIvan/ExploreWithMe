@@ -14,8 +14,8 @@ import ru.bykov.explore.model.dto.ParticipationRequestDto;
 import ru.bykov.explore.model.dto.event.*;
 import ru.bykov.explore.repositories.*;
 import ru.bykov.explore.services.EventService;
-import ru.bykov.explore.utils.FromSizeSortPageable;
 import ru.bykov.explore.utils.EventState;
+import ru.bykov.explore.utils.FromSizeSortPageable;
 import ru.bykov.explore.utils.RequestState;
 import ru.bykov.explore.utils.mapperForDto.EventMapper;
 import ru.bykov.explore.utils.mapperForDto.LocationMapper;
@@ -140,7 +140,7 @@ public class EventServiceImpl implements EventService {
     public EventFullDto updateFromUser(Long userId, UpdateEventRequest updateEventRequest) {
         User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
         if (updateEventRequest.getEventId() == null)
-            throw new ValidationException(Event.class, "id=",  "null! В запросе обязательно должен присутствовать id события!");
+            throw new ValidationException(Event.class, "id=", "null! В запросе обязательно должен присутствовать id события!");
         Event event = eventRepository.findById(updateEventRequest.getEventId()).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", updateEventRequest.getEventId().toString()));
         if (event.getInitiator().getId() != user.getId())
             throw new ValidationException(Event.class, "Initiator=", event.getInitiator() + "! Пользователь не является инициатором данного события!");
@@ -159,7 +159,8 @@ public class EventServiceImpl implements EventService {
             event.setEventDate(dateAndTimeOfEvent);
         }
         if (updateEventRequest.getPaid() != null) event.setPaid(updateEventRequest.getPaid());
-        if (updateEventRequest.getParticipantLimit() != null) event.setParticipantLimit(updateEventRequest.getParticipantLimit());
+        if (updateEventRequest.getParticipantLimit() != null)
+            event.setParticipantLimit(updateEventRequest.getParticipantLimit());
         if (updateEventRequest.getTitle() != null) event.setTitle(updateEventRequest.getTitle());
         if (event.getState().equals(EventState.CANCELED)) event.setState(EventState.PENDING);
         return EventMapper.toEventFullDto(eventRepository.save(event), statClient.getViews(event));
@@ -188,10 +189,10 @@ public class EventServiceImpl implements EventService {
     public EventFullDto canselByUserIdAndEventIdFromUser(Long userId, Long eventId) {
         userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
-        if (event.getInitiator().getId() != userId) throw new ValidationException(Event.class, "Initiator=", event.getInitiator().getId() + "! Событие опубликовал не данный пользователь!");
-        if (event.getState().equals(EventState.PUBLISHED) || event.getState().equals(EventState.CANCELED)) {
+        if (event.getInitiator().getId() != userId)
+            throw new ValidationException(Event.class, "Initiator=", event.getInitiator().getId() + "! Событие опубликовал не данный пользователь!");
+        if (event.getState().equals(EventState.PUBLISHED) || event.getState().equals(EventState.CANCELED))
             throw new ValidationException(Event.class, "State=", event.getState() + "! Событие уже опубликовано или уже отменено!");
-        }
         event.setState(EventState.CANCELED);
         return EventMapper.toEventFullDto(eventRepository.save(event), statClient.getViews(event));
     }
@@ -200,7 +201,8 @@ public class EventServiceImpl implements EventService {
     @Transactional
     public List<ParticipationRequestDto> findRequestsByUserIdAndEventIdFromUser(Long userId, Long eventId) {
         userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
-        if (eventRepository.findByIdAndInitiatorId(eventId, userId) == null) throw new EntityNotFoundException(Event.class, "id", eventId.toString());
+        if (eventRepository.findByIdAndInitiatorId(eventId, userId) == null)
+            throw new EntityNotFoundException(Event.class, "id", eventId.toString());
         return requestRepository.findAllByEventId(eventId).stream()
                 .map(RequestMapper::toParticipationRequestDto)
                 .collect(Collectors.toList());
@@ -253,8 +255,10 @@ public class EventServiceImpl implements EventService {
         for (int i = 0; i < states.length; i++) {
             stateOfEvent[i] = EventState.valueOf(states[i]);
         }
-        LocalDateTime start = LocalDateTime.parse(decode(rangeStart), formatter);
-        LocalDateTime end = LocalDateTime.parse(decode(rangeEnd), formatter);
+        LocalDateTime start = null;
+        LocalDateTime end = null;
+        if (rangeStart != null) start = LocalDateTime.parse(decode(rangeStart), formatter);
+        if (rangeEnd != null) end = LocalDateTime.parse(decode(rangeEnd), formatter);
         return eventRepository.findByParamFromAdmin(users, stateOfEvent, categories, start, end, FromSizeSortPageable.of(from, size, Sort.by(Sort.Direction.ASC, "id")))
                 .stream()
                 .map((Event event) -> EventMapper.toEventFullDto(event, statClient.getViews(event)))
@@ -265,33 +269,23 @@ public class EventServiceImpl implements EventService {
     @Transactional
     public EventFullDto updateByIdFromAdmin(Long eventId, AdminUpdateEventRequest adminUpdateEventRequest) {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
-        if (adminUpdateEventRequest.getAnnotation() != null) {
+        if (adminUpdateEventRequest.getAnnotation() != null)
             event.setAnnotation(adminUpdateEventRequest.getAnnotation());
-        }
-        if (adminUpdateEventRequest.getCategory() != null) {
-            event.setCategory(categoryRepository.findById(adminUpdateEventRequest.getCategory()).orElseThrow(() -> new EntityNotFoundException(Category.class, "id", adminUpdateEventRequest.getCategory().toString())));
-        }
-        if (adminUpdateEventRequest.getDescription() != null) {
+        if (adminUpdateEventRequest.getCategory() != null)
+            event.setCategory(categoryRepository.findById(adminUpdateEventRequest.getCategory())
+                    .orElseThrow(() -> new EntityNotFoundException(Category.class, "id", adminUpdateEventRequest.getCategory().toString())));
+        if (adminUpdateEventRequest.getDescription() != null)
             event.setDescription(adminUpdateEventRequest.getDescription());
-        }
-        if (adminUpdateEventRequest.getEventDate() != null) {
+        if (adminUpdateEventRequest.getEventDate() != null)
             event.setEventDate(LocalDateTime.parse(adminUpdateEventRequest.getEventDate(), formatter));
-        }
-        if (adminUpdateEventRequest.getLocation() != null) {
+        if (adminUpdateEventRequest.getLocation() != null)
             event.setLocation(LocationMapper.toLocation(adminUpdateEventRequest.getLocation()));
-        }
-        if (adminUpdateEventRequest.getPaid() != null) {
-            event.setPaid(adminUpdateEventRequest.getPaid());
-        }
-        if (adminUpdateEventRequest.getParticipantLimit() != null) {
+        if (adminUpdateEventRequest.getPaid() != null) event.setPaid(adminUpdateEventRequest.getPaid());
+        if (adminUpdateEventRequest.getParticipantLimit() != null)
             event.setParticipantLimit(adminUpdateEventRequest.getParticipantLimit());
-        }
-        if (adminUpdateEventRequest.getRequestModeration() != null) {
+        if (adminUpdateEventRequest.getRequestModeration() != null)
             event.setRequestModeration(adminUpdateEventRequest.getRequestModeration());
-        }
-        if (adminUpdateEventRequest.getTitle() != null) {
-            event.setTitle(adminUpdateEventRequest.getTitle());
-        }
+        if (adminUpdateEventRequest.getTitle() != null) event.setTitle(adminUpdateEventRequest.getTitle());
         return EventMapper.toEventFullDto(eventRepository.save(event), statClient.getViews(event));
     }
 
@@ -299,17 +293,12 @@ public class EventServiceImpl implements EventService {
     @Transactional
     public EventFullDto publishEventByIdFromAdmin(Long eventId) {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
-        LocalDateTime dateAndTimeOfEvent = event.getEventDate();
+        if (event.getState().equals(EventState.CANCELED) || event.getState().equals(EventState.PUBLISHED))
+            throw new ValidationException(Event.class, "state", event.getState() + "! Событие уже отменено или опубликовано!");
         LocalDateTime dateAndTimeNowPublish = LocalDateTime.now();
-        if (dateAndTimeOfEvent.isBefore(dateAndTimeNowPublish)) {
-            Duration duration = Duration.between(dateAndTimeOfEvent, dateAndTimeNowPublish);
-            if (duration.toMinutes() > 60) {
-                throw new ValidationException(Event.class, "EventDate = " + event.getEventDate(), "Дата начала события должна быть не ранее чем за час от даты публикации");
-            }
-        }
-        if (event.getState().equals(EventState.CANCELED)) {
-            throw new ValidationException(Event.class, "state = " + event.getState(), "Событие уже отменено!");
-        }
+        Duration duration = Duration.between(dateAndTimeNowPublish, event.getEventDate());
+        if (duration.toMinutes() < 60) throw new ValidationException(Event.class, "EventDate", event.getEventDate() +
+                "! Дата начала события должна быть не ранее чем за час от даты публикации");
         event.setPublishedOn(dateAndTimeNowPublish);
         event.setState(EventState.PUBLISHED);
         return EventMapper.toEventFullDto(eventRepository.save(event), statClient.getViews(event));
@@ -319,9 +308,8 @@ public class EventServiceImpl implements EventService {
     @Transactional
     public EventFullDto rejectEventByIdFromAdmin(Long eventId) {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
-        if (event.getState().equals(EventState.PUBLISHED)) {
-            throw new ValidationException(Event.class, "state = " + event.getState(), "Событие уже опубликовано!");
-        }
+        if (event.getState().equals(EventState.PUBLISHED))
+            throw new ValidationException(Event.class, "state", event.getState() + "! Событие уже опубликовано!");
         event.setState(EventState.CANCELED);
         return EventMapper.toEventFullDto(eventRepository.save(event), statClient.getViews(event));
     }

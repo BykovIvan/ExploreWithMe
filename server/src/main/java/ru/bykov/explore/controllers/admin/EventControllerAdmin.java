@@ -25,7 +25,8 @@ public class EventControllerAdmin {
                                           @RequestParam(value = "rangeEnd", required = false) String rangeEnd,      //дата и время не позже которых должно произойти событие
                                           @RequestParam(value = "from", required = false, defaultValue = "0") Integer from,
                                           @RequestParam(value = "size", required = false, defaultValue = "10") Integer size) {
-        log.info("Получен запрос к эндпоинту /admin/events, метод GET, получение событий по параметрам");
+        log.info("Получен запрос к эндпоинту /admin/events, метод GET, получение событий по параметрам users = {}, states = {}, categories = {}, " +
+                "rangeStart = {}, rangeEnd = {}, from = {}, size = {}", users, states, categories, rangeStart, rangeEnd, from, size);
         return eventService.findByParamFromAdmin(users, states, categories, rangeStart, rangeEnd, from, size);
     }
 

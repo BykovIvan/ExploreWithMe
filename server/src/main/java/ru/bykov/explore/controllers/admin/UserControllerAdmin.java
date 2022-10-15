@@ -22,7 +22,7 @@ public class UserControllerAdmin {
     public List<UserDto> userById(@RequestParam(value = "ids") Long[] ids,
                                   @RequestParam(value = "from", required = false, defaultValue = "0") Integer from,
                                   @RequestParam(value = "size", required = false, defaultValue = "10") Integer size) {
-        log.info("Получен запрос к эндпоинту /admin/users получение пользователей по param. Метод GET");
+        log.info("Получен запрос к эндпоинту /admin/users получение пользователей по параметрам. Метод GET");
         return userService.findByParamFromAdmin(ids, from, size);
     }
 
@@ -34,7 +34,7 @@ public class UserControllerAdmin {
 
     @DeleteMapping("/{userId}")
     public void deleteById(@PathVariable("userId") Long userId) {
-        log.info("Получен запрос к эндпоинту /admin/users удаление по id {}. Метод DELETE", userId);
+        log.info("Получен запрос к эндпоинту /admin/users удаление по id = {}. Метод DELETE", userId);
         userService.deleteByIdFromAdmin(userId);
     }
 }
