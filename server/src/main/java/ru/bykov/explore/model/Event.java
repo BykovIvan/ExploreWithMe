@@ -7,6 +7,7 @@ import ru.bykov.explore.utils.EventState;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Builder
 @AllArgsConstructor
@@ -54,15 +55,7 @@ public class Event {
     @Enumerated(EnumType.STRING)
     private EventState state;
     private String title;
-
-
-//    @Column(columnDefinition = "varchar(255) default 'John Snow'")
-//    private String name;
-//
-//    @Column(columnDefinition = "integer default 25")
-//    private Integer age;
-//
-//    @Column(columnDefinition = "boolean default false")
-//    private Boolean locked;
-
+    private Boolean CommentModeration;
+//    @OneToMany()                   //Комментарии можно будет смотреть только по отдельной ссылке для каждого события
+//    private List<Comment> comments;
 }

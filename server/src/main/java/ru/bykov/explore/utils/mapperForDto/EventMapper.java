@@ -1,9 +1,7 @@
 package ru.bykov.explore.utils.mapperForDto;
 
-import ru.bykov.explore.model.Category;
-import ru.bykov.explore.model.Event;
-import ru.bykov.explore.model.Location;
-import ru.bykov.explore.model.User;
+import ru.bykov.explore.model.*;
+import ru.bykov.explore.model.dto.event.EventDtoWithComments;
 import ru.bykov.explore.model.dto.event.EventFullDto;
 import ru.bykov.explore.model.dto.event.EventShortDto;
 import ru.bykov.explore.model.dto.event.NewEventDto;
@@ -11,6 +9,7 @@ import ru.bykov.explore.utils.EventState;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 public class EventMapper {
     private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -47,6 +46,7 @@ public class EventMapper {
         event.setPaid(newEventDto.getPaid() != null ? newEventDto.getPaid() : false);
         event.setParticipantLimit(newEventDto.getParticipantLimit() != null ? newEventDto.getParticipantLimit() : 0L);
         event.setRequestModeration(newEventDto.getRequestModeration() != null ? newEventDto.getRequestModeration() : false);
+        event.setCommentModeration(newEventDto.getCommentModeration() != null ? newEventDto.getCommentModeration() : false);
         return event;
     }
 
@@ -66,6 +66,31 @@ public class EventMapper {
                 .requestModeration(event.getRequestModeration())
                 .state(event.getState().toString())
                 .title(event.getTitle())
+                .commentModeration(event.getCommentModeration())
+                .build();
+        if (event.getPublishedOn() != null) eventFullDto.setPublishedOn(event.getPublishedOn().format(formatter));
+        eventFullDto.setViews(views != null ? views : 0);
+        return eventFullDto;
+    }
+
+    public static EventDtoWithComments toEventFullDto(Event event, Long views, User user, List<Comment> comment) {
+        EventDtoWithComments eventFullDto = EventDtoWithComments.builder()
+                .annotation(event.getAnnotation())
+                .category(event.getCategory())
+                .confirmedRequests(event.getConfirmedRequests())
+                .createdOn(event.getCreatedOn().format(formatter))
+                .description(event.getDescription())
+                .eventDate(event.getEventDate().format(formatter))
+                .id(event.getId())
+                .initiator(UserMapper.toUserShortDto(event.getInitiator()))
+                .location(LocationMapper.toLocationDto(event.getLocation()))
+                .paid(event.getPaid())
+                .participantLimit(event.getParticipantLimit())
+                .requestModeration(event.getRequestModeration())
+                .state(event.getState().toString())
+                .title(event.getTitle())
+                .commentModeration(event.getCommentModeration())
+                .comments(Comment.builder().owner(User.builder().name(user.getName()).build()).text().build())
                 .build();
         if (event.getPublishedOn() != null) eventFullDto.setPublishedOn(event.getPublishedOn().format(formatter));
         eventFullDto.setViews(views != null ? views : 0);

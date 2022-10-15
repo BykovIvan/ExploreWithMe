@@ -6,13 +6,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.bykov.explore.model.Category;
 import ru.bykov.explore.model.dto.LocationDto;
+import ru.bykov.explore.model.dto.comment.CommentShortDto;
 import ru.bykov.explore.model.dto.user.UserShortDto;
+
+import java.util.List;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class EventFullDto {
+public class EventDtoWithComments {
     private String annotation;
     private Category category;
     private Long confirmedRequests;
@@ -30,4 +33,5 @@ public class EventFullDto {
     private String title;
     private Long views;
     private Boolean commentModeration;
+    private List<CommentShortDto> comments;
 }

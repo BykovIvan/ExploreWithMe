@@ -286,6 +286,7 @@ public class EventServiceImpl implements EventService {
         if (adminUpdateEventRequest.getRequestModeration() != null)
             event.setRequestModeration(adminUpdateEventRequest.getRequestModeration());
         if (adminUpdateEventRequest.getTitle() != null) event.setTitle(adminUpdateEventRequest.getTitle());
+        if (adminUpdateEventRequest.getCommentModeration() != null) event.setCommentModeration(adminUpdateEventRequest.getCommentModeration());
         return EventMapper.toEventFullDto(eventRepository.save(event), statClient.getViews(event));
     }
 
