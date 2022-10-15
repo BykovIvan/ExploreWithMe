@@ -4,10 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.bykov.explore.model.dto.ParticipationRequestDto;
-import ru.bykov.explore.model.dto.event.EventFullDto;
-import ru.bykov.explore.model.dto.event.EventShortDto;
-import ru.bykov.explore.model.dto.event.NewEventDto;
-import ru.bykov.explore.model.dto.event.UpdateEventRequest;
+import ru.bykov.explore.model.dto.event.*;
 import ru.bykov.explore.services.EventService;
 
 import javax.validation.Valid;
@@ -84,5 +81,16 @@ public class EventControllerUser {
         log.info("Получен запрос к эндпоинту /users/{userID}/events{eventId}/request/{reqId}/confirm отклонение " +
                 "чужой заявки id = {} на участие в событии id = {} пользователем id = {}. Метод PATCH.", reqId, eventId, userId);
         return eventService.rejectRequestByUserIdAndEventIdFromUser(userId, eventId, reqId);
+    }
+
+    //Получение всех комментариев у вещи пользователем
+    @GetMapping("/{userId}/events/{eventId}/comments")
+    public List<EventDtoWithComments> commentsEventById(@PathVariable("userId") Long userId,
+                                                       @PathVariable("eventId") Long eventId,
+                                                        @RequestParam(value = "from", required = false, defaultValue = "0") Integer from,
+                                                        @RequestParam(value = "size", required = false, defaultValue = "10") Integer size) {
+        log.info("Получен запрос к эндпоинту /users/{userID}/events{eventId}/comments " +
+                "получение события с комментариями. Метод GET. Где userId = {}, eventId={}", userId, eventId);
+        return eventService.findEventWithCommentsByEventIdFromUser(userId, eventId, from, size);
     }
 }
