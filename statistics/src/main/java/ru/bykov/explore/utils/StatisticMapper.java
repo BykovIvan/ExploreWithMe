@@ -2,7 +2,6 @@ package ru.bykov.explore.utils;
 
 import ru.bykov.explore.model.Statistic;
 import ru.bykov.explore.model.dto.EndPointHit;
-import ru.bykov.explore.model.dto.ViewStats;
 
 import java.time.LocalDateTime;
 
@@ -16,13 +15,4 @@ public class StatisticMapper {
                 .timestamp(timeOfGetEvents)
                 .build();
     }
-
-    public static ViewStats toViewStats(Statistic statistic, Long hits) {
-        return ViewStats.builder()
-                .app(statistic.getApp())
-                .uri(statistic.getUri())
-                .hits(hits)
-                .build();
-    }
-
 }

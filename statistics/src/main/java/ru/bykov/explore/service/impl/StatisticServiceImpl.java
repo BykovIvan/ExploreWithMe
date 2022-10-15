@@ -11,7 +11,6 @@ import ru.bykov.explore.repository.StatisticRepository;
 import ru.bykov.explore.service.StatisticService;
 import ru.bykov.explore.utils.StatisticMapper;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -37,9 +36,8 @@ public class StatisticServiceImpl implements StatisticService {
     public List<ViewStats> getStatsByParam(String start, String end, String[] uris, Boolean unique) {
         LocalDateTime timeOfStart = LocalDateTime.parse(decode(start), formatter);
         LocalDateTime timeOfEnd = LocalDateTime.parse(decode(end), formatter);
-        if (Boolean.TRUE.equals(unique)) {
+        if (Boolean.TRUE.equals(unique))
             return statisticRepository.findByParamByUniqueIp(timeOfStart, timeOfEnd, uris);
-        }
         return statisticRepository.findByParam(timeOfStart, timeOfEnd, uris);
     }
 

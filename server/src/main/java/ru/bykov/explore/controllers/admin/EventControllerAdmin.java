@@ -48,6 +48,4 @@ public class EventControllerAdmin {
         log.info("Получен запрос к эндпоинту /admin/events/{eventId}/reject, метод PATCH, отклонение публикации события по id = {}", eventId);
         return eventService.rejectEventByIdFromAdmin(eventId);
     }
-
-
 }

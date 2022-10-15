@@ -45,10 +45,12 @@ public class RequestServiceImpl implements RequestService {
     public ParticipationRequestDto addRequestToEventByUserIdFromUser(Long userId, Long eventId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
-        if (event.getInitiator().getId() == userId) throw new ValidationException(Event.class, "Initiator", event.getInitiator() + "! Пользователь" +
-                " не может подать запрос на участие в своем событии!");
-        if (!event.getState().equals(EventState.PUBLISHED)) throw new ValidationException(Event.class, "State", event.getState() + "! Пользователь " +
-                "не может участвовать в неопубликованном событии!");
+        if (event.getInitiator().getId() == userId)
+            throw new ValidationException(Event.class, "Initiator", event.getInitiator() + "! Пользователь" +
+                    " не может подать запрос на участие в своем событии!");
+        if (!event.getState().equals(EventState.PUBLISHED))
+            throw new ValidationException(Event.class, "State", event.getState() + "! Пользователь " +
+                    "не может участвовать в неопубликованном событии!");
         if (event.getParticipantLimit() != 0 && requestRepository.countByEventId(eventId) >= event.getParticipantLimit()) {
             throw new ValidationException(Event.class, "Сount", requestRepository.countByEventId(eventId) + "! Достигнут лимит запросов на участие!");
         }

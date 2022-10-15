@@ -43,5 +43,4 @@ public class EventController {
         log.info("endpoint path: {}", request.getRequestURI());
         return eventService.findByIdForAllUsers(eventId, request.getRemoteAddr(), request.getRequestURI());
     }
-
 }

@@ -321,5 +321,4 @@ public class EventServiceImpl implements EventService {
             throw new RuntimeException(e);
         }
     }
-
 }

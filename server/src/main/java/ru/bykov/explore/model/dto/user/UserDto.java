@@ -5,10 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Класс который возвращается полльзователям
- * The class that is returned to users
- */
 @Data
 @Builder
 @NoArgsConstructor

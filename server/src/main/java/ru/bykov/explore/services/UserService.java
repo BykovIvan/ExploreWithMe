@@ -24,6 +24,4 @@ public interface UserService {
      * Deleting a user by an administrator.
      */
     void deleteByIdFromAdmin(Long userId);
-
-
 }

@@ -37,5 +37,4 @@ public interface CategoryService {
      * Removing a category by administrator.
      */
     void deleteFromAdminByCatId(Long catId);
-
 }

@@ -10,35 +10,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CompilationMapper {
-    public static CompilationDto toCompilationDto(Compilation compilation, List<EventShortDto> eventShortDto) {
+    public static CompilationDto toCompilationDto(Compilation compilation, List<EventShortDto> listOdEvent) {
         CompilationDto compilationDto = CompilationDto.builder()
                 .id(compilation.getId())
                 .pinned(compilation.getPinned())
                 .title(compilation.getTitle())
                 .build();
-        if (eventShortDto != null) {
-            compilationDto.setEvents(eventShortDto);
-        } else {
-            compilationDto.setEvents(new ArrayList<>());
-        }
+        compilationDto.setEvents(listOdEvent != null ? listOdEvent : new ArrayList<>());
         return compilationDto;
     }
 
     public static Compilation toCompilation(NewCompilationDto newCompilationDto, List<Event> listOdEvent) {
         Compilation compilation = Compilation.builder()
-                .pinned(newCompilationDto.getPinned())
                 .title(newCompilationDto.getTitle())
                 .build();
-        if (newCompilationDto.getPinned() != null){
-            compilation.setPinned(newCompilationDto.getPinned());
-        } else {
-            compilation.setPinned(false);
-        }
-        if (listOdEvent != null) {
-            compilation.setEvents(listOdEvent);
-        } else {
-            compilation.setEvents(new ArrayList<>());
-        }
+        compilation.setPinned(newCompilationDto.getPinned() != null ? newCompilationDto.getPinned() : false);
+        compilation.setEvents(listOdEvent != null ? listOdEvent : new ArrayList<>());
         return compilation;
     }
 }

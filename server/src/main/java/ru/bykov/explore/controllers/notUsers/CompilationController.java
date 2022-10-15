@@ -7,7 +7,6 @@ import ru.bykov.explore.model.dto.copmilation.CompilationDto;
 import ru.bykov.explore.services.CompilationService;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @Slf4j
@@ -30,5 +29,4 @@ public class CompilationController {
         log.info("Получен запрос к эндпоинту /compilations получение по id = {}. Метод GET", compilationId);
         return compilationService.findByIdForAll(compilationId);
     }
-
 }

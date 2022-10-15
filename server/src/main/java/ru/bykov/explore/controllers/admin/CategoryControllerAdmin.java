@@ -34,6 +34,4 @@ public class CategoryControllerAdmin {
         log.info("Получен запрос к эндпоинту /admin/categories удаление категории по id {} администратором. Метод DELETE", catId);
         categoryService.deleteFromAdminByCatId(catId);
     }
-
-
 }

@@ -4,7 +4,6 @@ import ru.bykov.explore.model.dto.copmilation.CompilationDto;
 import ru.bykov.explore.model.dto.copmilation.NewCompilationDto;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface CompilationService {
 
@@ -45,7 +44,7 @@ public interface CompilationService {
     void addEventToCompFromAdmin(Long compId, Long eventId);
 
     /**
-     * Открепить подборку на главной странице администратором.
+     * Открепить подборку c главной странице администратором.
      * Unpin a compilation on the main page by the administrator.
      */
     void deleteCompFromMainPageFromAdmin(Long compId);
@@ -55,5 +54,4 @@ public interface CompilationService {
      * Pin a compilation on the main page by the administrator.
      */
     void addCompFromMainPageFromAdmin(Long compId);
-
 }

@@ -38,5 +38,4 @@ public class RequestControllerUser {
         log.info("Получен запрос к эндпоинту /users/{userID}/request/{requestId}/cansel отмена запроса от пользователя id = {} на участие с id = {}", userId, requestId);
         return requestService.canselRequestByUserIdAndRequestIdFromUser(userId, requestId);
     }
-
 }

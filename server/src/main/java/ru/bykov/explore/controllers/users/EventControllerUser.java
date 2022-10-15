@@ -85,6 +85,4 @@ public class EventControllerUser {
                 "чужой заявки id = {} на участие в событии id = {} пользователем id = {}. Метод PATCH.", reqId, eventId, userId);
         return eventService.rejectRequestByUserIdAndEventIdFromUser(userId, eventId, reqId);
     }
-
-
 }

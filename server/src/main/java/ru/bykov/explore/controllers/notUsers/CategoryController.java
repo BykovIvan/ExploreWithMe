@@ -29,5 +29,4 @@ public class CategoryController {
         log.info("Получен запрос к эндпоинту /categories получение по id. Метод GET");
         return categoryService.findByIdForAllUsers(catId);
     }
-
 }

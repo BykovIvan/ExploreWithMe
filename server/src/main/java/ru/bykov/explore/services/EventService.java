@@ -89,5 +89,4 @@ public interface EventService {
      * Rejecting an event by an administrator.
      */
     EventFullDto rejectEventByIdFromAdmin(Long eventId);
-
 }
