@@ -83,9 +83,8 @@ public class EventControllerUser {
         return eventService.rejectRequestByUserIdAndEventIdFromUser(userId, eventId, reqId);
     }
 
-    //Получение всех комментариев у вещи пользователем
     @GetMapping("/{userId}/events/{eventId}/comments")
-    public List<EventDtoWithComments> commentsEventById(@PathVariable("userId") Long userId,
+    public EventDtoWithComments commentsEventById(@PathVariable("userId") Long userId,
                                                        @PathVariable("eventId") Long eventId,
                                                         @RequestParam(value = "from", required = false, defaultValue = "0") Integer from,
                                                         @RequestParam(value = "size", required = false, defaultValue = "10") Integer size) {

@@ -14,5 +14,6 @@ public class CommentDto {
     private Long event;
     private Long owner;
     private String createdOn;
+    private String status;
     private String text;
 }

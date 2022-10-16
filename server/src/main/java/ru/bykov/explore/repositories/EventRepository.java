@@ -35,7 +35,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     Page<Event> findAllByInitiatorId(Long userId, Pageable pageable);
 
-    Event findByIdAndInitiatorId(Long eventId, Long userId);
+    Optional<Event> findByIdAndInitiatorId(Long eventId, Long userId);
 
     @Query("select e from Event e " +
             "JOIN User u on e.initiator.id = u.id " +

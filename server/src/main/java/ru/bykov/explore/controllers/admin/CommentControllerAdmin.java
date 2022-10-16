@@ -15,14 +15,12 @@ public class CommentControllerAdmin {
 
     private final CommentService commentService;
 
-    //Получение комментария администратором
     @GetMapping("/{comId}")
     public CommentDto findComment(@PathVariable("comId") Long comId){
         log.info("Получен запрос к эндпоинту /admin/comment/{comId}/publish получение комментария id = {} администратором. Метод GET.", comId);
         return commentService.findCommentByIdFromAdmin(comId);
     }
 
-    //Изменение комментария администратором. Изменить может все.
     @PatchMapping("/{comId}")
     public CommentDto updateComment(@PathVariable("comId") Long comId,
                                      @RequestBody UpdateCommentByAdmin updateCommentByAdmin){
@@ -30,21 +28,18 @@ public class CommentControllerAdmin {
         return commentService.updateCommentByIdFromAdmin(comId, updateCommentByAdmin);
     }
 
-    //Удаление комментария администратором.
     @DeleteMapping ("/{comId}")
-    public CommentDto deleteComment(@PathVariable("comId") Long comId){
+    public void deleteComment(@PathVariable("comId") Long comId){
         log.info("Получен запрос к эндпоинту /admin/comment/{comId}/publish удаление комментария id = {} администратором. Метод DELETE.", comId);
-        return commentService.deleteCommentByIdFromAdmin(comId);
+        commentService.deleteCommentByIdFromAdmin(comId);
     }
 
-    //Публикация комментария администратором.
     @PatchMapping("/{comId}/publish")
     public CommentDto publishComment(@PathVariable("comId") Long comId){
         log.info("Получен запрос к эндпоинту /admin/comment/{comId}/publish получение комментария id = {} администратором. Метод PATCH.", comId);
         return commentService.publishCommentByIdFromAdmin(comId);
     }
 
-    //Отклонение комментария администратором.
     @PatchMapping("/{comId}/reject")
     public CommentDto rejectComment(@PathVariable("comId") Long comId){
         log.info("Получен запрос к эндпоинту /admin/comment/{comId}/publish отклонение комментария id = {} администратором. Метод PATCH.", comId);

@@ -1,6 +1,7 @@
 package ru.bykov.explore.utils.mapperForDto;
 
 import ru.bykov.explore.model.*;
+import ru.bykov.explore.model.dto.comment.CommentShortDto;
 import ru.bykov.explore.model.dto.event.EventDtoWithComments;
 import ru.bykov.explore.model.dto.event.EventFullDto;
 import ru.bykov.explore.model.dto.event.EventShortDto;
@@ -73,7 +74,7 @@ public class EventMapper {
         return eventFullDto;
     }
 
-    public static EventDtoWithComments toEventFullDto(Event event, Long views, User user, List<Comment> comment) {
+    public static EventDtoWithComments toEventDtoWithComments(Event event, Long views, List<CommentShortDto> comment) {
         EventDtoWithComments eventFullDto = EventDtoWithComments.builder()
                 .annotation(event.getAnnotation())
                 .category(event.getCategory())
@@ -90,7 +91,7 @@ public class EventMapper {
                 .state(event.getState().toString())
                 .title(event.getTitle())
                 .commentModeration(event.getCommentModeration())
-                .comments(Comment.builder().owner(User.builder().name(user.getName()).build()).text().build())
+                .comments(comment)
                 .build();
         if (event.getPublishedOn() != null) eventFullDto.setPublishedOn(event.getPublishedOn().format(formatter));
         eventFullDto.setViews(views != null ? views : 0);

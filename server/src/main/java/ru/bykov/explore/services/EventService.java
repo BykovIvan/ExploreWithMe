@@ -89,4 +89,10 @@ public interface EventService {
      * Rejecting an event by an administrator.
      */
     EventFullDto rejectEventByIdFromAdmin(Long eventId);
+
+    /**
+     * Получение всех комментариев у своего события пользователем.
+     * Retrieving all comments on your event by the user.
+     */
+    EventDtoWithComments findEventWithCommentsByEventIdFromUser(Long userId, Long eventId, Integer from, Integer size);
 }
