@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.bykov.explore.model.Category;
 import ru.bykov.explore.model.dto.LocationDto;
-import ru.bykov.explore.model.dto.comment.CommentShortDto;
+import ru.bykov.explore.model.dto.comment.CommentDtoForEvent;
 import ru.bykov.explore.model.dto.user.UserShortDto;
 
 import java.util.List;
@@ -33,5 +33,5 @@ public class EventDtoWithComments {
     private String title;
     private Long views;
     private Boolean commentModeration;
-    private List<CommentShortDto> comments;
+    private List<CommentDtoForEvent> comments;
 }

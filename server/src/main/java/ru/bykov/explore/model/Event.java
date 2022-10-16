@@ -56,6 +56,4 @@ public class Event {
     private EventState state;
     private String title;
     private Boolean CommentModeration;
-//    @OneToMany()                   //Комментарии можно будет смотреть только по отдельной ссылке для каждого события
-//    private List<Comment> comments;
 }

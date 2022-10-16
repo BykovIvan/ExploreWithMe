@@ -1,6 +1,7 @@
 package ru.bykov.explore.model;
 
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 import ru.bykov.explore.utils.CommentState;
 
 import javax.persistence.*;
@@ -27,7 +28,11 @@ public class Comment {
     @JoinColumn(name = "owner")
     private User owner;
     private String text;
+    @NotNull
+    @Enumerated(EnumType.STRING)
     private CommentState status;
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Column(name = "created_on")
     private LocalDateTime createdOn;
 
 }

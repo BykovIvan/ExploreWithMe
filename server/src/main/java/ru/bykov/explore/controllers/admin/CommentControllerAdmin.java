@@ -34,16 +34,16 @@ public class CommentControllerAdmin {
         commentService.deleteCommentByIdFromAdmin(comId);
     }
 
-    @PatchMapping("/{comId}/publish")
+    @PatchMapping("/{comId}/cancel")
     public CommentDto publishComment(@PathVariable("comId") Long comId){
-        log.info("Получен запрос к эндпоинту /admin/comment/{comId}/publish получение комментария id = {} администратором. Метод PATCH.", comId);
-        return commentService.publishCommentByIdFromAdmin(comId);
+        log.info("Получен запрос к эндпоинту /admin/comment/{comId}/cancel получение комментария id = {} администратором. Метод PATCH.", comId);
+        return commentService.cancelCommentByIdFromAdmin(comId);
     }
 
-    @PatchMapping("/{comId}/reject")
+    @PatchMapping("/{comId}/publish")
     public CommentDto rejectComment(@PathVariable("comId") Long comId){
         log.info("Получен запрос к эндпоинту /admin/comment/{comId}/publish отклонение комментария id = {} администратором. Метод PATCH.", comId);
-        return commentService.rejectCommentByIdFromAdmin(comId);
+        return commentService.publishCommentByIdFromAdmin(comId);
     }
 
 

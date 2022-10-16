@@ -85,9 +85,9 @@ public class EventControllerUser {
 
     @GetMapping("/{userId}/events/{eventId}/comments")
     public EventDtoWithComments commentsEventById(@PathVariable("userId") Long userId,
-                                                       @PathVariable("eventId") Long eventId,
-                                                        @RequestParam(value = "from", required = false, defaultValue = "0") Integer from,
-                                                        @RequestParam(value = "size", required = false, defaultValue = "10") Integer size) {
+                                                  @PathVariable("eventId") Long eventId,
+                                                  @RequestParam(value = "from", required = false, defaultValue = "0") Integer from,
+                                                  @RequestParam(value = "size", required = false, defaultValue = "10") Integer size) {
         log.info("Получен запрос к эндпоинту /users/{userID}/events{eventId}/comments " +
                 "получение события с комментариями. Метод GET. Где userId = {}, eventId={}", userId, eventId);
         return eventService.findEventWithCommentsByEventIdFromUser(userId, eventId, from, size);

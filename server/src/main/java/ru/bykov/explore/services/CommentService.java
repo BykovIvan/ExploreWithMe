@@ -1,9 +1,6 @@
 package ru.bykov.explore.services;
 
-import ru.bykov.explore.model.dto.comment.CommentDto;
-import ru.bykov.explore.model.dto.comment.NewCommentDto;
-import ru.bykov.explore.model.dto.comment.UpdateCommentByAdmin;
-import ru.bykov.explore.model.dto.comment.UpdateCommentDto;
+import ru.bykov.explore.model.dto.comment.*;
 
 import java.util.List;
 
@@ -19,7 +16,7 @@ public interface CommentService {
      * Обновление комментария пользователем, может менять текст и менять статут на неопубликованный.
      * Updating a comment by a user, can change the text and change the status to unpublished.
      */
-    CommentDto updateCommentToEventFromUser(Long ownerId, Long eventId , Long comId, UpdateCommentDto updateCommentDto);
+    CommentDto updateCommentToEventFromUser(Long ownerId, Long eventId, Long comId, UpdateCommentDto updateCommentDto);
 
     /**
      * Получение у события своего комментария пользователем.
@@ -37,7 +34,7 @@ public interface CommentService {
      * Поиск у события комментария по слову/тексту.
      * Search for a comment event by word/text.
      */
-    List<CommentDto> searchCommentsByParamFromUser(Long ownerId, Long eventId, String text, Integer from, Integer size);
+    List<CommentShortDto> searchCommentsByParamFromUser(Long ownerId, Long eventId, String text, Integer from, Integer size);
 
     /**
      * Получение комментария администратором.
@@ -67,5 +64,5 @@ public interface CommentService {
      * Отклонение комментария администратором.
      * Rejecting a comment by an admin.
      */
-    CommentDto rejectCommentByIdFromAdmin(Long comId);
+    CommentDto cancelCommentByIdFromAdmin(Long comId);
 }

@@ -18,10 +18,7 @@ import ru.bykov.explore.utils.CommentState;
 import ru.bykov.explore.utils.EventState;
 import ru.bykov.explore.utils.FromSizeSortPageable;
 import ru.bykov.explore.utils.RequestState;
-import ru.bykov.explore.utils.mapperForDto.CommentMapper;
-import ru.bykov.explore.utils.mapperForDto.EventMapper;
-import ru.bykov.explore.utils.mapperForDto.LocationMapper;
-import ru.bykov.explore.utils.mapperForDto.RequestMapper;
+import ru.bykov.explore.utils.mapperForDto.*;
 
 import javax.validation.Valid;
 import java.io.UnsupportedEncodingException;
@@ -323,14 +320,16 @@ public class EventServiceImpl implements EventService {
     @Transactional
     public EventDtoWithComments findEventWithCommentsByEventIdFromUser(Long userId, Long eventId, Integer from, Integer size) {
         userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
-        Event event = eventRepository.findByIdAndInitiatorId(eventId, userId)
+        Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
-        if (!event.getState().equals(EventState.PUBLISHED) || !event.getState().equals(EventState.CANCELED))
+        if (event.getState().equals(EventState.PENDING) || event.getState().equals(EventState.CANCELED))
             throw new ValidationException(Event.class, "state", event.getState() + "! Событие не опубликовано или отменено!");
+
         List<Comment> listOfComment = commentRepository.findByEventIdAndStatus(eventId, CommentState.PUBLISHED,
-                FromSizeSortPageable.of(from, size, Sort.by(Sort.Direction.DESC, "createdOn")));
+                FromSizeSortPageable.of(from, size, Sort.by(Sort.Direction.DESC, "id")));
+
         return EventMapper.toEventDtoWithComments(event, statClient.getViews(event), listOfComment.stream()
-                .map(CommentMapper::toCommentShortDto)
+                .map((Comment comment) -> CommentMapper.toCommentDtoForEvent(comment, UserMapper.toUserShortDto(comment.getOwner())))
                 .collect(Collectors.toList()));
     }
 

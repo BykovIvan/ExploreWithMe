@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.bykov.explore.model.dto.comment.CommentDto;
+import ru.bykov.explore.model.dto.comment.CommentShortDto;
 import ru.bykov.explore.model.dto.comment.NewCommentDto;
 import ru.bykov.explore.model.dto.comment.UpdateCommentDto;
 import ru.bykov.explore.services.CommentService;
@@ -58,11 +59,11 @@ public class CommentsControllerUser {
 
     //
     @GetMapping("{ownerId}/events/{eventId}/comments/search")
-    public List<CommentDto> searchCommentFromUser(@PathVariable("ownerId") Long ownerId,
-                                                  @PathVariable("eventId") Long eventId,
-                                                  @RequestParam(value = "text") String text,
-                                                  @RequestParam(value = "from", required = false, defaultValue = "0") Integer from,
-                                                  @RequestParam(value = "size", required = false, defaultValue = "10") Integer size) {
+    public List<CommentShortDto> searchCommentFromUser(@PathVariable("ownerId") Long ownerId,
+                                                       @PathVariable("eventId") Long eventId,
+                                                       @RequestParam(value = "text") String text,
+                                                       @RequestParam(value = "from", required = false, defaultValue = "0") Integer from,
+                                                       @RequestParam(value = "size", required = false, defaultValue = "10") Integer size) {
         log.info("Получен запрос к эндпоинту /users/{userID}/{eventId}/comment поиск " +
                 "комментария пользователем id = {} к событию id = {} текст = {}. Метод GET.", ownerId, eventId, text);
         return commentService.searchCommentsByParamFromUser(ownerId, eventId, text, from, size);

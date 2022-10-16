@@ -1,7 +1,10 @@
 package ru.bykov.explore.utils.mapperForDto;
 
-import ru.bykov.explore.model.*;
-import ru.bykov.explore.model.dto.comment.CommentShortDto;
+import ru.bykov.explore.model.Category;
+import ru.bykov.explore.model.Event;
+import ru.bykov.explore.model.Location;
+import ru.bykov.explore.model.User;
+import ru.bykov.explore.model.dto.comment.CommentDtoForEvent;
 import ru.bykov.explore.model.dto.event.EventDtoWithComments;
 import ru.bykov.explore.model.dto.event.EventFullDto;
 import ru.bykov.explore.model.dto.event.EventShortDto;
@@ -10,6 +13,7 @@ import ru.bykov.explore.utils.EventState;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 public class EventMapper {
@@ -74,8 +78,8 @@ public class EventMapper {
         return eventFullDto;
     }
 
-    public static EventDtoWithComments toEventDtoWithComments(Event event, Long views, List<CommentShortDto> comment) {
-        EventDtoWithComments eventFullDto = EventDtoWithComments.builder()
+    public static EventDtoWithComments toEventDtoWithComments(Event event, Long views, List<CommentDtoForEvent> comment) {
+        EventDtoWithComments eventWithCommentsDto = EventDtoWithComments.builder()
                 .annotation(event.getAnnotation())
                 .category(event.getCategory())
                 .confirmedRequests(event.getConfirmedRequests())
@@ -91,10 +95,10 @@ public class EventMapper {
                 .state(event.getState().toString())
                 .title(event.getTitle())
                 .commentModeration(event.getCommentModeration())
-                .comments(comment)
                 .build();
-        if (event.getPublishedOn() != null) eventFullDto.setPublishedOn(event.getPublishedOn().format(formatter));
-        eventFullDto.setViews(views != null ? views : 0);
-        return eventFullDto;
+        eventWithCommentsDto.setComments(comment != null ? comment : new ArrayList<>());
+        if (event.getPublishedOn() != null) eventWithCommentsDto.setPublishedOn(event.getPublishedOn().format(formatter));
+        eventWithCommentsDto.setViews(views != null ? views : 0);
+        return eventWithCommentsDto;
     }
 }

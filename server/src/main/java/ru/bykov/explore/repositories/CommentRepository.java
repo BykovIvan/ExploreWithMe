@@ -23,12 +23,16 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             "JOIN User u on c.event.id = u.id " +
             "JOIN Event e on c.event.id = e.id " +
             "WHERE (UPPER(c.text) like UPPER(concat('%', :text, '%'))) " +
-            "AND c.owner.id = (:ownerId) " +
             "AND c.event.id = (:eventId)")
-    Page<Comment> findByParamFromUser(@Param("ownerId") Long ownerId,
-                                      @Param("eventId") Long eventId,
+    Page<Comment> findByParamFromUser(@Param("eventId") Long eventId,
                                       @Param("text") String text,
                                       Pageable pageable);
 
-    List<Comment> findByEventIdAndStatus(Long eventId, CommentState status, Pageable pageable);
+    @Query("select c from Comment c " +
+            "JOIN Event e on c.event.id = e.id " +
+            "WHERE c.status IN (:status) " +
+            "AND c.event.id = (:eventId)")
+    List<Comment> findByEventIdAndStatus(@Param("eventId") Long eventId,
+                                         @Param("status") CommentState status,
+                                         Pageable pageable);
 }
