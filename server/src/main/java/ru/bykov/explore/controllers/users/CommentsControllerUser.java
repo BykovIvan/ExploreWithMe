@@ -57,7 +57,6 @@ public class CommentsControllerUser {
         commentService.deleteCommentByIdFromUser(ownerId, eventId, comId);
     }
 
-    //
     @GetMapping("{ownerId}/events/{eventId}/comments/search")
     public List<CommentShortDto> searchCommentFromUser(@PathVariable("ownerId") Long ownerId,
                                                        @PathVariable("eventId") Long eventId,

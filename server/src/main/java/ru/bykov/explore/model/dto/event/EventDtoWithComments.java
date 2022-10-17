@@ -1,9 +1,6 @@
 package ru.bykov.explore.model.dto.event;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import ru.bykov.explore.model.Category;
 import ru.bykov.explore.model.dto.LocationDto;
 import ru.bykov.explore.model.dto.comment.CommentDtoForEvent;
@@ -11,7 +8,9 @@ import ru.bykov.explore.model.dto.user.UserShortDto;
 
 import java.util.List;
 
-@Data
+@Getter
+@Setter
+@ToString
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
