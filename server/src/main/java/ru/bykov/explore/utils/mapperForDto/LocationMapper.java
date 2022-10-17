@@ -5,7 +5,7 @@ import ru.bykov.explore.model.dto.LocationDto;
 
 public class LocationMapper {
 
-    private LocationMapper(){
+    private LocationMapper() {
     }
 
     public static Location toLocation(LocationDto locationDto) {

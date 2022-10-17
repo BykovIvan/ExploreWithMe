@@ -19,7 +19,7 @@ public class CommentMapper {
     private CommentMapper() {
     }
 
-    private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public static Comment toComment(NewCommentDto newCommentDto, User owner, Event event, LocalDateTime createdOn) {
         return Comment.builder()
