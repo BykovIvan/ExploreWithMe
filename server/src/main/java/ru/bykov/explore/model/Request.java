@@ -2,7 +2,6 @@ package ru.bykov.explore.model;
 
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
-import ru.bykov.explore.utils.EventState;
 import ru.bykov.explore.utils.RequestState;
 
 import javax.persistence.*;

@@ -5,6 +5,10 @@ import ru.bykov.explore.model.dto.category.CategoryDto;
 import ru.bykov.explore.model.dto.category.NewCategoryDto;
 
 public class CategoryMapper {
+
+    private CategoryMapper() {
+    }
+
     public static CategoryDto toCategoryDto(Category category) {
         return CategoryDto.builder()
                 .id(category.getId())

@@ -10,6 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CompilationMapper {
+
+    private CompilationMapper() {
+    }
+
     public static CompilationDto toCompilationDto(Compilation compilation, List<EventShortDto> listOdEvent) {
         CompilationDto compilationDto = CompilationDto.builder()
                 .id(compilation.getId())

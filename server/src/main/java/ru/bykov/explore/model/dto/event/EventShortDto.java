@@ -7,8 +7,6 @@ import lombok.NoArgsConstructor;
 import ru.bykov.explore.model.dto.category.CategoryDto;
 import ru.bykov.explore.model.dto.user.UserShortDto;
 
-import java.time.LocalDateTime;
-
 @Data
 @Builder
 @NoArgsConstructor

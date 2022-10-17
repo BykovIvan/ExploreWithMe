@@ -20,5 +20,5 @@ public class AdminUpdateEventRequest {
     private Long participantLimit;
     private Boolean requestModeration;
     private String title;
-    private Boolean CommentModeration;
+    private Boolean commentModeration;
 }

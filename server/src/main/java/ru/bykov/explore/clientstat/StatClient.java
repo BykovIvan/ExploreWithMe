@@ -55,7 +55,7 @@ public class StatClient extends BaseClient {
                 new String[]{"/events/" + event.getId()},
                 false);
         ViewStats[] viewStats = str.getBody();
-        if (viewStats != null && viewStats.length > 0){
+        if (viewStats != null && viewStats.length > 0) {
             return viewStats[0].getHits();
         }
         return 0L;

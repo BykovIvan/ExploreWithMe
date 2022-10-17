@@ -11,7 +11,6 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 
 import javax.validation.ConstraintViolation;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,6 +55,7 @@ public class ApiError {
     private ApiError() {
         timestamp = LocalDateTime.now();
     }
+
     private void addSubError(ApiSubError subError) {
         if (errors == null) {
             errors = new ArrayList<>();

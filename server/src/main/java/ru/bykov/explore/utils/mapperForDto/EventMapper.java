@@ -17,7 +17,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EventMapper {
-    private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    private EventMapper() {
+    }
+
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public static EventShortDto toEventShortDto(Event event, Long views) {
         EventShortDto eventShortDto = EventShortDto.builder()
@@ -97,7 +101,8 @@ public class EventMapper {
                 .commentModeration(event.getCommentModeration())
                 .build();
         eventWithCommentsDto.setComments(comment != null ? comment : new ArrayList<>());
-        if (event.getPublishedOn() != null) eventWithCommentsDto.setPublishedOn(event.getPublishedOn().format(formatter));
+        if (event.getPublishedOn() != null)
+            eventWithCommentsDto.setPublishedOn(event.getPublishedOn().format(formatter));
         eventWithCommentsDto.setViews(views != null ? views : 0);
         return eventWithCommentsDto;
     }

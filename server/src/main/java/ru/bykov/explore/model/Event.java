@@ -7,7 +7,6 @@ import ru.bykov.explore.utils.EventState;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Builder
 @AllArgsConstructor
@@ -55,5 +54,5 @@ public class Event {
     @Enumerated(EnumType.STRING)
     private EventState state;
     private String title;
-    private Boolean CommentModeration;
+    private Boolean commentModeration;
 }
