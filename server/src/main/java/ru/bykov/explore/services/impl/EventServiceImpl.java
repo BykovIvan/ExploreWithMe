@@ -138,7 +138,7 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional
     public EventFullDto updateFromUser(Long userId, UpdateEventRequest updateEventRequest) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
+        userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
         if (updateEventRequest.getEventId() == null)
             throw new ValidationException(Event.class, "id", "null! В запросе обязательно должен присутствовать id события!");
         Event event = eventRepository.findByIdAndInitiatorId(updateEventRequest.getEventId(), userId)
