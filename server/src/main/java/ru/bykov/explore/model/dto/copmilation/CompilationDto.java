@@ -1,14 +1,13 @@
 package ru.bykov.explore.model.dto.copmilation;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import ru.bykov.explore.model.dto.event.EventShortDto;
 
 import java.util.List;
 
-@Data
+@Getter
+@Setter
+@ToString
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

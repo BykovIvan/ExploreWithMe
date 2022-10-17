@@ -12,7 +12,7 @@ import javax.validation.Valid;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping(path = "admin/categories")
+@RequestMapping(path = "/admin/categories")
 public class CategoryControllerAdmin {
 
     private final CategoryService categoryService;

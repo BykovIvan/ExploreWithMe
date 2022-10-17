@@ -54,15 +54,5 @@ public class Event {
     @Enumerated(EnumType.STRING)
     private EventState state;
     private String title;
-
-
-//    @Column(columnDefinition = "varchar(255) default 'John Snow'")
-//    private String name;
-//
-//    @Column(columnDefinition = "integer default 25")
-//    private Integer age;
-//
-//    @Column(columnDefinition = "boolean default false")
-//    private Boolean locked;
-
+    private Boolean commentModeration;
 }

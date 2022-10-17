@@ -3,7 +3,10 @@ package ru.bykov.explore.model.dto.event;
 import lombok.*;
 import ru.bykov.explore.model.Category;
 import ru.bykov.explore.model.dto.LocationDto;
+import ru.bykov.explore.model.dto.comment.CommentDtoForEvent;
 import ru.bykov.explore.model.dto.user.UserShortDto;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -11,7 +14,7 @@ import ru.bykov.explore.model.dto.user.UserShortDto;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class EventFullDto {
+public class EventDtoWithComments {
     private String annotation;
     private Category category;
     private Long confirmedRequests;
@@ -29,4 +32,5 @@ public class EventFullDto {
     private String title;
     private Long views;
     private Boolean commentModeration;
+    private List<CommentDtoForEvent> comments;
 }

@@ -1,16 +1,15 @@
 package ru.bykov.explore.model.dto.event;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import ru.bykov.explore.model.dto.LocationDto;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-@Data
+@Getter
+@Setter
+@ToString
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -37,4 +36,5 @@ public class NewEventDto {
     @NotBlank
     @Size(min = 3, max = 120)
     private String title;
+    private Boolean commentModeration;
 }

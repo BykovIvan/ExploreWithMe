@@ -24,7 +24,7 @@ public interface CategoryService {
      * Изменение категории администратором.
      * Changing category by administrator.
      */
-    CategoryDto updateFromAdmin(CategoryDto CategoryDto);
+    CategoryDto updateFromAdmin(CategoryDto categoryDto);
 
     /**
      * Добавление новой категории администратором.

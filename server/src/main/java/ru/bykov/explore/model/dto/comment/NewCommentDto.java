@@ -1,11 +1,10 @@
-package ru.bykov.explore.model.dto.copmilation;
+package ru.bykov.explore.model.dto.comment;
 
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.List;
 
 @Getter
 @Setter
@@ -13,11 +12,9 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class NewCompilationDto {
-    private List<Long> events;
-    private Boolean pinned;
+public class NewCommentDto {
     @NotNull
     @NotBlank
-    @Size(min = 1, max = 80)
-    private String title;
+    @Size(min = 1, max = 7000)
+    private String text;
 }

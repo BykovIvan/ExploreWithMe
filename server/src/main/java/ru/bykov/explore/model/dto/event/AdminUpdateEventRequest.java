@@ -1,12 +1,11 @@
 package ru.bykov.explore.model.dto.event;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import ru.bykov.explore.model.dto.LocationDto;
 
-@Data
+@Getter
+@Setter
+@ToString
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,4 +19,5 @@ public class AdminUpdateEventRequest {
     private Long participantLimit;
     private Boolean requestModeration;
     private String title;
+    private Boolean commentModeration;
 }

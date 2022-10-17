@@ -4,6 +4,10 @@ import ru.bykov.explore.model.Location;
 import ru.bykov.explore.model.dto.LocationDto;
 
 public class LocationMapper {
+
+    private LocationMapper() {
+    }
+
     public static Location toLocation(LocationDto locationDto) {
         return Location.builder()
                 .lat(locationDto.getLat())

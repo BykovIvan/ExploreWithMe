@@ -1,11 +1,8 @@
 package ru.bykov.explore.model;
 
 import lombok.*;
-import org.springframework.boot.context.properties.bind.DefaultValue;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Builder

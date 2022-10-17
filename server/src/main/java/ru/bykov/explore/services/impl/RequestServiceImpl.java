@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class RequestServiceImpl implements RequestService {
-
     private final RequestRepository requestRepository;
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
@@ -45,7 +44,7 @@ public class RequestServiceImpl implements RequestService {
     public ParticipationRequestDto addRequestToEventByUserIdFromUser(Long userId, Long eventId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
-        if (event.getInitiator().getId() == userId)
+        if (event.getInitiator().getId().equals(userId))
             throw new ValidationException(Event.class, "Initiator", event.getInitiator() + "! Пользователь" +
                     " не может подать запрос на участие в своем событии!");
         if (!event.getState().equals(EventState.PUBLISHED))

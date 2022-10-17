@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class CompilationServiceImpl implements CompilationService {
-
     private final CompilationRepository compilationRepository;
     private final EventRepository eventRepository;
     private final StatClient statClient;

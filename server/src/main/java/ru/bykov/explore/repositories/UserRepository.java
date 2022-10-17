@@ -7,14 +7,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.bykov.explore.model.User;
-import ru.bykov.explore.model.dto.user.UserDto;
-
-import java.util.List;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("select u from User u " +
             "where u.id IN (:ids)")
-    Page<User> findByIdIn(@Param("ids")Long[] ids, Pageable pageable);
+    Page<User> findByIdIn(@Param("ids") Long[] ids, Pageable pageable);
 }
