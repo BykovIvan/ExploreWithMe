@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.Nullable;
 import org.springframework.web.client.RestTemplate;
 import ru.bykov.explore.clientstat.ViewStats;
 
@@ -35,7 +34,7 @@ public class BaseClient {
         return responseBuilder.build();
     }
 
-    protected ResponseEntity<ViewStats[]> get(String path, @Nullable Map<String, Object> parameters) {
+    protected ResponseEntity<ViewStats[]> get(String path, Map<String, Object> parameters) {
         return makeAndSendRequestViews(path, parameters);
     }
 
