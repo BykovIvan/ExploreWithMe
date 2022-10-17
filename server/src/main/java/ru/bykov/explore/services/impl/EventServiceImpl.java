@@ -143,7 +143,7 @@ public class EventServiceImpl implements EventService {
             throw new ValidationException(Event.class, "id=", "null! В запросе обязательно должен присутствовать id события!");
         Event event = eventRepository.findById(updateEventRequest.getEventId())
                 .orElseThrow(() -> new EntityNotFoundException(Event.class, "id", updateEventRequest.getEventId().toString()));
-        if (event.getInitiator().getId() != user.getId())
+        if (event.getInitiator().getId().equals(user.getId()))
             throw new ValidationException(Event.class, "Initiator=", event.getInitiator() + "! Пользователь не является инициатором данного события!");
         if (event.getState().equals(EventState.PUBLISHED))
             throw new ValidationException(Event.class, "State=", event.getState() + "! Событие уже опубликовано и его нельзя изменить!");
@@ -192,7 +192,7 @@ public class EventServiceImpl implements EventService {
     public EventFullDto canselByUserIdAndEventIdFromUser(Long userId, Long eventId) {
         userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
-        if (event.getInitiator().getId() != userId)
+        if (event.getInitiator().getId().equals(userId))
             throw new ValidationException(Event.class, "Initiator=", event.getInitiator().getId() + "! Событие опубликовал не данный пользователь!");
         if (event.getState().equals(EventState.PUBLISHED) || event.getState().equals(EventState.CANCELED))
             throw new ValidationException(Event.class, "State=", event.getState() + "! Событие уже опубликовано или уже отменено!");
@@ -295,7 +295,7 @@ public class EventServiceImpl implements EventService {
     public EventFullDto publishEventByIdFromAdmin(Long eventId) {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
         if (event.getState().equals(EventState.CANCELED) || event.getState().equals(EventState.PUBLISHED))
-            throw new ValidationException(Event.class, "state", event.getState() + "! Событие уже отменено или опубликовано!");
+            throw new ValidationException(Event.class, "State", event.getState() + "! Событие уже отменено или опубликовано!");
         LocalDateTime dateAndTimeNowPublish = LocalDateTime.now();
         Duration duration = Duration.between(dateAndTimeNowPublish, event.getEventDate());
         if (duration.toMinutes() < 60) throw new ValidationException(Event.class, "EventDate", event.getEventDate() +
@@ -310,12 +310,11 @@ public class EventServiceImpl implements EventService {
     public EventFullDto rejectEventByIdFromAdmin(Long eventId) {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
         if (event.getState().equals(EventState.PUBLISHED))
-            throw new ValidationException(Event.class, "state", event.getState() + "! Событие уже опубликовано!");
+            throw new ValidationException(Event.class, "State", event.getState() + "! Событие уже опубликовано!");
         event.setState(EventState.CANCELED);
         return EventMapper.toEventFullDto(eventRepository.save(event), statClient.getViews(event));
     }
 
-    //TODO
     @Override
     @Transactional
     public EventDtoWithComments findEventWithCommentsByEventIdFromUser(Long userId, Long eventId, Integer from, Integer size) {
