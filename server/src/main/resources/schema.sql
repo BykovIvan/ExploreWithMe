@@ -69,9 +69,9 @@ CREATE TABLE IF NOT EXISTS compilations_events (
     compilation_id BIGINT,
     events_id BIGINT,
 
-    CONSTRAINT pk_comp_eve PRIMARY KEY (compilation_id, events_id),
-    CONSTRAINT fk_copm FOREIGN KEY(compilation_id) REFERENCES compilations(id),
-    CONSTRAINT fk_event FOREIGN KEY(events_id) REFERENCES events(id)
+    CONSTRAINT pk_to_comp_eve PRIMARY KEY (compilation_id, events_id),
+    CONSTRAINT fk_to_copm FOREIGN KEY(compilation_id) REFERENCES compilations(id),
+    CONSTRAINT fk_to_event FOREIGN KEY(events_id) REFERENCES events(id)
 
 );
 

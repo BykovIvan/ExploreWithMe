@@ -140,13 +140,11 @@ public class EventServiceImpl implements EventService {
     public EventFullDto updateFromUser(Long userId, UpdateEventRequest updateEventRequest) {
         User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
         if (updateEventRequest.getEventId() == null)
-            throw new ValidationException(Event.class, "id=", "null! В запросе обязательно должен присутствовать id события!");
-        Event event = eventRepository.findById(updateEventRequest.getEventId())
+            throw new ValidationException(Event.class, "id", "null! В запросе обязательно должен присутствовать id события!");
+        Event event = eventRepository.findByIdAndInitiatorId(updateEventRequest.getEventId(), userId)
                 .orElseThrow(() -> new EntityNotFoundException(Event.class, "id", updateEventRequest.getEventId().toString()));
-        if (event.getInitiator().getId().equals(user.getId()))
-            throw new ValidationException(Event.class, "Initiator=", event.getInitiator() + "! Пользователь не является инициатором данного события!");
         if (event.getState().equals(EventState.PUBLISHED))
-            throw new ValidationException(Event.class, "State=", event.getState() + "! Событие уже опубликовано и его нельзя изменить!");
+            throw new ValidationException(Event.class, "State", event.getState() + "! Событие уже опубликовано и его нельзя изменить!");
         if (updateEventRequest.getAnnotation() != null) event.setAnnotation(updateEventRequest.getAnnotation());
         if (updateEventRequest.getCategory() != null)
             event.setCategory(categoryRepository.findById(updateEventRequest.getCategory())
@@ -156,7 +154,7 @@ public class EventServiceImpl implements EventService {
             LocalDateTime dateAndTimeOfEvent = LocalDateTime.parse(updateEventRequest.getEventDate(), formatter);
             Duration duration = Duration.between(LocalDateTime.now(), dateAndTimeOfEvent);
             if (duration.toMinutes() < 120) {
-                throw new ValidationException(Event.class, "EventDate=", event.getEventDate() + "! Время до события менее 2 часов и поэтому его нельзя изменить!");
+                throw new ValidationException(Event.class, "EventDate", event.getEventDate() + "! Время до события менее 2 часов и поэтому его нельзя изменить!");
             }
             event.setEventDate(dateAndTimeOfEvent);
         }
@@ -191,11 +189,9 @@ public class EventServiceImpl implements EventService {
     @Transactional
     public EventFullDto canselByUserIdAndEventIdFromUser(Long userId, Long eventId) {
         userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, "id", userId.toString()));
-        Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
-        if (event.getInitiator().getId().equals(userId))
-            throw new ValidationException(Event.class, "Initiator=", event.getInitiator().getId() + "! Событие опубликовал не данный пользователь!");
+        Event event = eventRepository.findByIdAndInitiatorId(eventId, userId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
         if (event.getState().equals(EventState.PUBLISHED) || event.getState().equals(EventState.CANCELED))
-            throw new ValidationException(Event.class, "State=", event.getState() + "! Событие уже опубликовано или уже отменено!");
+            throw new ValidationException(Event.class, "State", event.getState() + "! Событие уже опубликовано или уже отменено!");
         event.setState(EventState.CANCELED);
         return EventMapper.toEventFullDto(eventRepository.save(event), statClient.getViews(event));
     }
@@ -238,8 +234,8 @@ public class EventServiceImpl implements EventService {
         Event event = eventRepository.findByIdAndInitiatorId(eventId, userId).orElseThrow(() -> new EntityNotFoundException(Event.class, "id", eventId.toString()));
         Request request = requestRepository.findByIdAndEventId(reqId, eventId).orElseThrow(() -> new EntityNotFoundException(Request.class, "id", reqId.toString()));
         if (event.getParticipantLimit() == 0 || !event.getRequestModeration()) {
-            throw new ValidationException(Event.class, "ParticipantLimit = " + event.getParticipantLimit() + "RequestModeration = " +
-                    event.getParticipantLimit(), "Подтверждение заявки не требуется!");
+            throw new ValidationException(Event.class, "ParticipantLimit", event.getParticipantLimit() + "! RequestModeration = " +
+                    event.getParticipantLimit() + "! Подтверждение заявки не требуется!");
         }
         if (request.getStatus().equals(RequestState.CONFIRMED) && eventRepository.findById(request.getEvent().getId()).get().getConfirmedRequests() != 0)
             eventRepository.setNewConfirmedRequestsMinusOne(eventId);
