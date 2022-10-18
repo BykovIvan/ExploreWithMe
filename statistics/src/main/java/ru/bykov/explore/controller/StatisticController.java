@@ -7,6 +7,7 @@ import ru.bykov.explore.model.dto.EndPointHit;
 import ru.bykov.explore.model.dto.ViewStats;
 import ru.bykov.explore.service.StatisticService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -17,7 +18,7 @@ public class StatisticController {
     private final StatisticService statisticService;
 
     @PostMapping("/hit")
-    public void createStat(@RequestBody EndPointHit endPointHit) {
+    public void createStat(@Valid @RequestBody EndPointHit endPointHit) {
         log.info("Получен запрос к эндпоинту /hit, сохранение статистики");
         statisticService.createStat(endPointHit);
     }

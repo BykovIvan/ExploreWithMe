@@ -5,6 +5,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 import ru.bykov.explore.utils.RequestState;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 @Builder
@@ -18,14 +21,20 @@ public class Request {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @NotNull
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime created;
+    @NotNull
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "event", referencedColumnName = "id")
     private Event event;
+    @NotNull
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "requester", referencedColumnName = "id")
     private User requester;
+    @NotNull
+    @NotBlank
+    @Size(min = 1, max = 64)
     @Enumerated(EnumType.STRING)
     private RequestState status;
 }
