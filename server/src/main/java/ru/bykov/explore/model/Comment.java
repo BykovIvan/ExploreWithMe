@@ -5,7 +5,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 import ru.bykov.explore.utils.CommentState;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 @Builder
@@ -24,11 +26,14 @@ public class Comment {
     @JoinColumn(name = "event")
     private Event event;
     @NotNull
+    @Size(min = 1, max = 7000)
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "owner")
     private User owner;
-    private String text;
     @NotNull
+    @NotBlank
+    @Size(min = 1, max = 7000)
+    private String text;
     @Enumerated(EnumType.STRING)
     private CommentState status;
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")

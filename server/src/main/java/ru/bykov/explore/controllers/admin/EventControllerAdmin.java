@@ -7,6 +7,7 @@ import ru.bykov.explore.model.dto.event.AdminUpdateEventRequest;
 import ru.bykov.explore.model.dto.event.EventFullDto;
 import ru.bykov.explore.services.EventService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -32,7 +33,7 @@ public class EventControllerAdmin {
 
     @PutMapping("/{eventId}")
     public EventFullDto updateById(@PathVariable("eventId") Long eventId,
-                                   @RequestBody AdminUpdateEventRequest adminUpdateEventRequest) {
+                                   @Valid @RequestBody AdminUpdateEventRequest adminUpdateEventRequest) {
         log.info("Получен запрос к эндпоинту /admin/events/{eventId}, метод PUT, обновление события по id = {}", eventId);
         return eventService.updateByIdFromAdmin(eventId, adminUpdateEventRequest);
     }

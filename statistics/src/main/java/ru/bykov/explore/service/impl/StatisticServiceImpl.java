@@ -21,7 +21,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 public class StatisticServiceImpl implements StatisticService {
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private final StatisticRepository statisticRepository;
 
     @Override
@@ -36,7 +36,7 @@ public class StatisticServiceImpl implements StatisticService {
     public List<ViewStats> getStatsByParam(String start, String end, String[] uris, Boolean unique) {
         LocalDateTime timeOfStart = LocalDateTime.parse(decode(start), formatter);
         LocalDateTime timeOfEnd = LocalDateTime.parse(decode(end), formatter);
-        if (Boolean.TRUE.equals(unique))
+        if (unique)
             return statisticRepository.findByParamByUniqueIp(timeOfStart, timeOfEnd, uris);
         return statisticRepository.findByParam(timeOfStart, timeOfEnd, uris);
     }

@@ -25,7 +25,7 @@ public class CategoryController {
     }
 
     @GetMapping("/{catId}")
-    public Optional<CategoryDto> categoryById(@PathVariable("catId") Long catId) {
+    public CategoryDto categoryById(@PathVariable("catId") Long catId) {
         log.info("Получен запрос к эндпоинту /categories получение по id. Метод GET");
         return categoryService.findByIdForAllUsers(catId);
     }

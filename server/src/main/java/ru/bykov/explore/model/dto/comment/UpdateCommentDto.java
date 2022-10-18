@@ -1,15 +1,16 @@
 package ru.bykov.explore.model.dto.comment;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import ru.bykov.explore.utils.CommentState;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-@Getter
-@Setter
-@ToString
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,5 +19,8 @@ public class UpdateCommentDto {
     @NotBlank
     @Size(min = 1, max = 7000)
     private String text;
+    @NotNull
+    @NotBlank
+    @Size(min = 1, max = 64)
     private CommentState status;
 }

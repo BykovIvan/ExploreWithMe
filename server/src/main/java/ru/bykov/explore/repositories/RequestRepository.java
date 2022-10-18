@@ -19,7 +19,7 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
 
     @Modifying
     @Query("update Request r set r.status = :newStatus " +
-            "where r.status IN (:oldStatus) " +
+            "where r.status = (:oldStatus) " +
             "AND r.event IN (SELECT e FROM Event e " +
             "WHERE e.id  = :eventId)")
     void setStatusCanselWhereByStatusAndEventId(@Param("newStatus") RequestState newStatus,

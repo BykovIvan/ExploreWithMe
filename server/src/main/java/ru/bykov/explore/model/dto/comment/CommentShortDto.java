@@ -1,12 +1,13 @@
 package ru.bykov.explore.model.dto.comment;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import ru.bykov.explore.model.dto.event.EventShortDto;
 import ru.bykov.explore.model.dto.user.UserShortDto;
 
-@Getter
-@Setter
-@ToString
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

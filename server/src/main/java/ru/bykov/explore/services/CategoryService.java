@@ -18,7 +18,7 @@ public interface CategoryService {
      * Получение информации о категории по ее идентификатором всеми пользователями.
      * Getting information about a category by its ID by all users.
      */
-    Optional<CategoryDto> findByIdForAllUsers(Long id);
+    CategoryDto findByIdForAllUsers(Long id);
 
     /**
      * Изменение категории администратором.

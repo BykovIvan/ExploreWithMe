@@ -31,15 +31,16 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Optional<CategoryDto> findByIdForAllUsers(Long catId) {
-        Optional<Category> category = categoryRepository.findById(catId);
-        return category.map(CategoryMapper::toCategoryDto);
+    public CategoryDto findByIdForAllUsers(Long catId) {
+        Category category = categoryRepository.findById(catId).orElseThrow(() -> new EntityNotFoundException(Category.class, "id", catId.toString()));
+        return CategoryMapper.toCategoryDto(category);
     }
 
     @Override
     @Transactional
     public CategoryDto updateFromAdmin(CategoryDto categoryDto) {
-        Category category = categoryRepository.findById(categoryDto.getId()).orElseThrow(() -> new EntityNotFoundException(Category.class, "id", categoryDto.getId().toString()));
+        Category category = categoryRepository.findById(categoryDto.getId())
+                .orElseThrow(() -> new EntityNotFoundException(Category.class, "id", categoryDto.getId().toString()));
         category.setName(categoryDto.getName());
         return CategoryMapper.toCategoryDto(categoryRepository.save(category));
     }

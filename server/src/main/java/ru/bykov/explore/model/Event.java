@@ -5,7 +5,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import ru.bykov.explore.utils.EventState;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 import java.time.LocalDateTime;
 
 @Builder
@@ -20,17 +20,23 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @NotNull
+    @NotBlank
+    @Size(min = 1, max = 2000)
     private String annotation;
     @NotNull
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category")
     private Category category;
+    @NotNull
     @Column(name = "confirmed_requests")
     private Long confirmedRequests;
+    @NotNull
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "created_on")
     private LocalDateTime createdOn;
     @NotNull
+    @NotBlank
+    @Size(min = 1, max = 7000)
     private String description;
     @NotNull
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -44,15 +50,22 @@ public class Event {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "location")
     private Location location;
+    @NotNull
     private Boolean paid;
+    @NotNull
+    @PositiveOrZero
     private Long participantLimit;
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "published_on")
     private LocalDateTime publishedOn;
-    private Boolean requestModeration;
     @NotNull
+    private Boolean requestModeration;
     @Enumerated(EnumType.STRING)
     private EventState state;
+    @NotNull
+    @NotBlank
+    @Size(min = 1, max = 120)
     private String title;
+    @NotNull
     private Boolean commentModeration;
 }
