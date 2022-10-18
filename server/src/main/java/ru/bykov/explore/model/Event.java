@@ -5,7 +5,10 @@ import org.springframework.format.annotation.DateTimeFormat;
 import ru.bykov.explore.utils.EventState;
 
 import javax.persistence.*;
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 @Builder

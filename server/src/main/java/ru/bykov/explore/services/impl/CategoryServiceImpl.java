@@ -14,7 +14,6 @@ import ru.bykov.explore.utils.FromSizeSortPageable;
 import ru.bykov.explore.utils.mapperForDto.CategoryMapper;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service

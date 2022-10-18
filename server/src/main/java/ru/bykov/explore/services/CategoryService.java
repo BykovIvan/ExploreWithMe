@@ -4,7 +4,6 @@ import ru.bykov.explore.model.dto.category.CategoryDto;
 import ru.bykov.explore.model.dto.category.NewCategoryDto;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface CategoryService {
 

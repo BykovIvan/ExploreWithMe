@@ -7,7 +7,6 @@ import ru.bykov.explore.model.dto.category.CategoryDto;
 import ru.bykov.explore.services.CategoryService;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @Slf4j
