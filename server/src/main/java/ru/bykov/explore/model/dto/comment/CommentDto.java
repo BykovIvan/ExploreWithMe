@@ -2,9 +2,7 @@ package ru.bykov.explore.model.dto.comment;
 
 import lombok.*;
 
-@Getter
-@Setter
-@ToString
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

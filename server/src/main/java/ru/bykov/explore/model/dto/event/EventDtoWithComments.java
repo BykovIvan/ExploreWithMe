@@ -8,9 +8,7 @@ import ru.bykov.explore.model.dto.user.UserShortDto;
 
 import java.util.List;
 
-@Getter
-@Setter
-@ToString
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

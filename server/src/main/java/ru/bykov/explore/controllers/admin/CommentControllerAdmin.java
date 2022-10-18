@@ -7,6 +7,8 @@ import ru.bykov.explore.model.dto.comment.CommentDto;
 import ru.bykov.explore.model.dto.comment.UpdateCommentByAdmin;
 import ru.bykov.explore.services.CommentService;
 
+import javax.validation.Valid;
+
 @RestController
 @Slf4j
 @RequiredArgsConstructor
@@ -23,7 +25,7 @@ public class CommentControllerAdmin {
 
     @PatchMapping("/{comId}")
     public CommentDto updateComment(@PathVariable("comId") Long comId,
-                                    @RequestBody UpdateCommentByAdmin updateCommentByAdmin) {
+                                    @Valid @RequestBody UpdateCommentByAdmin updateCommentByAdmin) {
         log.info("Получен запрос к эндпоинту /admin/comment/{comId}/publish обновление комментария id = {} администратором. Метод PATCH.", comId);
         return commentService.updateCommentByIdFromAdmin(comId, updateCommentByAdmin);
     }

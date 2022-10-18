@@ -5,9 +5,7 @@ import ru.bykov.explore.model.dto.event.EventShortDto;
 
 import java.util.List;
 
-@Getter
-@Setter
-@ToString
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

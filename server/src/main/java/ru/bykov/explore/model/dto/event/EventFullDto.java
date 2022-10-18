@@ -5,9 +5,7 @@ import ru.bykov.explore.model.Category;
 import ru.bykov.explore.model.dto.LocationDto;
 import ru.bykov.explore.model.dto.user.UserShortDto;
 
-@Getter
-@Setter
-@ToString
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

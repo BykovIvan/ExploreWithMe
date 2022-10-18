@@ -4,9 +4,7 @@ import lombok.*;
 import ru.bykov.explore.model.dto.event.EventShortDto;
 import ru.bykov.explore.model.dto.user.UserShortDto;
 
-@Getter
-@Setter
-@ToString
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

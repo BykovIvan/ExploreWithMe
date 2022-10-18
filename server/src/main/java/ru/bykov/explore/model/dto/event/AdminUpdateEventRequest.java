@@ -3,9 +3,7 @@ package ru.bykov.explore.model.dto.event;
 import lombok.*;
 import ru.bykov.explore.model.dto.LocationDto;
 
-@Getter
-@Setter
-@ToString
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
